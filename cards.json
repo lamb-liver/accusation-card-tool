@@ -1,0 +1,991 @@
+[
+  {
+    "id": "cro01",
+    "name": "第十三夜",
+    "faction": "鴉教團",
+    "type": "教主",
+    "effect": "當你觸發詠頌時，抽1張牌。你的每個回合限一次，棄置你2張手牌，將你棄牌區另外1張牌拿回手。",
+    "symbols": ["夜幕", "知識"]
+  },
+  {
+    "id": "cro02",
+    "name": "黑色葬禮",
+    "faction": "鴉教團",
+    "type": "儀式",
+    "calamity": 3,
+    "effect": "執行儀式。若你擁有(4*凋零)，且你棄牌區有至少4個信徒。",
+    "symbols": ["凋零"]
+  },
+  {
+    "id": "cro03",
+    "name": "群鴉風暴",
+    "faction": "鴉教團",
+    "type": "儀式",
+    "calamity": 1,
+    "effect": "執行儀式。若你場上有至少3個地點。",
+    "symbols": ["夜幕"]
+  },
+  {
+    "id": "cro04",
+    "name": "無聲奉獻",
+    "faction": "鴉教團",
+    "type": "儀式",
+    "calamity": 2,
+    "effect": "執行儀式。若你場上有至少4個夜幕信徒。",
+    "symbols": ["知識"]
+  },
+  {
+    "id": "cro05",
+    "name": "鴉仕女",
+    "faction": "鴉教團",
+    "type": "信徒",
+    "volume": 4,
+    "calamity": 3,
+    "effect": "詠頌：抽1張牌。",
+    "symbols": ["夜幕"]
+  },
+  {
+    "id": "cro06",
+    "name": "鴉司祭",
+    "faction": "鴉教團",
+    "type": "信徒",
+    "volume": 3,
+    "calamity": 3,
+    "effect": "詠頌：將你手牌至多1個信徒放置到你場上，然後觸發該信徒的詠頌效果。",
+    "symbols": ["夜幕", "知識"]
+  },
+  {
+    "id": "cro07",
+    "name": "信使",
+    "faction": "鴉教團",
+    "type": "信徒",
+    "volume": 3,
+    "calamity": 3,
+    "effect": "詠頌：抽1張牌，然後雙方玩家棄置1張手牌。",
+    "symbols": ["夜幕"]
+  },
+  {
+    "id": "cro08",
+    "name": "烏血醫生",
+    "faction": "鴉教團",
+    "type": "信徒",
+    "volume": 3,
+    "calamity": 3,
+    "effect": "詠頌：將場上1個信徒變為罪惡。",
+    "symbols": ["禁忌"]
+  },
+  {
+    "id": "cro09",
+    "name": "失眠掘墓人",
+    "faction": "鴉教團",
+    "type": "信徒",
+    "volume": 3,
+    "calamity": 3,
+    "effect": "詠頌：將你棄牌區1個聲量3以下的信徒拿回手，若你場上有「墓園」，觸發該信徒的詠頌效果。",
+    "symbols": ["凋零"]
+  },
+  {
+    "id": "cro10",
+    "name": "迷路的亡魂",
+    "faction": "鴉教團",
+    "type": "信徒",
+    "volume": 2,
+    "calamity": 2,
+    "effect": "詠頌：破壞敵方場上1個儀式。",
+    "symbols": ["夜幕"]
+  },
+  {
+    "id": "cro11",
+    "name": "割舌的僧侶",
+    "faction": "鴉教團",
+    "type": "信徒",
+    "volume": 3,
+    "calamity": 0,
+    "effect": "這個信徒無法控訴。你每擁有(3*夜幕)，你的魔法災厄增加1。",
+    "symbols": ["禁忌"]
+  },
+  {
+    "id": "cro12",
+    "name": "鐘塔守衛",
+    "faction": "鴉教團",
+    "type": "信徒",
+    "volume": 3,
+    "calamity": 0,
+    "effect": "當這個信徒控訴時，將你棄牌區1個地點拿回手。",
+    "symbols": ["禁忌"]
+  },
+  {
+    "id": "cro13",
+    "name": "灰眼童",
+    "faction": "鴉教團",
+    "type": "信徒",
+    "volume": 5,
+    "calamity": 0,
+    "effect": "當這個信徒控訴時，破壞你場上1個信徒。",
+    "symbols": ["夜幕", "凋零"]
+  },
+  {
+    "id": "cro14",
+    "name": "鴉雛",
+    "faction": "鴉教團",
+    "type": "信徒",
+    "volume": 2,
+    "calamity": 3,
+    "effect": "詠頌：棄置你2張手牌，將你棄牌區另外1張牌拿回手。這個信徒不會變為罪惡。",
+    "symbols": ["知識"]
+  },
+  {
+    "id": "cro15",
+    "name": "黑夫人",
+    "faction": "鴉教團",
+    "type": "信徒",
+    "volume": 3,
+    "calamity": 3,
+    "effect": "詠頌：你每擁有(3*凋零)，目標敵方棄置1張手牌。",
+    "symbols": ["凋零"]
+  },
+  {
+    "id": "cro16",
+    "name": "夜渡橋",
+    "faction": "鴉教團",
+    "type": "地點",
+    "guard": 4,
+    "calamity": 2,
+    "locationType": "橋",
+    "effect": "地點行動：你每擁有(2*禁忌)，破壞場上1個信徒。",
+    "symbols": ["夜幕"]
+  },
+  {
+    "id": "cro17",
+    "name": "鐘塔",
+    "faction": "鴉教團",
+    "type": "地點",
+    "guard": 5,
+    "calamity": 0,
+    "locationType": "聖地",
+    "effect": "雙方信徒控訴後被破壞。",
+    "symbols": ["禁忌"]
+  },
+  {
+    "id": "cro18",
+    "name": "巢修道院",
+    "faction": "鴉教團",
+    "type": "地點",
+    "guard": 5,
+    "calamity": 0,
+    "locationType": "聖地",
+    "effect": "若你擁有(4*知識)，你每回合第一個觸發的詠頌效果結算完後，額外再觸發1次。",
+    "symbols": ["知識"]
+  },
+  {
+    "id": "cro19",
+    "name": "羽墓園",
+    "faction": "鴉教團",
+    "type": "地點",
+    "guard": 6,
+    "calamity": 4,
+    "locationType": "墓園",
+    "effect": "地點行動：你每擁有(1*凋零)，將你棄牌區的1個信徒拿回手，然後破壞這個地點。",
+    "symbols": ["凋零"]
+  },
+  {
+    "id": "cro20",
+    "name": "湖畔墓園",
+    "faction": "鴉教團",
+    "type": "地點",
+    "guard": 4,
+    "calamity": 4,
+    "locationType": "墓園",
+    "effect": "地點行動：你棄牌區每有2個信徒，將你棄牌區1張魔法拿回手，然後破壞這個地點。",
+    "symbols": ["凋零"]
+  },
+  {
+    "id": "cro21",
+    "name": "黯燭",
+    "faction": "鴉教團",
+    "type": "魔法",
+    "stardust": 3,
+    "calamity": 1,
+    "effect": "破壞場上1張非教主牌。星塵效果：這個魔法災厄增加2。",
+    "symbols": ["夜幕"]
+  },
+  {
+    "id": "cro22",
+    "name": "烏骨療法",
+    "faction": "鴉教團",
+    "type": "魔法",
+    "stardust": 2,
+    "calamity": 3,
+    "effect": "解除場上1個信徒的罪惡。星塵效果：可將場上1個信徒變為罪惡。",
+    "symbols": ["禁忌"]
+  },
+  {
+    "id": "cro23",
+    "name": "失聲詛咒",
+    "faction": "鴉教團",
+    "type": "魔法",
+    "stardust": 4,
+    "calamity": 3,
+    "effect": "本回合敵方無法控訴你的詠頌。星塵效果：改為本回合敵方無法控訴。",
+    "symbols": ["禁忌"]
+  },
+  {
+    "id": "cro24",
+    "name": "鳴災",
+    "faction": "鴉教團",
+    "type": "魔法",
+    "stardust": 3,
+    "calamity": 3,
+    "effect": "破壞場上至多2個罪惡信徒。星塵效果：可改為除外場上至多2個罪惡信徒。",
+    "symbols": ["凋零"]
+  },
+  {
+    "id": "fox01",
+    "name": "雪白尾",
+    "faction": "白狐神社",
+    "type": "教主",
+    "effect": "你的執行儀式災厄增加1。你的每個回合限一次，從你棄牌區或牌庫尋找至多1個「荒野」放置到你場上。",
+    "symbols": ["野性", "知識"]
+  },
+  {
+    "id": "fox02",
+    "name": "狐嫁夜",
+    "faction": "白狐神社",
+    "type": "儀式",
+    "calamity": 3,
+    "effect": "執行儀式。若你擁有(5*野性)，並且你場上有「雪白尾」或「祈願之子」。",
+    "symbols": ["夜幕"]
+  },
+  {
+    "id": "fox03",
+    "name": "稻魂祭",
+    "faction": "白狐神社",
+    "type": "儀式",
+    "calamity": 2,
+    "effect": "執行儀式。若你擁有(5*自然)。",
+    "symbols": ["自然"]
+  },
+  {
+    "id": "fox04",
+    "name": "返靈舞",
+    "faction": "白狐神社",
+    "type": "儀式",
+    "calamity": 2,
+    "effect": "執行儀式：若你場上的地點守護總和至少為18。",
+    "symbols": ["知識"]
+  },
+  {
+    "id": "fox05",
+    "name": "神巫",
+    "faction": "白狐神社",
+    "type": "信徒",
+    "volume": 1,
+    "calamity": 4,
+    "effect": "詠頌：你每擁有(2*夜幕)，將你棄牌區1個地點拿回手。",
+    "symbols": ["野性", "知識"]
+  },
+  {
+    "id": "fox06",
+    "name": "神隱修士",
+    "faction": "白狐神社",
+    "type": "信徒",
+    "volume": 3,
+    "calamity": 3,
+    "effect": "詠頌：若你場上有至少2個「聖地」，完成你場上1個儀式，然後破壞你場上1個「聖地」。",
+    "symbols": ["知識"]
+  },
+  {
+    "id": "fox07",
+    "name": "焚香師",
+    "faction": "白狐神社",
+    "type": "信徒",
+    "volume": 2,
+    "calamity": 4,
+    "effect": "詠頌：破壞你場上1個「荒野」，然後破壞對方場上至多2個聲量總和為該「荒野」守護以下的信徒。",
+    "symbols": ["自然"]
+  },
+  {
+    "id": "fox08",
+    "name": "稻草人",
+    "faction": "白狐神社",
+    "type": "信徒",
+    "volume": 2,
+    "effect": "駐守3。你場上的「荒野」不會被襲擊。",
+    "symbols": ["自然"]
+  },
+  {
+    "id": "fox09",
+    "name": "白衣武士",
+    "faction": "白狐神社",
+    "type": "信徒",
+    "volume": 2,
+    "effect": "詠頌：你每擁有(1*夜幕)，這個信徒襲擊聲量增加1。",
+    "symbols": ["夜幕"]
+  },
+  {
+    "id": "fox10",
+    "name": "祈願之子",
+    "faction": "白狐神社",
+    "type": "信徒",
+    "volume": 3,
+    "effect": "駐守2。若你擁有(3*自然)，你場上的儀式不會被破壞與除外。",
+    "symbols": ["野性"]
+  },
+  {
+    "id": "fox11",
+    "name": "燈籠巡遊",
+    "faction": "白狐神社",
+    "type": "信徒",
+    "volume": 2,
+    "calamity": 3,
+    "effect": "詠頌：目標敵方下一回合無法襲擊。駐守2。",
+    "symbols": ["夜幕"]
+  },
+  {
+    "id": "fox12",
+    "name": "面守",
+    "faction": "白狐神社",
+    "type": "信徒",
+    "volume": 2,
+    "effect": "駐守2。你場上每有1個駐守中的信徒，這個信徒控訴聲量增加2。",
+    "symbols": ["夜幕", "野性"]
+  },
+  {
+    "id": "fox13",
+    "name": "狐渡",
+    "faction": "白狐神社",
+    "type": "信徒",
+    "volume": 3,
+    "effect": "雙方場上每有1個「橋」，這個信徒控訴聲量增加2。",
+    "symbols": ["野性"]
+  },
+  {
+    "id": "fox14",
+    "name": "櫻華",
+    "faction": "白狐神社",
+    "type": "信徒",
+    "volume": 1,
+    "effect": "駐守1。這個信徒不會變為罪惡。",
+    "symbols": ["夜幕", "自然"]
+  },
+  {
+    "id": "fox15",
+    "name": "神巫之間",
+    "faction": "白狐神社",
+    "type": "地點",
+    "guard": 5,
+    "calamity": 3,
+    "locationType": "圖書館",
+    "effect": "地點行動：你每擁有(2*知識)，將你場上一個信徒解除罪惡，然後啟動該信徒的駐守效果。",
+    "symbols": ["知識"]
+  },
+  {
+    "id": "fox16",
+    "name": "狐尾橋",
+    "faction": "白狐神社",
+    "type": "地點",
+    "guard": 4,
+    "locationType": "橋",
+    "effect": "你每擁有(3*野性)，你的執行儀式災厄增加1。",
+    "symbols": ["野性"]
+  },
+  {
+    "id": "fox17",
+    "name": "神隱之森",
+    "faction": "白狐神社",
+    "type": "地點",
+    "guard": 3,
+    "locationType": "荒野",
+    "effect": "(沒有任何效果)",
+    "symbols": ["自然", "野性"]
+  },
+  {
+    "id": "fox18",
+    "name": "稻原",
+    "faction": "白狐神社",
+    "type": "地點",
+    "guard": 2,
+    "locationType": "荒野",
+    "effect": "(沒有任何效果)",
+    "symbols": ["自然", "自然", "夜幕"]
+  },
+  {
+    "id": "fox19",
+    "name": "本殿",
+    "faction": "白狐神社",
+    "type": "地點",
+    "guard": 5,
+    "calamity": 3,
+    "locationType": "聖地",
+    "effect": "從你的棄牌區或牌庫尋找至多1個儀式放置到你的場上。",
+    "symbols": ["野性"]
+  },
+  {
+    "id": "fox20",
+    "name": "遺忘神龕",
+    "faction": "白狐神社",
+    "type": "地點",
+    "guard": 5,
+    "calamity": 3,
+    "locationType": "聖地",
+    "effect": "若這個地點守護至少為10，完成你場上一個儀式，然後破壞這個地點。",
+    "symbols": ["夜幕"]
+  },
+  {
+    "id": "fox21",
+    "name": "狐火",
+    "faction": "白狐神社",
+    "type": "魔法",
+    "stardust": 3,
+    "calamity": 3,
+    "effect": "破壞場上1個聲量3以下的信徒。星塵效果：可額外破壞場上1個聲量2以下的信徒。",
+    "symbols": []
+  },
+  {
+    "id": "fox22",
+    "name": "魂燈",
+    "faction": "白狐神社",
+    "type": "魔法",
+    "stardust": 3,
+    "calamity": 4,
+    "effect": "目標敵方可棄置手牌1個信徒，否則隨機棄置一張手牌。星塵效果：將你棄牌區1個信徒拿回手。",
+    "symbols": []
+  },
+  {
+    "id": "fox23",
+    "name": "時雨",
+    "faction": "白狐神社",
+    "type": "魔法",
+    "stardust": 3,
+    "calamity": 4,
+    "effect": "你場上每有2個地點，抽1張牌。星塵效果：破壞你場上所有荒野，然後破壞敵方場上等量信徒。",
+    "symbols": []
+  },
+  {
+    "id": "fox24",
+    "name": "結靈",
+    "faction": "白狐神社",
+    "type": "魔法",
+    "stardust": 2,
+    "calamity": 3,
+    "effect": "你場上每有1個駐守中的信徒，本回合下一次襲擊聲量增加2。星塵效果：以聲量2進行一次襲擊。",
+    "symbols": []
+  },
+  {
+    "id": "dor01",
+    "name": "鑰匙持有人",
+    "faction": "門教團",
+    "type": "教主",
+    "effect": "你的魔法災厄增加1。你的每個回合限1次，獻祭你棄牌區1張魔法。",
+    "symbols": ["煉金", "禁忌"]
+  },
+  {
+    "id": "dor02",
+    "name": "無知對談",
+    "faction": "門教團",
+    "type": "儀式",
+    "calamity": 3,
+    "effect": "執行儀式：若你擁有(6*知識)。",
+    "symbols": ["知識"]
+  },
+  {
+    "id": "dor03",
+    "name": "開啟入口",
+    "faction": "門教團",
+    "type": "儀式",
+    "calamity": 3,
+    "effect": "執行儀式：若你擁有(6*煉金)。",
+    "symbols": ["煉金"]
+  },
+  {
+    "id": "dor04",
+    "name": "門之創造",
+    "faction": "門教團",
+    "type": "儀式",
+    "calamity": 6,
+    "effect": "執行儀式：若你擁有(5*煉金)(5*知識)，並且你的場上有「圖書館」。",
+    "symbols": ["禁忌"]
+  },
+  {
+    "id": "dor05",
+    "name": "瘋狂數學家",
+    "faction": "門教團",
+    "type": "信徒",
+    "volume": 4,
+    "effect": "解構1。",
+    "symbols": ["知識"]
+  },
+  {
+    "id": "dor06",
+    "name": "異象分析師",
+    "faction": "門教團",
+    "type": "信徒",
+    "volume": 3,
+    "effect": "解構1。若你擁有(3*知識)，改為解構2。",
+    "symbols": ["禁忌"]
+  },
+  {
+    "id": "dor07",
+    "name": "門測量員",
+    "faction": "門教團",
+    "type": "信徒",
+    "volume": 1,
+    "calamity": 3,
+    "effect": "詠頌：獻祭你牌庫頂2張牌。",
+    "symbols": ["煉金"]
+  },
+  {
+    "id": "dor08",
+    "name": "失憶的研究員",
+    "faction": "門教團",
+    "type": "信徒",
+    "volume": 2,
+    "effect": "解構1。這個信徒不會變為罪惡。",
+    "symbols": ["凋零"]
+  },
+  {
+    "id": "dor09",
+    "name": "概念術士",
+    "faction": "門教團",
+    "type": "信徒",
+    "volume": 2,
+    "calamity": 3,
+    "effect": "詠頌：將你棄牌區1張魔法拿回手。解構1。",
+    "symbols": ["煉金"]
+  },
+  {
+    "id": "dor10",
+    "name": "資料庫管理員",
+    "faction": "門教團",
+    "type": "信徒",
+    "volume": 3,
+    "calamity": 3,
+    "effect": "詠頌：你場上每有1個「圖書館」，啟動你場上1個非罪惡信徒的解構效果。",
+    "symbols": ["知識"]
+  },
+  {
+    "id": "dor11",
+    "name": "Δ議會博士",
+    "faction": "門教團",
+    "type": "信徒",
+    "volume": 3,
+    "calamity": 4,
+    "effect": "詠頌：將你棄牌區所有儀式放置到場上。",
+    "symbols": ["知識"]
+  },
+  {
+    "id": "dor12",
+    "name": "知罪者",
+    "faction": "門教團",
+    "type": "信徒",
+    "volume": 7,
+    "effect": "當這個信徒變為罪惡時，你可以棄置手牌1張儀式，若沒棄置儀式，則破壞你場上1個儀式。",
+    "symbols": ["凋零"]
+  },
+  {
+    "id": "dor13",
+    "name": "實驗體",
+    "faction": "門教團",
+    "type": "信徒",
+    "volume": 3,
+    "effect": "你場上每有1個解構中的信徒，這個信徒襲擊聲量增加2。這個信徒只能單獨襲擊。",
+    "symbols": ["凋零", "禁忌"]
+  },
+  {
+    "id": "dor14",
+    "name": "未知語言學家",
+    "faction": "門教團",
+    "type": "信徒",
+    "volume": 3,
+    "effect": "若你擁有(4*禁忌)，敵方魔法無法觸發星塵效果。",
+    "symbols": ["知識"]
+  },
+  {
+    "id": "dor15",
+    "name": "上鎖的檔案庫",
+    "faction": "門教團",
+    "type": "地點",
+    "guard": 5,
+    "locationType": "圖書館",
+    "effect": "若你擁有(4*知識)，你的儀式減少1個任意符號需求。",
+    "symbols": ["知識"]
+  },
+  {
+    "id": "dor16",
+    "name": "門物質研究間",
+    "faction": "門教團",
+    "type": "地點",
+    "guard": 5,
+    "calamity": 3,
+    "locationType": "圖書館",
+    "effect": "地點行動：你每擁有(2*凋零)，獻祭你棄牌區1張牌。",
+    "symbols": ["凋零"]
+  },
+  {
+    "id": "dor17",
+    "name": "研究室中庭",
+    "faction": "門教團",
+    "type": "地點",
+    "guard": 4,
+    "calamity": 3,
+    "locationType": "庭院",
+    "effect": "地點行動：你每擁有(2*煉金)，將你場上或棄牌區1個信徒洗回牌庫。",
+    "symbols": ["煉金"]
+  },
+  {
+    "id": "dor18",
+    "name": "增幅管道",
+    "faction": "門教團",
+    "type": "地點",
+    "guard": 4,
+    "locationType": "橋",
+    "effect": "若你擁有(4*凋零)，你每個回合打出的第一張魔法不消耗回合行動。",
+    "symbols": ["凋零"]
+  },
+  {
+    "id": "dor19",
+    "name": "物質瓦解",
+    "faction": "門教團",
+    "type": "魔法",
+    "stardust": 3,
+    "calamity": 1,
+    "effect": "破壞場上1個信徒或地點。星塵效果：改為除外場上1個信徒或地點。",
+    "symbols": []
+  },
+  {
+    "id": "dor20",
+    "name": "現實扭曲",
+    "faction": "門教團",
+    "type": "魔法",
+    "stardust": 5,
+    "calamity": 3,
+    "effect": "敵方下一回合無法執行地點行動。星塵效果：敵方下一回合無法執行儀式。",
+    "symbols": []
+  },
+  {
+    "id": "dor21",
+    "name": "逆向儀式",
+    "faction": "門教團",
+    "type": "魔法",
+    "stardust": 4,
+    "calamity": 2,
+    "effect": "破壞敵方場上一個儀式。星塵效果：若你擁有的(禁忌)數量大於該儀式的災厄，改為除外該儀式。",
+    "symbols": []
+  },
+  {
+    "id": "dor22",
+    "name": "意識轉移",
+    "faction": "門教團",
+    "type": "魔法",
+    "stardust": 4,
+    "calamity": 3,
+    "effect": "獻祭你場上任意數量信徒。星塵效果：你每有3張被獻祭的牌，本回合執行儀式災厄增加1。",
+    "symbols": []
+  },
+  {
+    "id": "dor23",
+    "name": "整理資料",
+    "faction": "門教團",
+    "type": "魔法",
+    "stardust": 4,
+    "calamity": 5,
+    "effect": "棄掉任意數量的手牌，然後抽取等量的牌。星塵效果：將你棄牌區1張牌拿回手。",
+    "symbols": []
+  },
+  {
+    "id": "dor24",
+    "name": "重要的數據",
+    "faction": "門教團",
+    "type": "魔法",
+    "stardust": 2,
+    "calamity": 4,
+    "effect": "獻祭這個魔法。星塵效果：你每擁有(2*煉金)，抽1張牌。",
+    "symbols": []
+  },
+  {
+    "id": "asy01",
+    "name": "院長",
+    "faction": "瘋人院",
+    "type": "教主",
+    "effect": "你的信徒控訴聲量增加1。你的每個回合限1次，將你棄牌區1個聲量2以下的信徒拿回手。",
+    "symbols": ["煉金", "醫藥"]
+  },
+  {
+    "id": "asy02",
+    "name": "切開頭顱",
+    "faction": "瘋人院",
+    "type": "儀式",
+    "calamity": 2,
+    "effect": "執行儀式：若你擁有(5*醫藥)。",
+    "symbols": ["醫藥"]
+  },
+  {
+    "id": "asy03",
+    "name": "辦理出院",
+    "faction": "瘋人院",
+    "type": "儀式",
+    "calamity": 2,
+    "effect": "執行儀式：若你場上有至少5個非罪惡信徒。",
+    "symbols": ["煉金"]
+  },
+  {
+    "id": "asy04",
+    "name": "控訴之夜",
+    "faction": "瘋人院",
+    "type": "儀式",
+    "calamity": 3,
+    "effect": "執行儀式：若你擁有(4*夜幕)，且你場上有至少5個罪惡信徒。",
+    "symbols": ["夜幕"]
+  },
+  {
+    "id": "asy05",
+    "name": "排隊的瘋子",
+    "faction": "瘋人院",
+    "type": "信徒",
+    "volume": 4,
+    "effect": "當這個信徒控訴時，若你擁有(3*凋零)，目標敵方棄置1張手牌。",
+    "symbols": ["凋零"]
+  },
+  {
+    "id": "asy06",
+    "name": "艾德與比利",
+    "faction": "瘋人院",
+    "type": "信徒",
+    "volume": 3,
+    "effect": "解構1。當這個信徒控訴時，若你擁有的(煉金)數量大於(醫藥)，將你棄牌區一張牌拿回手。",
+    "symbols": ["凋零"]
+  },
+  {
+    "id": "asy07",
+    "name": "小丑",
+    "faction": "瘋人院",
+    "type": "信徒",
+    "volume": 0,
+    "effect": "當這個信徒控訴時，除外被這個信徒控訴的非儀式牌。",
+    "symbols": ["夜幕"]
+  },
+  {
+    "id": "asy08",
+    "name": "孤單藝術家",
+    "faction": "瘋人院",
+    "type": "信徒",
+    "volume": 2,
+    "effect": "當這個信徒控訴時，破壞場上1個聲量為雙方場上「聖地」數量以下的信徒。",
+    "symbols": ["煉金"]
+  },
+  {
+    "id": "asy09",
+    "name": "誠實的病患",
+    "faction": "瘋人院",
+    "type": "信徒",
+    "volume": 8,
+    "effect": "當這個信徒控訴時，或是這個信徒變為罪惡時，除外這個信徒。",
+    "symbols": ["煉金"]
+  },
+  {
+    "id": "asy10",
+    "name": "夢遊人",
+    "faction": "瘋人院",
+    "type": "信徒",
+    "volume": 2,
+    "effect": "當你觸發地點行動時，從場上將這個信徒拿回手。這個信徒無法襲擊。這個信徒不會變為罪惡。",
+    "symbols": ["夜幕"]
+  },
+  {
+    "id": "asy11",
+    "name": "數列女士",
+    "faction": "瘋人院",
+    "type": "信徒",
+    "volume": 1,
+    "effect": "解構1。若你場上剛好有1/2/3/4個罪惡信徒，這個信徒的控訴聲量增加2/3/5/8。",
+    "symbols": ["煉金"]
+  },
+  {
+    "id": "asy12",
+    "name": "催眠師",
+    "faction": "瘋人院",
+    "type": "信徒",
+    "volume": 2,
+    "effect": "當你打出災厄4以上的魔法時，將你場上1個信徒拿回手。",
+    "symbols": ["醫藥"]
+  },
+  {
+    "id": "asy13",
+    "name": "實習護士",
+    "faction": "瘋人院",
+    "type": "信徒",
+    "volume": 3,
+    "calamity": 4,
+    "effect": "詠頌：你每擁有(2*凋零)，破壞你場上1個罪惡信徒，然後破壞敵方場上等量信徒。",
+    "symbols": ["醫藥"]
+  },
+  {
+    "id": "asy14",
+    "name": "主治醫生",
+    "faction": "瘋人院",
+    "type": "信徒",
+    "volume": 3,
+    "calamity": 3,
+    "effect": "將你棄牌區1個信徒拿回手。解構1。",
+    "symbols": ["凋零"]
+  },
+  {
+    "id": "asy15",
+    "name": "藥劑師",
+    "faction": "瘋人院",
+    "type": "信徒",
+    "volume": 2,
+    "effect": "你每擁有(3*醫藥)，你的信徒控訴聲量增加1。",
+    "symbols": ["醫藥"]
+  },
+  {
+    "id": "asy16",
+    "name": "手術室",
+    "faction": "瘋人院",
+    "type": "地點",
+    "guard": 6,
+    "locationType": "聖地",
+    "effect": "若你擁有(4*醫藥)，你的信徒控訴後不會變為罪惡。",
+    "symbols": ["醫藥"]
+  },
+  {
+    "id": "asy17",
+    "name": "廢棄電話亭",
+    "faction": "瘋人院",
+    "type": "地點",
+    "guard": 5,
+    "calamity": 4,
+    "locationType": "聖地",
+    "effect": "地點行動：你每擁有(2*夜幕)，敵方獻祭自己場上1個信徒。",
+    "symbols": ["夜幕"]
+  },
+  {
+    "id": "asy18",
+    "name": "瘋人院花園",
+    "faction": "瘋人院",
+    "type": "地點",
+    "guard": 4,
+    "calamity": 4,
+    "locationType": "庭院",
+    "effect": "地點行動：你每擁有(2*凋零)，將你場上1個信徒拿回手。",
+    "symbols": ["凋零"]
+  },
+  {
+    "id": "asy19",
+    "name": "諮商室",
+    "faction": "瘋人院",
+    "type": "地點",
+    "guard": 5,
+    "locationType": "圖書館",
+    "effect": "你每擁有(3*煉金)，你的信徒控訴聲量增加1。",
+    "symbols": ["煉金"]
+  },
+  {
+    "id": "asy20",
+    "name": "狂亂質詢",
+    "faction": "瘋人院",
+    "type": "魔法",
+    "stardust": 3,
+    "calamity": 5,
+    "effect": "雙方破壞自己場上1個信徒。星塵效果：可改為雙方破壞自己場上一半數量的信徒(向下取整)。",
+    "symbols": []
+  },
+  {
+    "id": "asy21",
+    "name": "安眠藥",
+    "faction": "瘋人院",
+    "type": "魔法",
+    "stardust": 3,
+    "calamity": 1,
+    "effect": "雙方場上所有信徒變為罪惡。星塵效果：你每擁有(1*醫藥)，這個魔法的災厄增加1。",
+    "symbols": []
+  },
+  {
+    "id": "asy22",
+    "name": "強制拘束",
+    "faction": "瘋人院",
+    "type": "魔法",
+    "stardust": 2,
+    "calamity": 5,
+    "effect": "附著於場上信徒，該信徒不能襲擊與解除罪惡。星塵效果：該信徒變為罪惡。",
+    "symbols": []
+  },
+  {
+    "id": "asy23",
+    "name": "深度催眠",
+    "faction": "瘋人院",
+    "type": "魔法",
+    "stardust": 3,
+    "calamity": 2,
+    "effect": "附著於敵方場上信徒，該信徒失去效果欄內所有能力。星塵效果：你獲得該信徒的控制權。",
+    "symbols": []
+  },
+  {
+    "id": "asy24",
+    "name": "特殊療法",
+    "faction": "瘋人院",
+    "type": "魔法",
+    "stardust": 3,
+    "calamity": 3,
+    "effect": "雙方獻祭自己場上兩個非罪惡信徒。星塵效果：破壞敵方場上所有至少獻祭3張牌的儀式。",
+    "symbols": []
+  },
+  {
+    "id": "exi01",
+    "name": "斷翅的鴉",
+    "faction": "放逐者",
+    "type": "信徒",
+    "volume": 2,
+    "calamity": 3,
+    "stardust": 1,
+    "effect": "詠頌：抽1張牌，然後棄置你1張手牌。",
+    "symbols": ["夜幕"]
+  },
+  {
+    "id": "exi02",
+    "name": "酒鬼傑克",
+    "faction": "放逐者",
+    "type": "信徒",
+    "volume": 3,
+    "effect": "當這個信徒控訴時，破壞你場上1個信徒。",
+    "symbols": ["凋零"]
+  },
+  {
+    "id": "exi03",
+    "name": "黑尾",
+    "faction": "放逐者",
+    "type": "信徒",
+    "volume": 2,
+    "effect": "雙方執行儀式災厄減少1。",
+    "symbols": ["野性"]
+  },
+  {
+    "id": "exi04",
+    "name": "沼澤女巫",
+    "faction": "放逐者",
+    "type": "信徒",
+    "volume": 1,
+    "effect": "駐守3。這個信徒無法駐守「荒野」。",
+    "symbols": ["自然"]
+  },
+  {
+    "id": "exi05",
+    "name": "竊密者",
+    "faction": "放逐者",
+    "type": "信徒",
+    "volume": 2,
+    "calamity": 3,
+    "stardust": 1,
+    "effect": "詠頌：獻祭你手牌或棄牌區至多1張儀式。",
+    "symbols": ["知識"]
+  },
+  {
+    "id": "exi06",
+    "name": "說謊的病患",
+    "faction": "放逐者",
+    "type": "信徒",
+    "volume": 5,
+    "effect": "當這個信徒控訴時，或是這個信徒變為罪惡時，除外這個信徒。",
+    "symbols": ["煉金"]
+  }
+]
