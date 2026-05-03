@@ -1207,3 +1207,41 @@ input:checked ~ .label-text {
     border-color: transparent;
     outline: 2px solid var(--primary-gold);
 }
+@media screen and (max-width: 768px) {
+    .deck-builder-container:not(.hidden) {
+        display: flex !important;
+        flex-direction: column !important;
+        align-items: center !important;
+        justify-content: center !important;
+        width: 100% !important;
+        padding: 10px 0 !important;
+        margin: 0 !important;
+        overflow-x: hidden !important;
+    }
+
+    .deck-list-section {
+        width: 92% !important;
+        max-width: 500px !important;
+        margin: 0 auto 20px auto !important;
+        padding: 12px !important;
+        flex: none !important;
+        box-sizing: border-box !important;
+        position: relative !important;
+        left: 0 !important;
+    }
+
+    .deck-pool-section {
+        width: 100% !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        display: flex !important;
+        flex-direction: column !important;
+        align-items: center !important;
+    }
+
+    .pool-gallery {
+        width: 92% !important;
+        margin: 0 auto !important;
+        padding: 0 !important;
+    }
+}
