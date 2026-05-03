@@ -409,7 +409,7 @@ function cardHTML(card) {
     return `
     <div class="card" onclick="openModal('${card.id}')" title="${(card.effect || '').substring(0, 100).replace(/"/g, '&quot;')}">
         <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 280'%3E%3Crect width='200' height='280' fill='%23333'/%3E%3C/svg%3E"
-             data-src="images/${card.id}.jpg" class="lazy-img" style="opacity:0.3" alt="${card.name}" loading="lazy">
+             data-src="images/${card.id}.webp" class="lazy-img" style="opacity:0.3" alt="${card.name}" loading="lazy">
         <h3>${card.name}</h3>
         <div>
             <span class="tag">${card.faction}</span>
@@ -509,7 +509,7 @@ function openModal(cardId) {
 
     modalBody.innerHTML = `
         <div class="modal-details">
-            <img src="images/${card.id}.jpg" alt="${card.name}" style="width:100%;border-radius:5px;" onerror="handleImageError(this)">
+            <img src="images/${card.id}.webp" alt="${card.name}" style="width:100%;border-radius:5px;" onerror="handleImageError(this)">
             <h2 id="modalTitle">${card.name}</h2>
             <p>
                 <strong>教團：</strong>${card.faction} |
@@ -847,7 +847,7 @@ function renderDeckPool() {
             <div class="card" style="padding:10px;display:flex;flex-direction:column;justify-content:space-between;height:100%;">
                 <div>
                     <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 280'%3E%3Crect width='200' height='280' fill='%23333'/%3E%3C/svg%3E"
-                         data-src="images/${card.id}.jpg" class="lazy-img" style="opacity:0.3; width:100%; border-radius:5px; cursor:zoom-in;"
+                         data-src="images/${card.id}.webp" class="lazy-img" style="opacity:0.3; width:100%; border-radius:5px; cursor:zoom-in;"
                          onclick="openModal('${card.id}')" onerror="handleImageError(this)">
                     <h4>${card.name}</h4>
                     <div>
@@ -1664,31 +1664,98 @@ function applyDrawerFilters() {
     document.getElementById('drawerBackdrop')?.classList.remove('open');
 }
 
-
-/* ============================================================
- * 常見問題（QA）
- * ============================================================ */
-
 /** QA 資料。 */
 const qaData = [
     {
         category: '通用規則',
         questions: [
             {
-                q: '放逐者（中立卡牌）可以加入任何教團嗎？',
-                a: '是的，放逐者不受單教團或雙教團的規則限制，您可以將它們加入任何牌組中。',
+                q: '解構中的信徒，執行儀式時是否計算其符號？',
+                a: '是，解構中的信徒依然在場上。',
             },
             {
-                q: '教主可以放幾張？',
-                a: '每個牌組不論規則為何，都只能放入 1 張教主，且必須與您的「主要教團」相同。',
+                q: '詠頌效果需計算符號的卡牌，觸發詠頌時是否計算自身符號？',
+                a: '是，用回合行動打出卡牌時，會先放置到場上再觸發詠頌，故會計算自身。',
             },
+            {
+                q: '控訴時效果需計算符號的卡牌，結算時是否計算自身符號？',
+                a: '否，控訴時會先觸發控訴時效果，才放置到場上。',
+            },
+            {
+                q: '獻祭的卡牌，在執行儀式時是否計算其符號？',
+                a: '否，獻祭的卡牌會覆蓋在儀式下，不視為在場上，無符號。',
+            },
+            {
+                q: '效果文本中的「棄置」是玩家選擇，還是隨機？',
+                a: '若文本中無註明「隨機」，即為玩家選擇。',
+            },
+            {
+                q: '同時擁有詠頌及解構（或駐守）的信徒打出且未被控訴時，效果是否同時適用？',
+                a: '是，觸發順序可由玩家自選。',
+            },
+            {
+                q: '發動災厄效果時，在敵方控訴前是否需宣告對象？',
+                a: '否，若未被控訴，於結算效果時再宣告對象即可。',
+            },
+            {
+                q: '教主在場上時，是否視同信徒？（例如計算符號或儀式條件）',
+                a: '否，教主身分並非信徒，不計入任何要求「信徒數量」的條件中。',
+            },
+            {
+                q: '回合結束且滿足儀式條件時，是否可以選擇不執行儀式？',
+                a: '是，可以選擇不執行。',
+            },
+            {
+                q: '回合結束因牌庫為空強制執行儀式，若被控訴是否判敗？',
+                a: '否，遊戲繼續進行。',
+            },
+            {
+                q: '駐守中、解構中的信徒是否可以執行襲擊？',
+                a: '是，但襲擊後會變為「罪惡」，將無法繼續保持駐守或解構狀態。',
+            }
         ],
     },
-    { category: '鴉教團',  questions: [{ q: '待補充', a: '待補充' }] },
-    { category: '白狐神社', questions: [{ q: '待補充', a: '待補充' }] },
-    { category: '瘋人院',  questions: [{ q: '待補充', a: '待補充' }] },
-    { category: '門教團',  questions: [{ q: '待補充', a: '待補充' }] },
-    { category: '放逐者',  questions: [{ q: '待補充', a: '待補充' }] },
+    {
+        category: '鴉教團',
+        questions: [
+            {
+                q: '解構、獻祭是否可以減少《無聲奉獻》的儀式條件？',
+                a: '否，《無聲奉獻》要求的是「信徒數量」而非符號數量。',
+            },
+            {
+                q: '教主《第十三夜》在場時，若信徒詠頌被控訴，是否能觸發抽牌被動？',
+                a: '否，被控訴時不會「觸發詠頌」，故不滿足抽牌條件。',
+            },
+            {
+                q: '透過《鴉司祭》將有駐守或解構效果的信徒放置到場上，是否能使用其駐守/解構效果？',
+                a: '否，除非額外文本註明，否則僅觸發詠頌效果，無法執行駐守或解構。',
+            }
+        ]
+    },
+    {
+        category: '白狐神社',
+        questions: [
+            {
+                q: '《神隱修士》、《遺忘神龕》的「完成儀式」，是否需達成原儀式的執行條件？',
+                a: '否，只要滿足該卡牌自身條件且未被控訴，即可直接完成場上一個儀式。',
+            }
+        ]
+    },
+    {
+        category: '瘋人院',
+        questions: [
+            {
+                q: '棄牌區聲量2的信徒會因教主《院長》被動變為聲量3，導致無法被《院長》快速行動收回嗎？',
+                a: '否，《院長》被動僅增加「控訴聲量」，不影響信徒原始聲量，故仍可收回。',
+            },
+            {
+                q: '打出《安眠藥》時，場上有《催眠師》，效果如何結算？',
+                a: '先結算《催眠師》將1個信徒拿回手（此時災厄已因星辰效果達標），再確認敵方是否控訴。',
+            }
+        ]
+    },
+    { category: '門教團',  questions: [{ q: '目前尚無特定 QA', a: '歡迎補充！' }] },
+    { category: '放逐者',  questions: [{ q: '目前尚無特定 QA', a: '歡迎補充！' }] },
 ];
 
 /** 渲染常見問題頁面。 */
