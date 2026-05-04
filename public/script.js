@@ -348,7 +348,11 @@ function getFilterPredicate() {
 function applyAllFilters() {
     const filtered = mockCards.filter(getFilterPredicate());
     currentFilteredCards = filtered;
-    document.getElementById('resultCount').innerText = filtered.length;
+    if (!cardGallerySection.classList.contains('hidden')) {
+        const countEl = document.getElementById('resultCount');
+        if (countEl) countEl.innerText = filtered.length;
+    }
+
     renderCards(filtered);
     renderDeckPool();
     saveFilters();
@@ -824,6 +828,11 @@ function renderDeckPool() {
 
     // 隱藏已選卡牌
     if (hideSelected) availableCards = availableCards.filter(card => !allDeckIds.includes(card.id));
+
+    if (!deckBuilderSection.classList.contains('hidden')) {
+        const countEl = document.getElementById('resultCount');
+        if (countEl) countEl.innerText = availableCards.length;
+    }
 
     if (!availableCards.length) {
         deckPoolGallery.innerHTML = `<div class="empty-state"><i class="fas fa-database"></i><p>沒有可選的卡牌，請調整篩選或規則</p></div>`;
@@ -1924,7 +1933,14 @@ document.addEventListener('DOMContentLoaded', () => {
             document.getElementById('ruleModal').style.display = 'flex';
             syncDrawerFilters();
         }
+        if (mode === 'gallery') {
+            const countEl = document.getElementById('resultCount');
+            if (countEl) countEl.innerText = currentFilteredCards.length;
+        } else if (mode === 'deck') {
+            renderDeckPool(); 
+        }
     }
+    
     btnGallery.addEventListener('click',      () => switchMode('gallery'));
     btnDeckBuilder.addEventListener('click',  () => switchMode('deck'));
     btnQA.addEventListener('click',           () => switchMode('qa'));
