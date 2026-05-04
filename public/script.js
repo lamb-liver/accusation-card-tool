@@ -521,8 +521,14 @@ function openModal(cardId) {
                 ${card.locationType ? ` | <strong>標記：</strong>${card.locationType}` : ''}
             </p>
             ${getStatsHTML(card)}
-            <div><strong>符號：</strong><br>${symbolTags}</div>
             <div class="effect-text"><strong>效果：</strong><p>${formatEffectWithSymbols(card.effect)}</p></div>
+            
+            ${card.source ? `
+            <div style="margin-top: 10px; font-size: 13px; color: #888; text-align: right; padding-right: 5px;">
+                <i class="fas fa-layer-group"></i> 取得方式：${card.source}
+            </div>
+            ` : ''}
+
             <div style="margin-top:15px;">
                 <button id="modalAddBtn" class="btn-apply-rule" style="width:100%;">＋ 加入牌組</button>
             </div>
