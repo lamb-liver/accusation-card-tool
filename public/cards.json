@@ -228,7 +228,7 @@
     "stardust": 3,
     "calamity": 1,
     "effect": "破壞場上1張非教主牌。星塵效果：這個魔法災厄增加2。",
-    "symbols": []
+    "symbols": ["夜幕"]
   },
   {
     "id": "cro22",
@@ -239,7 +239,7 @@
     "stardust": 2,
     "calamity": 3,
     "effect": "解除場上1個信徒的罪惡。星塵效果：可將場上1個信徒變為罪惡。",
-    "symbols": []
+    "symbols": ["禁忌"]
   },
   {
     "id": "cro23",
@@ -250,7 +250,7 @@
     "stardust": 4,
     "calamity": 3,
     "effect": "本回合敵方無法控訴你的詠頌。星塵效果：改為本回合敵方無法控訴。",
-    "symbols": []
+    "symbols": ["禁忌"]
   },
   {
     "id": "cro24",
@@ -261,7 +261,7 @@
     "stardust": 3,
     "calamity": 3,
     "effect": "破壞場上至多2個罪惡信徒。星塵效果：可改為除外場上至多2個罪惡信徒。",
-    "symbols": []
+    "symbols": ["凋零"]
   },
   {
     "id": "fox01",
@@ -425,6 +425,7 @@
     "type": "地點",
     "source": "夜與序幕",
     "guard": 4,
+    "calamity": 0,
     "locationType": "橋",
     "effect": "你每擁有(3*野性)，你的執行儀式災厄增加1。",
     "symbols": ["野性"]
@@ -436,6 +437,7 @@
     "type": "地點",
     "source": "夜與序幕",
     "guard": 3,
+    "calamity": 0,
     "locationType": "荒野",
     "effect": "(沒有任何效果)",
     "symbols": ["自然", "野性"]
@@ -447,6 +449,7 @@
     "type": "地點",
     "source": "夜與序幕",
     "guard": 2,
+    "calamity": 0,
     "locationType": "荒野",
     "effect": "(沒有任何效果)",
     "symbols": ["自然", "自然", "夜幕"]
@@ -669,6 +672,7 @@
     "type": "地點",
     "source": "知與癲狂",
     "guard": 5,
+    "calamity": 0,
     "locationType": "圖書館",
     "effect": "若你擁有(4*知識)，你的儀式減少1個任意符號需求。",
     "symbols": ["知識"]
@@ -704,6 +708,7 @@
     "type": "地點",
     "source": "知與癲狂",
     "guard": 4,
+    "calamity": 0,
     "locationType": "橋",
     "effect": "若你擁有(4*凋零)，你每個回合打出的第一張魔法不消耗回合行動。",
     "symbols": ["凋零"]
@@ -932,6 +937,7 @@
     "type": "地點",
     "source": "知與癲狂",
     "guard": 6,
+    "calamity": 0,
     "locationType": "聖地",
     "effect": "若你擁有(4*醫藥)，你的信徒控訴後不會變為罪惡。",
     "symbols": ["醫藥"]
@@ -967,6 +973,7 @@
     "type": "地點",
     "source": "知與癲狂",
     "guard": 5,
+    "calamity": 0,
     "locationType": "圖書館",
     "effect": "你每擁有(3*煉金)，你的信徒控訴聲量增加1。",
     "symbols": ["煉金"]
