@@ -228,7 +228,7 @@
     "stardust": 3,
     "calamity": 1,
     "effect": "破壞場上1張非教主牌。星塵效果：這個魔法災厄增加2。",
-    "symbols": ["夜幕"]
+    "symbols": []
   },
   {
     "id": "cro22",
@@ -239,7 +239,7 @@
     "stardust": 2,
     "calamity": 3,
     "effect": "解除場上1個信徒的罪惡。星塵效果：可將場上1個信徒變為罪惡。",
-    "symbols": ["禁忌"]
+    "symbols": []
   },
   {
     "id": "cro23",
@@ -250,7 +250,7 @@
     "stardust": 4,
     "calamity": 3,
     "effect": "本回合敵方無法控訴你的詠頌。星塵效果：改為本回合敵方無法控訴。",
-    "symbols": ["禁忌"]
+    "symbols": []
   },
   {
     "id": "cro24",
@@ -261,7 +261,7 @@
     "stardust": 3,
     "calamity": 3,
     "effect": "破壞場上至多2個罪惡信徒。星塵效果：可改為除外場上至多2個罪惡信徒。",
-    "symbols": ["凋零"]
+    "symbols": []
   },
   {
     "id": "fox01",
