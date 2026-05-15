@@ -78,7 +78,7 @@ define(['./workbox-b1bafff1'], (function (workbox) { 'use strict';
    */
   workbox.precacheAndRoute([{
     "url": "index.html",
-    "revision": "9b5a4a629365376fa756b6e8fc2c18f4"
+    "revision": "409144dfeab4010c9ef86658243d953a"
   }, {
     "url": "icons.svg",
     "revision": "3b4fcfcf393eca4d264dca4a4663bc37"
@@ -86,40 +86,40 @@ define(['./workbox-b1bafff1'], (function (workbox) { 'use strict';
     "url": "favicon.svg",
     "revision": "4ce3d6a00fbf75466e820138fdf80bad"
   }, {
-    "url": "assets/vendor-sortable-Dj4kwqSZ.js",
+    "url": "assets/vendor-sortable-B8WKgBjI.js",
     "revision": null
   }, {
-    "url": "assets/vendor-react-core-CKqLxHG7.js",
+    "url": "assets/vendor-react-core-CeQEEKxp.js",
     "revision": null
   }, {
-    "url": "assets/vendor-icons-C9YHTod0.js",
+    "url": "assets/vendor-icons-eKlxQtzt.js",
     "revision": null
   }, {
     "url": "assets/vendor-html2canvas-ZH4MpR-D.js",
     "revision": null
   }, {
-    "url": "assets/vendor-common-CcWQkuxr.js",
+    "url": "assets/vendor-common-DRstysBs.js",
     "revision": null
   }, {
     "url": "assets/rolldown-runtime-S-ySWqyJ.js",
     "revision": null
   }, {
-    "url": "assets/index-ZQcvQTUH.js",
+    "url": "assets/index-mLQjPXrR.css",
     "revision": null
   }, {
-    "url": "assets/index-Cyyz0hqu.css",
+    "url": "assets/index-DzSUGPUP.js",
     "revision": null
   }, {
     "url": "assets/cardFilter.worker-DMqEKwxU.js",
     "revision": null
   }, {
-    "url": "assets/QASection-rEJyMhKg.js",
+    "url": "assets/QASection-UHhIoZGm.js",
     "revision": null
   }, {
-    "url": "assets/DeckBuilder-BcglwZkI.js",
+    "url": "assets/DeckBuilder-1v3SQaWb.js",
     "revision": null
   }, {
-    "url": "assets/CardModal-C6txmyQj.js",
+    "url": "assets/CardModal-Bfubr94h.js",
     "revision": null
   }, {
     "url": "favicon.svg",

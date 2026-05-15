@@ -85,7 +85,8 @@ src/
 ## 卡牌資料與圖檔
 
 - 每張卡需有 **`public/images/{id}.webp`**（`id` 與 `cards.json` 一致）。
-- 執行 `npm run optimize:images` 可產生多寬度 WebP/AVIF 與 `srcset`（詳見 `scripts/optimize-images.mjs`）。
+- 執行 `npm run optimize:images` 可產生 **160 / 320 / 640** 寬度 WebP/AVIF 與 `srcset`（與 `CARD_GALLERY_SIZES` 對齊，避免 browser 選到過大圖）。
+- 圖示使用 WebP（`optimize:images` 另產 32px AVIF）；頁面背景使用 `images/icons/背景.webp`。
 - **取得方式**欄位使用 `source`（字串）；無則小卡／詳情可不顯示該列。
 
 ## 異畫（alternate art）

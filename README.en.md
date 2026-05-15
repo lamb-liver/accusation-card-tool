@@ -85,7 +85,8 @@ Gallery defaults to 24 cards per page; “show all” with more than 24 results 
 ## Card data & images
 
 - Each card needs **`public/images/{id}.webp`** (`id` must match `cards.json`).
-- Run `npm run optimize:images` to generate multi-width WebP/AVIF and `srcset` (see `scripts/optimize-images.mjs`).
+- Run `npm run optimize:images` to generate **160 / 320 / 640** WebP/AVIF variants and `srcset` (aligned with `CARD_GALLERY_SIZES` so the browser does not over-fetch).
+- Icons use WebP (script also emits 32px AVIF); page background uses `images/icons/背景.webp`.
 - **Acquisition** is stored in `source` (string). If omitted, the acquisition line may be hidden on cards and in the detail modal.
 
 ## Alternate art
