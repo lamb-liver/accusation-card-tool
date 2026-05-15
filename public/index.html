@@ -10,13 +10,23 @@
       content="《控訴》LCG 卡牌查詢、篩選與牌組構築輔助工具。支援教團／符號篩選、異畫切換、牌組匯出與離線瀏覽。"
     />
     <link rel="preload" href="/cards/index.json" as="fetch" crossorigin />
+    <!-- 首屏 LCP：HTML 階段即可發現，不必等 React mount -->
+    <link
+      rel="preload"
+      as="image"
+      type="image/avif"
+      href="/images/cro01-w320.avif"
+      imagesrcset="/images/cro01-w160.avif 160w, /images/cro01-w320.avif 320w, /images/cro01-w640.avif 640w"
+      imagesizes="(max-width: 640px) 42vw, (max-width: 1024px) 180px, 200px"
+      fetchpriority="high"
+    />
     <title>控訴 - 查卡、組牌與常見問題</title>
-    <script type="module" crossorigin src="/assets/index-DzSUGPUP.js"></script>
+    <script type="module" crossorigin src="/assets/index-DItcWrlI.js"></script>
     <link rel="modulepreload" crossorigin href="/assets/rolldown-runtime-S-ySWqyJ.js">
     <link rel="modulepreload" crossorigin href="/assets/vendor-common-DRstysBs.js">
     <link rel="modulepreload" crossorigin href="/assets/vendor-icons-eKlxQtzt.js">
     <link rel="modulepreload" crossorigin href="/assets/vendor-react-core-CeQEEKxp.js">
-    <link rel="stylesheet" crossorigin href="/assets/index-mLQjPXrR.css">
+    <link rel="stylesheet" crossorigin href="/assets/index-CNs8yuZx.css">
   <link rel="manifest" href="/manifest.webmanifest"></head>
   <body>
     <div id="root"></div>
