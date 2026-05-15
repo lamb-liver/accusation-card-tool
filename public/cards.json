@@ -1,6 +1,8 @@
 [
   {
     "id": "cro01",
+    "hasAlternateArt": true,
+    "alternateSource": "預購特典",
     "name": "第十三夜",
     "faction": "鴉教團",
     "type": "教主",
@@ -40,6 +42,8 @@
   },
   {
     "id": "cro05",
+    "hasAlternateArt": true,
+    "alternateSource": "閃卡包",
     "name": "鴉仕女",
     "faction": "鴉教團",
     "type": "信徒",
@@ -84,6 +88,8 @@
   },
   {
     "id": "cro09",
+    "hasAlternateArt": true,
+    "alternateSource": "閃卡包",
     "name": "失眠掘墓人",
     "faction": "鴉教團",
     "type": "信徒",
@@ -117,6 +123,8 @@
   },
   {
     "id": "cro12",
+    "hasAlternateArt": true,
+    "alternateSource": "賽季積分",
     "name": "鐘塔守衛",
     "faction": "鴉教團",
     "type": "信徒",
@@ -139,6 +147,8 @@
   },
   {
     "id": "cro14",
+    "hasAlternateArt": true,
+    "alternateSource": "閃卡包",
     "name": "鴉雛",
     "faction": "鴉教團",
     "type": "信徒",
@@ -228,7 +238,7 @@
     "stardust": 3,
     "calamity": 1,
     "effect": "破壞場上1張非教主牌。星塵效果：這個魔法災厄增加2。",
-    "symbols": []
+    "symbols": ["夜幕"]
   },
   {
     "id": "cro22",
@@ -239,7 +249,7 @@
     "stardust": 2,
     "calamity": 3,
     "effect": "解除場上1個信徒的罪惡。星塵效果：可將場上1個信徒變為罪惡。",
-    "symbols": []
+    "symbols": ["禁忌"]
   },
   {
     "id": "cro23",
@@ -250,7 +260,7 @@
     "stardust": 4,
     "calamity": 3,
     "effect": "本回合敵方無法控訴你的詠頌。星塵效果：改為本回合敵方無法控訴。",
-    "symbols": []
+    "symbols": ["禁忌"]
   },
   {
     "id": "cro24",
@@ -261,10 +271,12 @@
     "stardust": 3,
     "calamity": 3,
     "effect": "破壞場上至多2個罪惡信徒。星塵效果：可改為除外場上至多2個罪惡信徒。",
-    "symbols": []
+    "symbols": ["凋零"]
   },
   {
     "id": "fox01",
+    "hasAlternateArt": true,
+    "alternateSource": "預購特典",
     "name": "雪白尾",
     "faction": "白狐神社",
     "type": "教主",
@@ -304,6 +316,8 @@
   },
   {
     "id": "fox05",
+    "hasAlternateArt": true,
+    "alternateSource": "閃卡包",
     "name": "神巫",
     "faction": "白狐神社",
     "type": "信徒",
@@ -326,6 +340,8 @@
   },
   {
     "id": "fox07",
+    "hasAlternateArt": true,
+    "alternateSource": "賽季積分",
     "name": "焚香師",
     "faction": "白狐神社",
     "type": "信徒",
@@ -347,6 +363,8 @@
   },
   {
     "id": "fox09",
+    "hasAlternateArt": true,
+    "alternateSource": "閃卡包",
     "name": "白衣武士",
     "faction": "白狐神社",
     "type": "信徒",
@@ -357,6 +375,8 @@
   },
   {
     "id": "fox10",
+    "hasAlternateArt": true,
+    "alternateSource": "積分排名獎勵",
     "name": "祈願之子",
     "faction": "白狐神社",
     "type": "信徒",
@@ -367,6 +387,8 @@
   },
   {
     "id": "fox11",
+    "hasAlternateArt": true,
+    "alternateSource": "閃卡包",
     "name": "燈籠巡遊",
     "faction": "白狐神社",
     "type": "信徒",
@@ -524,6 +546,8 @@
   },
   {
     "id": "dor01",
+    "hasAlternateArt": true,
+    "alternateSource": "預購特典",
     "name": "鑰匙持有人",
     "faction": "門教團",
     "type": "教主",
@@ -594,6 +618,8 @@
   },
   {
     "id": "dor08",
+    "hasAlternateArt": true,
+    "alternateSource": "賽季積分",
     "name": "失憶的研究員",
     "faction": "門教團",
     "type": "信徒",
@@ -626,6 +652,8 @@
   },
   {
     "id": "dor11",
+    "hasAlternateArt": true,
+    "alternateSource": "閃卡包",
     "name": "Δ議會博士",
     "faction": "門教團",
     "type": "信徒",
@@ -647,6 +675,8 @@
   },
   {
     "id": "dor13",
+    "hasAlternateArt": true,
+    "alternateSource": "閃卡包",
     "name": "實驗體",
     "faction": "門教團",
     "type": "信徒",
@@ -657,6 +687,8 @@
   },
   {
     "id": "dor14",
+    "hasAlternateArt": true,
+    "alternateSource": "閃卡包",
     "name": "未知語言學家",
     "faction": "門教團",
     "type": "信徒",
@@ -781,6 +813,8 @@
   },
   {
     "id": "asy01",
+    "hasAlternateArt": true,
+    "alternateSource": "預購特典",
     "name": "院長",
     "faction": "瘋人院",
     "type": "教主",
@@ -830,6 +864,8 @@
   },
   {
     "id": "asy06",
+    "hasAlternateArt": true,
+    "alternateSource": "閃卡包",
     "name": "艾德與比利",
     "faction": "瘋人院",
     "type": "信徒",
@@ -840,6 +876,8 @@
   },
   {
     "id": "asy07",
+    "hasAlternateArt": true,
+    "alternateSource": "賽季積分",
     "name": "小丑",
     "faction": "瘋人院",
     "type": "信徒",
@@ -880,6 +918,8 @@
   },
   {
     "id": "asy11",
+    "hasAlternateArt": true,
+    "alternateSource": "閃卡包",
     "name": "數列女士",
     "faction": "瘋人院",
     "type": "信徒",
@@ -911,6 +951,8 @@
   },
   {
     "id": "asy14",
+    "hasAlternateArt": true,
+    "alternateSource": "閃卡包",
     "name": "主治醫生",
     "faction": "瘋人院",
     "type": "信徒",

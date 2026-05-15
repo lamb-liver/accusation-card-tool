@@ -78,13 +78,13 @@ define(['./workbox-b1bafff1'], (function (workbox) { 'use strict';
    */
   workbox.precacheAndRoute([{
     "url": "index.html",
-    "revision": "1471d2636abe3a92cc0c01f7aab2fcfb"
+    "revision": "f26b61694a6c53801c024359ed46eeee"
   }, {
     "url": "icons.svg",
     "revision": "3b4fcfcf393eca4d264dca4a4663bc37"
   }, {
     "url": "favicon.svg",
-    "revision": "7e840862161341271697daa99a40d76b"
+    "revision": "4ce3d6a00fbf75466e820138fdf80bad"
   }, {
     "url": "assets/vendor-react-core-lmBx3MHZ.js",
     "revision": null
@@ -98,14 +98,14 @@ define(['./workbox-b1bafff1'], (function (workbox) { 'use strict';
     "url": "assets/rolldown-runtime-S-ySWqyJ.js",
     "revision": null
   }, {
-    "url": "assets/index-DYZRW8-Y.css",
+    "url": "assets/index-BRXJZrft.js",
     "revision": null
   }, {
-    "url": "assets/index-B4edVUuc.js",
+    "url": "assets/index-BGf8Tns7.css",
     "revision": null
   }, {
     "url": "favicon.svg",
-    "revision": "7e840862161341271697daa99a40d76b"
+    "revision": "4ce3d6a00fbf75466e820138fdf80bad"
   }, {
     "url": "manifest.webmanifest",
     "revision": "8aeb48488a0d7a93c8c2964c02e92965"
