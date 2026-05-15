@@ -78,7 +78,7 @@ define(['./workbox-b1bafff1'], (function (workbox) { 'use strict';
    */
   workbox.precacheAndRoute([{
     "url": "index.html",
-    "revision": "f26b61694a6c53801c024359ed46eeee"
+    "revision": "9b5a4a629365376fa756b6e8fc2c18f4"
   }, {
     "url": "icons.svg",
     "revision": "3b4fcfcf393eca4d264dca4a4663bc37"
@@ -86,22 +86,40 @@ define(['./workbox-b1bafff1'], (function (workbox) { 'use strict';
     "url": "favicon.svg",
     "revision": "4ce3d6a00fbf75466e820138fdf80bad"
   }, {
-    "url": "assets/vendor-react-core-lmBx3MHZ.js",
+    "url": "assets/vendor-sortable-Dj4kwqSZ.js",
     "revision": null
   }, {
-    "url": "assets/vendor-html2canvas-RmJPy6_o.js",
+    "url": "assets/vendor-react-core-CKqLxHG7.js",
     "revision": null
   }, {
-    "url": "assets/vendor-common-BZFbPMOR.js",
+    "url": "assets/vendor-icons-C9YHTod0.js",
+    "revision": null
+  }, {
+    "url": "assets/vendor-html2canvas-ZH4MpR-D.js",
+    "revision": null
+  }, {
+    "url": "assets/vendor-common-CcWQkuxr.js",
     "revision": null
   }, {
     "url": "assets/rolldown-runtime-S-ySWqyJ.js",
     "revision": null
   }, {
-    "url": "assets/index-BRXJZrft.js",
+    "url": "assets/index-ZQcvQTUH.js",
     "revision": null
   }, {
-    "url": "assets/index-BGf8Tns7.css",
+    "url": "assets/index-Cyyz0hqu.css",
+    "revision": null
+  }, {
+    "url": "assets/cardFilter.worker-DMqEKwxU.js",
+    "revision": null
+  }, {
+    "url": "assets/QASection-rEJyMhKg.js",
+    "revision": null
+  }, {
+    "url": "assets/DeckBuilder-BcglwZkI.js",
+    "revision": null
+  }, {
+    "url": "assets/CardModal-C6txmyQj.js",
     "revision": null
   }, {
     "url": "favicon.svg",
@@ -116,10 +134,21 @@ define(['./workbox-b1bafff1'], (function (workbox) { 'use strict';
   }));
   workbox.registerRoute(({
     url
-  }) => /\.webp$/i.test(url.pathname), new workbox.CacheFirst({
+  }) => /\.(?:webp|avif)$/i.test(url.pathname), new workbox.CacheFirst({
     "cacheName": "accusation-webp",
     plugins: [new workbox.ExpirationPlugin({
       maxEntries: 800,
+      maxAgeSeconds: 31536000
+    }), new workbox.CacheableResponsePlugin({
+      statuses: [0, 200]
+    })]
+  }), 'GET');
+  workbox.registerRoute(({
+    url
+  }) => /\.png$/i.test(url.pathname) && /\/images\//i.test(url.pathname), new workbox.CacheFirst({
+    "cacheName": "accusation-png-icons",
+    plugins: [new workbox.ExpirationPlugin({
+      maxEntries: 64,
       maxAgeSeconds: 31536000
     }), new workbox.CacheableResponsePlugin({
       statuses: [0, 200]
@@ -132,6 +161,17 @@ define(['./workbox-b1bafff1'], (function (workbox) { 'use strict';
     plugins: [new workbox.ExpirationPlugin({
       maxEntries: 64,
       maxAgeSeconds: 604800
+    }), new workbox.CacheableResponsePlugin({
+      statuses: [0, 200]
+    })]
+  }), 'GET');
+  workbox.registerRoute(({
+    url
+  }) => url.pathname.endsWith("cards.json") || url.pathname.startsWith("/cards/"), new workbox.StaleWhileRevalidate({
+    "cacheName": "accusation-card-data",
+    plugins: [new workbox.ExpirationPlugin({
+      maxEntries: 4,
+      maxAgeSeconds: 86400
     }), new workbox.CacheableResponsePlugin({
       statuses: [0, 200]
     })]

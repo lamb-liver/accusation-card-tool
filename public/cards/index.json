@@ -1,0 +1,31 @@
+{
+  "version": 1,
+  "total": 102,
+  "shards": [
+    {
+      "key": "cro",
+      "path": "/cards/cro.json",
+      "count": 24
+    },
+    {
+      "key": "fox",
+      "path": "/cards/fox.json",
+      "count": 24
+    },
+    {
+      "key": "dor",
+      "path": "/cards/dor.json",
+      "count": 24
+    },
+    {
+      "key": "asy",
+      "path": "/cards/asy.json",
+      "count": 24
+    },
+    {
+      "key": "exi",
+      "path": "/cards/exi.json",
+      "count": 6
+    }
+  ]
+}
