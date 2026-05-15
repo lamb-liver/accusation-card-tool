@@ -931,6 +931,8 @@
   {
     "id": "asy12",
     "name": "催眠師",
+    "hasAlternateArt": true,
+    "alternateSource": "閃卡包",
     "faction": "瘋人院",
     "type": "信徒",
     "source": "知與癲狂",
@@ -951,8 +953,6 @@
   },
   {
     "id": "asy14",
-    "hasAlternateArt": true,
-    "alternateSource": "閃卡包",
     "name": "主治醫生",
     "faction": "瘋人院",
     "type": "信徒",
