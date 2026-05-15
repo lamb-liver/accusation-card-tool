@@ -1,4 +1,8 @@
-LCG《控訴》的卡牌瀏覽、篩選與牌組構築輔助工具（純前端）。資料來自 `public/cards.json` 與 `public/images/` 下的卡圖。
+# 控訴 — 卡牌查詢與組牌（accusation-v2）
+
+> English: [README.en.md](./README.en.md)
+
+《控訴》LCG（Living Card Game）的卡牌瀏覽、篩選與牌組構築輔助工具（純前端）。資料來自 `public/cards.json` 與 `public/images/` 下的卡圖。
 
 ## 技術棧
 
