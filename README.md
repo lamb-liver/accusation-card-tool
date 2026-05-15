@@ -1,6 +1,4 @@
-> English: [README.en.md](./README.en.md)
-
-桌遊《控訴》的卡牌瀏覽、篩選與牌組構築輔助工具（純前端）。資料來自 `public/cards.json` 與 `public/images/` 下的卡圖。
+LCG《控訴》的卡牌瀏覽、篩選與牌組構築輔助工具（純前端）。資料來自 `public/cards.json` 與 `public/images/` 下的卡圖。
 
 ## 技術棧
 
