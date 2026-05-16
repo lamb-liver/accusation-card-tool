@@ -2,7 +2,7 @@
 
 An unofficial **card search, filter, and deck-building** web app (PWA) for the *Accusation* living card game. Works in the browser and can be installed for offline card lookup and deck editing.
 
-> Community fan tool only—not affiliated with the publisher. Card art and game text remain the property of their respective rights holders.
+> Community fan tool only. Card art and game text remain the property of their respective rights holders.
 
 ## Features
 
