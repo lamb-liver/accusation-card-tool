@@ -1,4 +1,4 @@
-# Accusation (accusation-v2)
+# Accusation (accusation)
 
 An unofficial **card search, filter, and deck-building** web app (PWA) for the *Accusation* living card game. Works in the browser and can be installed for offline card lookup and deck editing.
 
