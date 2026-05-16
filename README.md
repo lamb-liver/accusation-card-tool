@@ -1,119 +1,134 @@
-# 控訴 — 卡牌查詢與組牌（accusation-v2）
+# 控訴（accusation-v2）
 
-> English: [README.en.md](./README.en.md)
+《控訴》Living Card Game 的**卡牌查詢、篩選與牌組構築**輔助 Web App（PWA）。可在瀏覽器使用，安裝後支援離線查卡與組牌。
 
-《控訴》LCG（Living Card Game）的卡牌瀏覽、篩選與牌組構築輔助工具（純前端）。執行時從 `public/cards/` 分片載入卡資料；卡圖位於 `public/images/`。
+> 本工具為玩家社群輔助用途，與官方無關。卡牌圖像與遊戲內容版權屬原權利人所有。
+
+## 功能概覽
+
+| 模式 | 說明 |
+|------|------|
+| **查卡** | 關鍵字、教團、類型、符號、機制等多條件篩選；分頁瀏覽；點擊開啟大圖與完整效果 |
+| **組牌** | 教主／儀式／主牌組分欄；構築規則（單教團、雙教團配額）；拖曳排序主牌；隱藏已選 |
+| **常見問題** | 內建 QA，可摺疊瀏覽 |
+| **匯出** | 文字清單、JSON 備份、牌組截圖（html2canvas） |
+| **異畫** | 支援異畫的卡可切換主圖／異畫（偏好存於 `localStorage`） |
+
+### 進階能力
+
+- **卡牌目錄**：`public/cards/` 分片 JSON + `index.json` 版本號；IndexedDB 快取，冷啟動先載入首個分片（`cro`）以縮短首屏
+- **篩選效能**：卡牌數 ≥ 80 時以 Web Worker 過濾；查卡列表超過 24 張時啟用 `react-window` 虛擬列表
+- **組牌卡池**：手機以 CSS Grid；桌面且卡數 > 24 時虛擬化，避免長列表卡頓
+- **圖片**：AVIF / WebP 響應式 `srcset`（160 / 320 / 640）；首屏 LCP 卡圖 HTML preload
+- **PWA**：Workbox 快取靜態資源、卡牌 JSON 與圖片；`autoUpdate` Service Worker
 
 ## 技術棧
 
-- **React 19** + **Vite 8**
-- **Tailwind CSS 4**
-- **react-window**（長列表虛擬化）
-- **PWA**（`vite-plugin-pwa` / Workbox）
-- **html2canvas**（匯出牌組圖片）
-- **lucide-react**、**SortableJS**
+- [Vite](https://vite.dev/) 8 · [React](https://react.dev/) 19 · [Tailwind CSS](https://tailwindcss.com/) 4
+- [vite-plugin-pwa](https://vite-pwa-org.netlify.app/)（Workbox）· [vite-plugin-compression2](https://github.com/nonzzz/vite-plugin-compression)
+- [react-window](https://github.com/bvaughn/react-window) · [sortablejs](https://sortablejs.github.io/Sortable/) · [lucide-react](https://lucide.dev/)
+- 建置期圖片處理：[sharp](https://sharp.pixelplumbing.com/)
 
-## 開發指令
+## 環境需求
+
+- **Node.js** 20+（建議 LTS）
+- **npm** 10+
+
+## 快速開始
+
+```bash
+git clone <repo-url>
+cd accusation-v2
+
+npm install
+npm run dev          # http://localhost:5173
+```
+
+```bash
+npm run build        # 產出 dist/
+npm run preview      # 預覽 dist/（預設 http://localhost:4173）
+```
+
+## 常用指令
 
 | 指令 | 說明 |
 |------|------|
-| `npm install` | 安裝依賴 |
 | `npm run dev` | 本機開發伺服器 |
-| `npm run build` | 正式建置（輸出至 `dist/`） |
-| `npm run build:ci` | 建置並檢查 PWA service worker |
+| `npm run build` | 正式建置至 `dist/` |
+| `npm run build:ci` | 建置並檢查 PWA `sw.js`（CI） |
+| `npm run build:deploy` | 建置後同步至 `deploy-output/` |
 | `npm run preview` | 預覽建置結果 |
 | `npm run lint` | ESLint |
-| `npm run split:cards` | 由 `public/cards.json` 產生 `public/cards/` 分片與 `index.json` |
-| `npm run optimize:images` | 批次產生 WebP / AVIF 響應式圖（`scripts/optimize-images.mjs`） |
+| `npm run test:rule-engine` | 構築規則單元測試 |
+| `npm run test:card-catalog` | 卡牌目錄載入測試 |
+| `npm run test:deck` | 牌組領域模組測試 |
+| `npm run test:gallery-layout` | 卡池版面估算測試 |
+| `npm run split:cards` | 將 `public/cards.json` 拆成 `public/cards/*.json` |
+| `npm run optimize:images` | 由 master WebP 產生 `-w160` / `-w320` / `-w640` 的 WebP、AVIF |
+| `npm run check:pwa-sw` | 檢查 `dist/sw.js` 是否存在 |
 
-> 編輯卡資料後請執行 `npm run split:cards`，再建置或部署，讓執行時分片與索引同步。
-
-## 專案結構（精簡）
+## 專案結構
 
 ```
-public/
-  cards.json              # 卡資料單一來源（編輯用）
-  cards/
-    index.json            # 分片索引（version、shards）
-    {cro,fox,dor,asy,exi}.json
-  images/{id}.webp        # 主圖；異畫為 {id}alt.webp
-
-src/
-  App.jsx                 # 模式切換、篩選／分頁／組牌編排
-  hooks/
-    useCardData.js        # 分片 fetch + IndexedDB 快取
-    useCardFilters.js     # 搜尋／篩選（Transition、Deferred、Worker）
-    usePagination.js      # 查牌分頁
-    deck/                 # 牌組儲存、規則、匯入匯出
-  workers/
-    cardFilter.worker.js  # 大量卡牌時的背景 filter
-  utils/
-    cardFilterLogic.js    # 篩選邏輯（主執行緒與 Worker 共用）
-    cardCache.js          # IndexedDB 讀寫
-    cardAlternateArt.js   # 異畫路徑、localStorage、同步事件
-    imageHints.js         # preload / idle prefetch
-  components/
-    Card.jsx, CardGallery.jsx, CardModal.jsx
-    common/OptimizedImage.jsx
-    DeckBuilder.jsx, FilterToolbar.jsx, …
+accusation-v2/
+├── public/
+│   ├── cards.json          # 完整卡牌（split:cards 的來源，可選維護）
+│   ├── cards/
+│   │   ├── index.json      # 分片索引與 version
+│   │   ├── cro.json        # 鴉教團等分片
+│   │   └── …
+│   ├── images/             # 卡圖與符號圖示（含響應式 -w* 變體）
+│   └── favicon.svg
+├── scripts/                # 建置、測試、部署、資料腳本
+├── src/
+│   ├── App.jsx             # 殼層：模式切換、資料 hooks、lazy 區塊
+│   ├── components/         # UI（Card、CardGallery、FilterToolbar、deckBuilder/…）
+│   ├── deck/               # 牌組領域（controller、storage、importExport）
+│   ├── rules/              # 構築規則（展示篩選 vs 加入合法性）
+│   ├── hooks/              # useCardData、useDeck、useCardFilters 等
+│   ├── utils/              # cardCatalog、篩選、圖片、LCP preload
+│   ├── workers/            # cardFilter.worker.js
+│   ├── constants/          # 篩選選項、符號、背景主題
+│   └── data/               # qaData.js
+├── index.html              # LCP preload、PWA manifest 連結
+├── vite.config.js          # chunk 分割、PWA、壓縮
+└── package.json
 ```
 
-## 卡牌資料流程
+## 架構備註
 
-1. **編輯**：維護 `public/cards.json`（id、名稱、教團、類型、效果、符號、`source` 等）。
-2. **分片**：`npm run split:cards` 依卡號前綴寫入 `public/cards/*.json` 與 `index.json`。
-3. **執行時載入**（`useCardData`）：
-   - 讀取 `/cards/index.json`，並行 fetch 各分片；
-   - 若 IndexedDB 有相同 `version` 的快取，先顯示快取再背景更新；
-   - PWA Workbox 另以 `StaleWhileRevalidate` 快取 `/cards/` 路徑（離線／二次造訪）。
+- **`src/rules/deckPoolDisplay.js`**：組牌池「顯示哪些卡」（例如 rule2 隱藏次要教團的教主／儀式）
+- **`src/rules/deckBuildValidity.js`**：點擊加入時的合法性（教團、配額、對話框）
+- **`src/deck/createDeckController.js`**：牌組狀態與 UI 回呼的集中入口；`useDeck` 為薄適配層
+- **圖片常數**：`src/utils/cardAlternateArt.js` 的 `CARD_IMAGE_WIDTHS` 須與 `scripts/optimize-images.mjs` 同步
 
-## 效能與 UI 行為
+## 環境變數
 
-| 機制 | 位置 | 說明 |
-|------|------|------|
-| `startTransition` | `useCardFilters` | 搜尋／篩選更新標記為低優先，輸入框不卡頓 |
-| `useDeferredValue` | `useCardFilters` → `App` | 列表用 deferred 結果渲染，捲動較順 |
-| Web Worker | `cardFilter.worker.js` | 卡牌數 ≥ 80 時 filter 在背景執行緒；未就緒前以主執行緒兜底 |
-| 虛擬化 | `CardGallery`（react-window） | 單頁超過 24 張或組牌池強制虛擬化 |
-| `content-visibility` | `index.css` `.card-list-cell` | 視窗外略過 layout/paint（固定列高約 320px） |
-| IndexedDB | `cardCache.js` | 避免每次造訪重複 parse 全部分片 JSON |
-| 圖片 | `OptimizedImage` | AVIF/WebP `<picture>`、Intersection Observer 延遲載入、卸載時清空 `src` 釋放 decode 後 bitmap |
-| PWA 圖片快取 | `vite.config.js` | WebP/AVIF `CacheFirst`；符號等小圖 PNG 另設快取 |
+目前**無必填**環境變數；卡牌與圖片皆由 `public/` 靜態提供。若日後新增，請使用 `VITE_` 前綴並更新 `.env.example`（見 [Vite 環境變數](https://vite.dev/guide/env-and-mode.html)）。
 
-查牌模式預設每頁 24 張；選「顯示全部」且結果 > 24 時啟用虛擬化。篩選條件變更時分頁會回到第 1 頁。
+## 部署
 
-## 卡牌資料與圖檔
+本 repo 為**原始碼**。靜態站點建議流程：
 
-- 每張卡需有 **`public/images/{id}.webp`**（`id` 與 `cards.json` 一致）。
-- 執行 `npm run optimize:images` 可產生 **160 / 320 / 640** 寬度 WebP/AVIF 與 `srcset`（與 `CARD_GALLERY_SIZES` 對齊，避免 browser 選到過大圖）。
-- 圖示使用 WebP（`optimize:images` 另產 32px AVIF）；頁面背景使用 `images/icons/背景.webp`。
-- **取得方式**欄位使用 `source`（字串）；無則小卡／詳情可不顯示該列。
+1. `npm run build:deploy` — 建置 `dist/` 並複製到 `deploy-output/`
+2. 將 `deploy-output/` 內容部署至靜態主機（例如 Cloudflare Pages 用的獨立 repo）
 
-## 異畫（alternate art）
+`dist/` 與 `deploy-output/` 已在 `.gitignore`，不應 commit 進原始碼 repo。
 
-具異畫的卡需在 `cards.json` 該物件上設定：
+## 資料維護
 
-- `hasAlternateArt`: `true`
-- `alternateSource`: 異畫版本專用的「取得方式」說明（字串，必填才會啟用異畫 UI）
+1. **更新卡牌文字**  
+   編輯 `public/cards.json`（或各分片 JSON）→ `npm run split:cards`（若改的是合併檔）→ 遞增 `public/cards/index.json` 的 `version`（觸發客戶端重新抓取）
 
-圖檔慣例：
+2. **新增卡圖**  
+   將 master 圖放入 `public/images/<id>.webp` → `npm run optimize:images` 產生響應式檔名
 
-- 主圖：`public/images/{id}.webp`
-- 異畫：`public/images/{id}alt.webp`（例如 `cro01` → `cro01alt.webp`）
+3. **構築規則**  
+   修改 `src/rules/` 後執行 `npm run test:rule-engine`
 
-使用者在小卡或詳情 modal 以 **`<` `>`** 切換主圖／異畫；偏好儲存在瀏覽器 **localStorage**（鍵名：`accusation-card-art-variant`），同一張卡在不同畫面會同步。
+4. **常見問題**  
+   編輯 `src/data/qaData.js`
 
-小卡右下與 modal 內的「取得方式」會隨主圖／異畫切換顯示 `source` 或 `alternateSource`。
+## 授權與免責
 
-## 匯出牌組圖片
-
-- 匯出 PNG 為牌組內卡圖的網格，**僅卡圖**（無標題列、無每張卡名 overlay）。
-- 有異畫且已標記的卡會依 **localStorage 與畫面相同的版本**（主圖或異畫）輸出；其餘卡固定主圖。
-
-## 授權與資產
-
-卡圖、規則文字等著作權屬原出版／設計方；本 repo 若含卡圖僅供個人／開發用途，請勿用於未經授權之商業散佈。
-
-## 授權（程式碼）
-
-若未另附 `LICENSE`，預設與專案根目錄授權檔一致；無檔案時請視為未宣告開源授權。
+卡牌圖像與遊戲文本版權屬原權利人。《控訴》為其商標或註冊商標（依實際權利人為準）。本倉庫僅提供非官方工具原始碼，不提供卡牌素材的重散布授權。

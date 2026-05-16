@@ -10,6 +10,8 @@
       content="《控訴》LCG 卡牌查詢、篩選與牌組構築輔助工具。支援教團／符號篩選、異畫切換、牌組匯出與離線瀏覽。"
     />
     <link rel="preload" href="/cards/index.json" as="fetch" crossorigin />
+    <!-- LCP：先抓首屏第一分片（cro01 所在），縮短等 React 才能畫出 <img> 的時間 -->
+    <link rel="preload" href="/cards/cro.json" as="fetch" crossorigin />
     <!-- 首屏 LCP：HTML 階段即可發現，不必等 React mount -->
     <link
       rel="preload"
@@ -21,12 +23,12 @@
       fetchpriority="high"
     />
     <title>控訴 - 查卡、組牌與常見問題</title>
-    <script type="module" crossorigin src="/assets/index-CktBFTH8.js"></script>
+    <script type="module" crossorigin src="/assets/index-Cy-mRxl_.js"></script>
     <link rel="modulepreload" crossorigin href="/assets/rolldown-runtime-S-ySWqyJ.js">
-    <link rel="modulepreload" crossorigin href="/assets/vendor-common-DRstysBs.js">
-    <link rel="modulepreload" crossorigin href="/assets/vendor-icons-eKlxQtzt.js">
-    <link rel="modulepreload" crossorigin href="/assets/vendor-react-core-CeQEEKxp.js">
-    <link rel="stylesheet" crossorigin href="/assets/index-CNs8yuZx.css">
+    <link rel="modulepreload" crossorigin href="/assets/vendor-common-Bs4UVh31.js">
+    <link rel="modulepreload" crossorigin href="/assets/vendor-icons-BLXgNvj9.js">
+    <link rel="modulepreload" crossorigin href="/assets/vendor-react-core-CDtdTopj.js">
+    <link rel="stylesheet" crossorigin href="/assets/index-CfOuCX_x.css">
   <link rel="manifest" href="/manifest.webmanifest"></head>
   <body>
     <div id="root"></div>

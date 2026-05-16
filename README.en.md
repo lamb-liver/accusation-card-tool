@@ -1,119 +1,134 @@
-# Accusation — Card Browser & Deck Builder (accusation-v2)
+# Accusation (accusation-v2)
 
-> 中文： [README.md](./README.md)
+An unofficial **card search, filter, and deck-building** web app (PWA) for the *Accusation* living card game. Works in the browser and can be installed for offline card lookup and deck editing.
 
-A frontend-only companion for *Accusation*, a **Living Card Game (LCG)**: browse cards, filter, and build decks. At runtime, card data is loaded from sharded JSON under `public/cards/`; images live in `public/images/`.
+> Community fan tool only—not affiliated with the publisher. Card art and game text remain the property of their respective rights holders.
 
-## Tech stack
+## Features
 
-- **React 19** + **Vite 8**
-- **Tailwind CSS 4**
-- **react-window** (virtualized long lists)
-- **PWA** (`vite-plugin-pwa` / Workbox)
-- **html2canvas** (deck image export)
-- **lucide-react**, **SortableJS**
+| Mode | Description |
+|------|-------------|
+| **Gallery** | Search and filter by name, faction, type, symbols, mechanics; paginated grid; tap for full card detail |
+| **Deck builder** | Leader / rituals / main deck slots; construction rules (single faction, dual-faction quotas); drag-and-drop main deck order; hide already selected |
+| **FAQ** | Built-in Q&A section |
+| **Export** | Text list, JSON backup, deck screenshot (via html2canvas) |
+| **Alternate art** | Toggle main / alt art where available (preference stored in `localStorage`) |
+
+### Technical highlights
+
+- **Card catalog**: sharded JSON under `public/cards/` + versioned `index.json`; IndexedDB cache; cold start loads the first shard (`cro`) early for faster first paint
+- **Filtering**: Web Worker when the catalog has ≥ 80 cards; virtualized gallery via `react-window` when more than 24 cards are shown at once
+- **Deck pool**: CSS Grid on mobile; virtualization on desktop when the pool has more than 24 cards
+- **Images**: responsive AVIF / WebP `srcset` (160 / 320 / 640); HTML preload for the LCP hero card image
+- **PWA**: Workbox caches static assets, card JSON, and images; `autoUpdate` service worker
+
+## Stack
+
+- [Vite](https://vite.dev/) 8 · [React](https://react.dev/) 19 · [Tailwind CSS](https://tailwindcss.com/) 4
+- [vite-plugin-pwa](https://vite-pwa-org.netlify.app/) (Workbox) · [vite-plugin-compression2](https://github.com/nonzzz/vite-plugin-compression)
+- [react-window](https://github.com/bvaughn/react-window) · [sortablejs](https://sortablejs.github.io/Sortable/) · [lucide-react](https://lucide.dev/)
+- Image pipeline: [sharp](https://sharp.pixelplumbing.com/) (build-time)
+
+## Requirements
+
+- **Node.js** 20+ (LTS recommended)
+- **npm** 10+
+
+## Quick start
+
+```bash
+git clone <repo-url>
+cd accusation-v2
+
+npm install
+npm run dev          # http://localhost:5173
+```
+
+```bash
+npm run build        # output to dist/
+npm run preview      # serve dist/ (default http://localhost:4173)
+```
 
 ## Scripts
 
-| Command | Description |
-|---------|-------------|
-| `npm install` | Install dependencies |
-| `npm run dev` | Local dev server |
-| `npm run build` | Production build (output: `dist/`) |
-| `npm run build:ci` | Build and verify PWA service worker |
+| Script | Description |
+|--------|-------------|
+| `npm run dev` | Development server |
+| `npm run build` | Production build → `dist/` |
+| `npm run build:ci` | Build + verify PWA `sw.js` (CI) |
+| `npm run build:deploy` | Build and sync to `deploy-output/` |
 | `npm run preview` | Preview production build |
 | `npm run lint` | ESLint |
-| `npm run split:cards` | Generate `public/cards/` shards and `index.json` from `public/cards.json` |
-| `npm run optimize:images` | Batch WebP / AVIF responsive assets (`scripts/optimize-images.mjs`) |
+| `npm run test:rule-engine` | Deck construction rule tests |
+| `npm run test:card-catalog` | Card catalog loader tests |
+| `npm run test:deck` | Deck domain module tests |
+| `npm run test:gallery-layout` | Gallery layout estimation tests |
+| `npm run split:cards` | Split `public/cards.json` into `public/cards/*.json` |
+| `npm run optimize:images` | Generate `-w160` / `-w320` / `-w640` WebP & AVIF from master WebP |
+| `npm run check:pwa-sw` | Assert `dist/sw.js` exists |
 
-> After editing card data, run `npm run split:cards` before build or deploy so runtime shards stay in sync.
-
-## Project layout (brief)
+## Project layout
 
 ```
-public/
-  cards.json              # Single source of truth (authoring)
-  cards/
-    index.json            # Shard index (version, shards)
-    {cro,fox,dor,asy,exi}.json
-  images/{id}.webp        # Default art; alt: {id}alt.webp
-
-src/
-  App.jsx                 # Modes, filter / pagination / deck wiring
-  hooks/
-    useCardData.js        # Sharded fetch + IndexedDB cache
-    useCardFilters.js     # Search / filters (Transition, Deferred, Worker)
-    usePagination.js      # Gallery pagination
-    deck/                 # Deck storage, rules, import/export
-  workers/
-    cardFilter.worker.js  # Background filtering for large sets
-  utils/
-    cardFilterLogic.js    # Shared filter logic (main thread + worker)
-    cardCache.js          # IndexedDB read/write
-    cardAlternateArt.js   # Alt-art paths, localStorage, sync event
-    imageHints.js         # preload / idle prefetch
-  components/
-    Card.jsx, CardGallery.jsx, CardModal.jsx
-    common/OptimizedImage.jsx
-    DeckBuilder.jsx, FilterToolbar.jsx, …
+accusation-v2/
+├── public/
+│   ├── cards.json          # full catalog (optional source for split:cards)
+│   ├── cards/
+│   │   ├── index.json      # shard manifest + version
+│   │   ├── cro.json        # e.g. Crow faction shard
+│   │   └── …
+│   ├── images/             # card art + symbol icons (responsive -w* variants)
+│   └── favicon.svg
+├── scripts/                # build, test, deploy, data tooling
+├── src/
+│   ├── App.jsx             # shell: modes, data hooks, lazy routes
+│   ├── components/         # UI (Card, CardGallery, FilterToolbar, deckBuilder/…)
+│   ├── deck/               # deck domain (controller, storage, import/export)
+│   ├── rules/              # pool display vs add-to-deck validity
+│   ├── hooks/
+│   ├── utils/              # catalog, filters, images, LCP preload
+│   ├── workers/            # cardFilter.worker.js
+│   ├── constants/
+│   └── data/               # qaData.js
+├── index.html
+├── vite.config.js
+└── package.json
 ```
 
-## Card data workflow
+## Architecture notes
 
-1. **Author** `public/cards.json` (id, name, faction, type, effect, symbols, `source`, etc.).
-2. **Shard** with `npm run split:cards` → `public/cards/*.json` and `index.json` (by id prefix).
-3. **Runtime** (`useCardData`):
-   - Fetch `/cards/index.json`, then shards in parallel;
-   - If IndexedDB has the same `version`, show cache first and revalidate in the background;
-   - PWA Workbox also caches `/cards/` with `StaleWhileRevalidate` for offline / repeat visits.
+- **`src/rules/deckPoolDisplay.js`**: which cards appear in the deck pool (e.g. rule2 hides leader/rituals from the secondary faction)
+- **`src/rules/deckBuildValidity.js`**: whether a card may be added (faction, quotas, prompts)
+- **`src/deck/createDeckController.js`**: deck state hub; `useDeck` is a thin React adapter
+- Keep `CARD_IMAGE_WIDTHS` in `src/utils/cardAlternateArt.js` in sync with `scripts/optimize-images.mjs`
 
-## Performance & UI behavior
+## Environment variables
 
-| Mechanism | Where | Purpose |
-|-----------|--------|---------|
-| `startTransition` | `useCardFilters` | Search / filter updates are non-urgent; typing stays responsive |
-| `useDeferredValue` | `useCardFilters` → `App` | Gallery / deck list render deferred results for smoother scrolling |
-| Web Worker | `cardFilter.worker.js` | Filtering runs off the main thread when card count ≥ 80; sync fallback until ready |
-| Virtualization | `CardGallery` (react-window) | Grid virtualized when page size > 24 or in deck pool |
-| `content-visibility` | `index.css` `.card-list-cell` | Skip layout/paint off-screen (intrinsic row height ~320px) |
-| IndexedDB | `cardCache.js` | Avoid re-parsing all shard JSON on every visit |
-| Images | `OptimizedImage` | AVIF/WebP `<picture>`, Intersection Observer lazy load, clear `src` on unmount to drop decoded bitmaps |
-| PWA image cache | `vite.config.js` | WebP/AVIF `CacheFirst`; small PNG icons cached separately |
+None required today—all data is served from `public/`. For future config, use the `VITE_` prefix and document keys in `.env.example` ([Vite env docs](https://vite.dev/guide/env-and-mode.html)).
 
-Gallery defaults to 24 cards per page; “show all” with more than 24 results enables virtualization. Changing filters resets pagination to page 1.
+## Deployment
 
-## Card data & images
+This repository is **source only**. Suggested static hosting flow:
 
-- Each card needs **`public/images/{id}.webp`** (`id` must match `cards.json`).
-- Run `npm run optimize:images` to generate **160 / 320 / 640** WebP/AVIF variants and `srcset` (aligned with `CARD_GALLERY_SIZES` so the browser does not over-fetch).
-- Icons use WebP (script also emits 32px AVIF); page background uses `images/icons/背景.webp`.
-- **Acquisition** is stored in `source` (string). If omitted, the acquisition line may be hidden on cards and in the detail modal.
+1. `npm run build:deploy` — builds `dist/` and copies to `deploy-output/`
+2. Publish the contents of `deploy-output/` (e.g. a separate repo wired to Cloudflare Pages)
 
-## Alternate art
+`dist/` and `deploy-output/` are gitignored and should not be committed here.
 
-Cards with alternate art must include in `cards.json`:
+## Data maintenance
 
-- `hasAlternateArt`: `true`
-- `alternateSource`: acquisition text for the alt version (string; required for alt-art UI to appear)
+1. **Card text**  
+   Edit `public/cards.json` (or shard files) → run `npm run split:cards` if you changed the merged file → bump `version` in `public/cards/index.json` so clients refetch
 
-File naming:
+2. **New card images**  
+   Add `public/images/<id>.webp` → `npm run optimize:images`
 
-- Default: `public/images/{id}.webp`
-- Alternate: `public/images/{id}alt.webp` (e.g. `cro01` → `cro01alt.webp`)
+3. **Construction rules**  
+   Edit `src/rules/` → `npm run test:rule-engine`
 
-Users switch default / alternate with **`<` `>`** on gallery cards and in the detail modal. The choice is stored in **localStorage** (key: `accusation-card-art-variant`) and stays in sync across views.
+4. **FAQ copy**  
+   Edit `src/data/qaData.js`
 
-The acquisition line on gallery cards and in the modal shows `source` or `alternateSource` depending on the active art.
+## License & disclaimer
 
-## Deck image export
-
-- Exported PNG is a grid of card images **only** (no title bar, no per-card name overlay).
-- Cards with alternate art use the **same version as localStorage / the UI** (default or alt); all others use default art.
-
-## Assets & copyright
-
-Card art and rules text belong to the original publisher / designers. Images in this repo are for personal or development use only; do not redistribute commercially without permission.
-
-## License (source code)
-
-Unless a `LICENSE` file is present at the repo root, source licensing is unspecified.
+Card images and game text belong to their rights holders. *Accusation* is a trademark of the respective owner(s). This repo ships tool source code only—not a license to redistribute official card assets.

@@ -78,7 +78,7 @@ define(['./workbox-b1bafff1'], (function (workbox) { 'use strict';
    */
   workbox.precacheAndRoute([{
     "url": "index.html",
-    "revision": "be69425c94f3845557764212dc71e0c7"
+    "revision": "e6829bdbe90947255b593816cea089f5"
   }, {
     "url": "icons.svg",
     "revision": "3b4fcfcf393eca4d264dca4a4663bc37"
@@ -89,37 +89,37 @@ define(['./workbox-b1bafff1'], (function (workbox) { 'use strict';
     "url": "assets/vendor-sortable-B8WKgBjI.js",
     "revision": null
   }, {
-    "url": "assets/vendor-react-core-CeQEEKxp.js",
+    "url": "assets/vendor-react-core-CDtdTopj.js",
     "revision": null
   }, {
-    "url": "assets/vendor-icons-eKlxQtzt.js",
+    "url": "assets/vendor-icons-BLXgNvj9.js",
     "revision": null
   }, {
     "url": "assets/vendor-html2canvas-ZH4MpR-D.js",
     "revision": null
   }, {
-    "url": "assets/vendor-common-DRstysBs.js",
+    "url": "assets/vendor-common-Bs4UVh31.js",
     "revision": null
   }, {
     "url": "assets/rolldown-runtime-S-ySWqyJ.js",
     "revision": null
   }, {
-    "url": "assets/index-CktBFTH8.js",
+    "url": "assets/index-Cy-mRxl_.js",
     "revision": null
   }, {
-    "url": "assets/index-CNs8yuZx.css",
+    "url": "assets/index-CfOuCX_x.css",
     "revision": null
   }, {
     "url": "assets/cardFilter.worker-DMqEKwxU.js",
     "revision": null
   }, {
-    "url": "assets/QASection-UHhIoZGm.js",
+    "url": "assets/QASection-BzWGVSrL.js",
     "revision": null
   }, {
-    "url": "assets/DeckBuilder-Ddn74WVu.js",
+    "url": "assets/DeckBuilder-CFjfnOmH.js",
     "revision": null
   }, {
-    "url": "assets/CardModal-wZ5jBPjp.js",
+    "url": "assets/CardModal-C8727-1o.js",
     "revision": null
   }, {
     "url": "favicon.svg",
