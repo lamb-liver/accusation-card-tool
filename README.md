@@ -1,4 +1,4 @@
-# 控訴（accusation-v2）
+# 控訴（accusation）
 
 《控訴》Living Card Game 的**卡牌查詢、篩選與牌組構築**輔助 Web App（PWA）。可在瀏覽器使用，安裝後支援離線查卡與組牌。
 
