@@ -2,7 +2,7 @@
 
 《控訴》Living Card Game 的**卡牌查詢、篩選與牌組構築**輔助 Web App（PWA）。可在瀏覽器使用，安裝後支援離線查卡與組牌。
 
-> 本工具為玩家社群輔助用途，與官方無關。卡牌圖像與遊戲內容版權屬原權利人所有。
+> 本工具為玩家社群輔助用途，卡牌圖像與遊戲內容版權屬原權利人所有。
 
 ## 功能概覽
 
@@ -18,7 +18,8 @@
 
 - **卡牌目錄**：`public/cards/` 分片 JSON + `index.json` 版本號；IndexedDB 快取，冷啟動先載入首個分片（`cro`）以縮短首屏
 - **篩選效能**：卡牌數 ≥ 80 時以 Web Worker 過濾；查卡列表超過 24 張時啟用 `react-window` 虛擬列表
-- **組牌卡池**：手機以 CSS Grid；桌面且卡數 > 24 時虛擬化，避免長列表卡頓
+- **組牌卡池**：卡數 > 24 時一律虛擬化（含手機）；`flex` 版面鎖定 viewport，僅卡池／牌組欄內滾動
+- **開發除錯**：組牌模式啟用 `useLayoutInvariant()`（dev only，違規時 console / overlay / 節點高亮）
 - **圖片**：AVIF / WebP 響應式 `srcset`（160 / 320 / 640）；首屏 LCP 卡圖 HTML preload
 - **PWA**：Workbox 快取靜態資源、卡牌 JSON 與圖片；`autoUpdate` Service Worker
 
@@ -63,6 +64,8 @@ npm run preview      # 預覽 dist/（預設 http://localhost:4173）
 | `npm run test:card-catalog` | 卡牌目錄載入測試 |
 | `npm run test:deck` | 牌組領域模組測試 |
 | `npm run test:gallery-layout` | 卡池版面估算測試 |
+| `npm run test:deck-layout` | 組牌模式 viewport／scroll 容器 Playwright 斷言 |
+| `npm run audit:deck-layout` | 組牌版面詳細 dump（除錯用） |
 | `npm run split:cards` | 將 `public/cards.json` 拆成 `public/cards/*.json` |
 | `npm run optimize:images` | 由 master WebP 產生 `-w160` / `-w320` / `-w640` 的 WebP、AVIF |
 | `npm run check:pwa-sw` | 檢查 `dist/sw.js` 是否存在 |
@@ -85,7 +88,8 @@ accusation-v2/
 │   ├── components/         # UI（Card、CardGallery、FilterToolbar、deckBuilder/…）
 │   ├── deck/               # 牌組領域（controller、storage、importExport）
 │   ├── rules/              # 構築規則（展示篩選 vs 加入合法性）
-│   ├── hooks/              # useCardData、useDeck、useCardFilters 等
+│   ├── hooks/              # useCardData、useDeck、useLayoutInvariant 等
+│   ├── dev/                # 僅開發建置（layout invariant 檢查）
 │   ├── utils/              # cardCatalog、篩選、圖片、LCP preload
 │   ├── workers/            # cardFilter.worker.js
 │   ├── constants/          # 篩選選項、符號、背景主題
@@ -131,4 +135,4 @@ accusation-v2/
 
 ## 授權與免責
 
-卡牌圖像與遊戲文本版權屬原權利人。《控訴》為其商標或註冊商標（依實際權利人為準）。本倉庫僅提供非官方工具原始碼，不提供卡牌素材的重散布授權。
+本工具為玩家社群輔助用途，卡牌圖像與遊戲內容版權屬原權利人所有。本倉庫僅提供工具原始碼，不提供卡牌素材的重散布授權。

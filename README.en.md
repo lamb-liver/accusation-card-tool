@@ -2,7 +2,7 @@
 
 An unofficial **card search, filter, and deck-building** web app (PWA) for the *Accusation* living card game. Works in the browser and can be installed for offline card lookup and deck editing.
 
-> Community fan tool only—not affiliated with the publisher. Card art and game text remain the property of their respective rights holders.
+> This tool is for community fan support. Card images and game content copyright belong to the respective rights holders.
 
 ## Features
 
@@ -18,7 +18,8 @@ An unofficial **card search, filter, and deck-building** web app (PWA) for the *
 
 - **Card catalog**: sharded JSON under `public/cards/` + versioned `index.json`; IndexedDB cache; cold start loads the first shard (`cro`) early for faster first paint
 - **Filtering**: Web Worker when the catalog has ≥ 80 cards; virtualized gallery via `react-window` when more than 24 cards are shown at once
-- **Deck pool**: CSS Grid on mobile; virtualization on desktop when the pool has more than 24 cards
+- **Deck pool**: virtualized when the pool has more than 24 cards (including mobile); flex layout locks the viewport—only the pool and deck panels scroll
+- **Dev tooling**: `useLayoutInvariant()` in deck mode (dev only—console warn, overlay, and node highlight on violations)
 - **Images**: responsive AVIF / WebP `srcset` (160 / 320 / 640); HTML preload for the LCP hero card image
 - **PWA**: Workbox caches static assets, card JSON, and images; `autoUpdate` service worker
 
@@ -63,6 +64,8 @@ npm run preview      # serve dist/ (default http://localhost:4173)
 | `npm run test:card-catalog` | Card catalog loader tests |
 | `npm run test:deck` | Deck domain module tests |
 | `npm run test:gallery-layout` | Gallery layout estimation tests |
+| `npm run test:deck-layout` | Playwright assertions for deck viewport / scroll containers |
+| `npm run audit:deck-layout` | Verbose deck layout dump (debugging) |
 | `npm run split:cards` | Split `public/cards.json` into `public/cards/*.json` |
 | `npm run optimize:images` | Generate `-w160` / `-w320` / `-w640` WebP & AVIF from master WebP |
 | `npm run check:pwa-sw` | Assert `dist/sw.js` exists |
@@ -85,7 +88,8 @@ accusation-v2/
 │   ├── components/         # UI (Card, CardGallery, FilterToolbar, deckBuilder/…)
 │   ├── deck/               # deck domain (controller, storage, import/export)
 │   ├── rules/              # pool display vs add-to-deck validity
-│   ├── hooks/
+│   ├── hooks/              # useCardData, useDeck, useLayoutInvariant, …
+│   ├── dev/                # dev-build only (layout invariant checks)
 │   ├── utils/              # catalog, filters, images, LCP preload
 │   ├── workers/            # cardFilter.worker.js
 │   ├── constants/
@@ -131,4 +135,4 @@ This repository is **source only**. Suggested static hosting flow:
 
 ## License & disclaimer
 
-Card images and game text belong to their rights holders. *Accusation* is a trademark of the respective owner(s). This repo ships tool source code only—not a license to redistribute official card assets.
+This tool is for community fan support. Card images and game content copyright belong to the respective rights holders. This repository ships tool source code only—not a license to redistribute official card assets.
