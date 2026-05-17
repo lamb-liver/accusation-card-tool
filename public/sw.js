@@ -78,7 +78,7 @@ define(['./workbox-b1bafff1'], (function (workbox) { 'use strict';
    */
   workbox.precacheAndRoute([{
     "url": "index.html",
-    "revision": "fe28caf4cf75ebadb27f71dc58cfe1f9"
+    "revision": "068c3ea17aa77d1de4423a0f80851ba5"
   }, {
     "url": "icons.svg",
     "revision": "3b4fcfcf393eca4d264dca4a4663bc37"
@@ -107,7 +107,7 @@ define(['./workbox-b1bafff1'], (function (workbox) { 'use strict';
     "url": "assets/index-CT-K8DLy.css",
     "revision": null
   }, {
-    "url": "assets/index-Bhk7zW7a.js",
+    "url": "assets/index-BL07KXTb.js",
     "revision": null
   }, {
     "url": "assets/cardFilter.worker-DMqEKwxU.js",
@@ -116,10 +116,10 @@ define(['./workbox-b1bafff1'], (function (workbox) { 'use strict';
     "url": "assets/QASection-BzWGVSrL.js",
     "revision": null
   }, {
-    "url": "assets/DeckBuilder-NEwcp-Si.js",
+    "url": "assets/DeckBuilder-e08jXlkH.js",
     "revision": null
   }, {
-    "url": "assets/CardModal-DX1TEoBn.js",
+    "url": "assets/CardModal-D5VNWCD6.js",
     "revision": null
   }, {
     "url": "favicon.svg",
