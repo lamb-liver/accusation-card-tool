@@ -2,6 +2,8 @@ name: Push Commit to Deploy Repo
 
 on:
   workflow_dispatch:
+  schedule:
+    - cron: '0 0 * * 1' # 每週一早上 8:00 (台灣時間) 自動執行
 
 jobs:
   push-commit:
