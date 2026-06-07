@@ -1,0 +1,162 @@
+{
+  "generatedAt": "2026-05-31T21:55:31.232Z",
+  "baseUrl": "http://localhost:4173/",
+  "runId": "531232",
+  "journeys": [
+    {
+      "width": 390,
+      "status": "completed",
+      "galleryMetrics": {
+        "scrollWidth": 390,
+        "clientWidth": 390,
+        "bodyScrollHeight": 5848,
+        "viewportHeight": 844,
+        "horizontalOverflow": false,
+        "overflowNodes": [],
+        "activeMode": "查牌模式",
+        "deckSheetExpanded": false,
+        "visibleTextSample": "控訴-查卡＆組牌＆QA\n查牌模式\n組牌模式\n常見問題\n篩選條件\n搜尋卡名或效果\n\n教團\n\n所有教團\n\n種類\n\n所有種類\n\n符號\n\n所有符號\n\n效果關鍵字\n\n所有效果關鍵字\n套用篩選\n\n找到 102 張符合條件的卡片\n\n第十三夜\n\n鴉教團\n教主\n夜幕\n知識\n取得方式：夜與序幕\n異畫\n\n黑色葬禮\n\n鴉教團\n儀式\n凋零\n災厄\n3\n取得方式：夜與序幕\n\n群鴉風暴\n\n鴉教團\n儀式\n夜幕\n災厄\n1\n取得方式：夜與序幕\n\n無聲奉獻\n\n鴉教團\n儀式\n知識\n災厄\n2\n取得方式：夜與序幕\n\n鴉仕女\n\n鴉教團\n信徒\n夜幕\n聲量\n4\n災厄\n3\n取得方式：夜與序幕\n異畫\n\n鴉司祭\n\n鴉教團\n信徒\n夜幕\n知識\n聲量\n3\n災厄\n3\n取得方式：夜與序幕\n\n信使\n\n鴉教團\n信徒\n夜幕\n聲量\n3\n災厄\n3\n取得方式：夜與序幕\n\n烏血醫生\n\n鴉教團\n信徒\n禁忌\n聲量\n3\n災厄\n3\n取得方式：夜與序幕\n\n失眠掘墓人\n\n鴉教團\n信徒\n凋零\n聲量\n3\n災厄\n3\n取得方式：夜與序幕\n異畫\n\n迷路的亡魂\n\n鴉教團\n信徒\n夜幕\n聲量\n2\n災厄\n2\n取得方式：夜與序幕\n\n割舌的僧侶\n\n鴉教團\n信徒\n禁忌\n聲量\n3\n災厄\n0\n取得方式：夜與序幕\n\n鐘塔守衛\n\n鴉教團\n信徒\n禁忌\n聲量\n3\n災厄\n0\n取得方式：夜與序幕\n異畫\n\n灰眼童\n\n鴉教團\n信徒\n夜幕\n凋零\n聲量\n5\n災厄\n0\n取得方式：夜與序幕\n\n鴉雛\n\n鴉教團\n信徒\n知識\n聲量"
+      },
+      "deckInitialMetrics": {
+        "scrollWidth": 390,
+        "clientWidth": 390,
+        "bodyScrollHeight": 1075,
+        "viewportHeight": 844,
+        "horizontalOverflow": false,
+        "overflowNodes": [],
+        "activeMode": "組牌模式",
+        "deckSheetExpanded": false,
+        "visibleTextSample": "控訴-查卡＆組牌＆QA\n查牌模式\n組牌模式\n常見問題\n篩選條件\n搜尋卡名或效果\n\n教團\n\n所有教團\n\n種類\n\n所有種類\n\n符號\n\n所有符號\n\n效果關鍵字\n\n所有效果關鍵字\n套用篩選\n我的牌組\n0/24\n\n構築規則\n\n規則一\n單一教團\n規則二\n主＋次教團\n\n主牌組限同一教團，搭配中立（放逐者）卡。主牌組上限 20 張。\n\n主要教團\n\n── 請選擇主要教團 ──\n\n次要教團\n\n── 請選擇次要教團 ──\n套用規則並過濾卡池\n清空牌組\n重置規則\n教主 (0/1)\n無卡片\n儀式 (0/3)\n無卡片\n主牌組 (0/20)\n無卡片\n牌組管理\n儲存\n\n尚無儲存的牌組\n\n複製牌組清單\n匯出備份(JSON)\n匯出牌組圖片\n匯入牌組\n可選卡牌池\n隱藏已選\n\n共 102 張可選 · 在列表內捲動瀏覽\n\n第十三夜\n\n鴉教團\n教主\n夜幕\n知識\n異畫\n加入\n\n黑色葬禮\n\n鴉教團\n儀式\n凋零\n災厄\n3\n加入\n\n群鴉風暴\n\n鴉教團\n儀式\n夜幕\n災厄\n1\n加入\n\n無聲奉獻\n\n鴉教團\n儀式\n知識\n災厄\n2\n加入\n\n鴉仕女\n\n鴉教團\n信徒\n夜幕\n聲量\n4\n災厄\n3\n異畫\n加入\n\n鴉司祭\n\n鴉教團\n信徒\n夜幕\n知識\n聲量\n3\n災厄\n3\n加入\nLine 社群\nDiscord 頻道\n工作室粉專\n下載規則書\n\n© 愚人古堡工作室 | 版權所有\n\nWebsite Developed by 羊肝"
+      },
+      "savedBeforeReload": 2,
+      "savedAfterReload": 1,
+      "exportedJsonValid": true,
+      "exportedJsonSize": 208,
+      "jsonImportSucceeded": false,
+      "oldFormatInputValue": "【控訴】牌組清單 儀式（1/3）   · 黑色葬禮（鴉教團）",
+      "oldFormatInputPreservedNewlines": false,
+      "oldImportSucceeded": false,
+      "oldImportFailed": true,
+      "finalMetrics": {
+        "scrollWidth": 390,
+        "clientWidth": 390,
+        "bodyScrollHeight": 1075,
+        "viewportHeight": 844,
+        "horizontalOverflow": false,
+        "overflowNodes": [],
+        "activeMode": "組牌模式",
+        "deckSheetExpanded": true,
+        "visibleTextSample": "控訴-查卡＆組牌＆QA\n查牌模式\n組牌模式\n常見問題\n篩選條件\n搜尋卡名或效果\n\n教團\n\n所有教團\n\n種類\n\n所有種類\n\n符號\n\n所有符號\n\n效果關鍵字\n\n所有效果關鍵字\n套用篩選\n我的牌組\n0/24\n\n構築規則\n\n規則一\n單一教團\n規則二\n主＋次教團\n\n主牌組限同一教團，搭配中立（放逐者）卡。主牌組上限 20 張。\n\n主要教團\n\n鴉教團\n\n次要教團\n\n── 請選擇次要教團 ──\n套用中：\n鴉教團 單教團\n套用規則並過濾卡池\n清空牌組\n重置規則\n\n教團配額進度：\n\n鴉教團\n\n0/20\n\n教主 (0/1)\n無卡片\n儀式 (0/3)\n無卡片\n主牌組 (0/20)\n無卡片\n牌組管理\n儲存\nmobile-390-531232\n載入\n刪除\n複製牌組清單\n匯出備份(JSON)\n匯出牌組圖片\n匯入牌組\n可選卡牌池\n隱藏已選\n\n共 30 張可選 · 在列表內捲動瀏覽\n\n第十三夜\n\n鴉教團\n教主\n夜幕\n知識\n異畫\n加入\n\n黑色葬禮\n\n鴉教團\n儀式\n凋零\n災厄\n3\n加入\n\n群鴉風暴\n\n鴉教團\n儀式\n夜幕\n災厄\n1\n加入\n\n無聲奉獻\n\n鴉教團\n儀式\n知識\n災厄\n2\n加入\n\n鴉仕女\n\n鴉教團\n信徒\n夜幕\n聲量\n4\n災厄\n3\n異畫\n加入\n\n鴉司祭\n\n鴉教團\n信徒\n夜幕\n知識\n聲量\n3\n災厄\n3\n加入\nLine 社群\nDiscord 頻道\n工作室粉專\n下載規則書\n\n© 愚人古堡工作室 | 版權所有\n\nWebs"
+      },
+      "consoleWarningsAndErrors": [],
+      "requestFailures": []
+    },
+    {
+      "width": 430,
+      "status": "completed",
+      "galleryMetrics": {
+        "scrollWidth": 430,
+        "clientWidth": 430,
+        "bodyScrollHeight": 6149,
+        "viewportHeight": 844,
+        "horizontalOverflow": false,
+        "overflowNodes": [],
+        "activeMode": "查牌模式",
+        "deckSheetExpanded": false,
+        "visibleTextSample": "控訴-查卡＆組牌＆QA\n查牌模式\n組牌模式\n常見問題\n篩選條件\n搜尋卡名或效果\n\n教團\n\n所有教團\n\n種類\n\n所有種類\n\n符號\n\n所有符號\n\n效果關鍵字\n\n所有效果關鍵字\n套用篩選\n\n找到 102 張符合條件的卡片\n\n第十三夜\n\n鴉教團\n教主\n夜幕\n知識\n取得方式：夜與序幕\n異畫\n\n黑色葬禮\n\n鴉教團\n儀式\n凋零\n災厄\n3\n取得方式：夜與序幕\n\n群鴉風暴\n\n鴉教團\n儀式\n夜幕\n災厄\n1\n取得方式：夜與序幕\n\n無聲奉獻\n\n鴉教團\n儀式\n知識\n災厄\n2\n取得方式：夜與序幕\n\n鴉仕女\n\n鴉教團\n信徒\n夜幕\n聲量\n4\n災厄\n3\n取得方式：夜與序幕\n異畫\n\n鴉司祭\n\n鴉教團\n信徒\n夜幕\n知識\n聲量\n3\n災厄\n3\n取得方式：夜與序幕\n\n信使\n\n鴉教團\n信徒\n夜幕\n聲量\n3\n災厄\n3\n取得方式：夜與序幕\n\n烏血醫生\n\n鴉教團\n信徒\n禁忌\n聲量\n3\n災厄\n3\n取得方式：夜與序幕\n\n失眠掘墓人\n\n鴉教團\n信徒\n凋零\n聲量\n3\n災厄\n3\n取得方式：夜與序幕\n異畫\n\n迷路的亡魂\n\n鴉教團\n信徒\n夜幕\n聲量\n2\n災厄\n2\n取得方式：夜與序幕\n\n割舌的僧侶\n\n鴉教團\n信徒\n禁忌\n聲量\n3\n災厄\n0\n取得方式：夜與序幕\n\n鐘塔守衛\n\n鴉教團\n信徒\n禁忌\n聲量\n3\n災厄\n0\n取得方式：夜與序幕\n異畫\n\n灰眼童\n\n鴉教團\n信徒\n夜幕\n凋零\n聲量\n5\n災厄\n0\n取得方式：夜與序幕\n\n鴉雛\n\n鴉教團\n信徒\n知識\n聲量"
+      },
+      "deckInitialMetrics": {
+        "scrollWidth": 430,
+        "clientWidth": 430,
+        "bodyScrollHeight": 1075,
+        "viewportHeight": 844,
+        "horizontalOverflow": false,
+        "overflowNodes": [],
+        "activeMode": "組牌模式",
+        "deckSheetExpanded": false,
+        "visibleTextSample": "控訴-查卡＆組牌＆QA\n查牌模式\n組牌模式\n常見問題\n篩選條件\n搜尋卡名或效果\n\n教團\n\n所有教團\n\n種類\n\n所有種類\n\n符號\n\n所有符號\n\n效果關鍵字\n\n所有效果關鍵字\n套用篩選\n我的牌組\n0/24\n\n構築規則\n\n規則一\n單一教團\n規則二\n主＋次教團\n\n主牌組限同一教團，搭配中立（放逐者）卡。主牌組上限 20 張。\n\n主要教團\n\n── 請選擇主要教團 ──\n\n次要教團\n\n── 請選擇次要教團 ──\n套用規則並過濾卡池\n清空牌組\n重置規則\n教主 (0/1)\n無卡片\n儀式 (0/3)\n無卡片\n主牌組 (0/20)\n無卡片\n牌組管理\n儲存\n\n尚無儲存的牌組\n\n複製牌組清單\n匯出備份(JSON)\n匯出牌組圖片\n匯入牌組\n可選卡牌池\n隱藏已選\n\n共 102 張可選 · 在列表內捲動瀏覽\n\n第十三夜\n\n鴉教團\n教主\n夜幕\n知識\n異畫\n加入\n\n黑色葬禮\n\n鴉教團\n儀式\n凋零\n災厄\n3\n加入\n\n群鴉風暴\n\n鴉教團\n儀式\n夜幕\n災厄\n1\n加入\n\n無聲奉獻\n\n鴉教團\n儀式\n知識\n災厄\n2\n加入\n\n鴉仕女\n\n鴉教團\n信徒\n夜幕\n聲量\n4\n災厄\n3\n異畫\n加入\n\n鴉司祭\n\n鴉教團\n信徒\n夜幕\n知識\n聲量\n3\n災厄\n3\n加入\nLine 社群\nDiscord 頻道\n工作室粉專\n下載規則書\n\n© 愚人古堡工作室 | 版權所有\n\nWebsite Developed by 羊肝"
+      },
+      "savedBeforeReload": 2,
+      "savedAfterReload": 1,
+      "exportedJsonValid": true,
+      "exportedJsonSize": 208,
+      "jsonImportSucceeded": false,
+      "oldFormatInputValue": "【控訴】牌組清單 儀式（1/3）   · 黑色葬禮（鴉教團）",
+      "oldFormatInputPreservedNewlines": false,
+      "oldImportSucceeded": false,
+      "oldImportFailed": true,
+      "finalMetrics": {
+        "scrollWidth": 430,
+        "clientWidth": 430,
+        "bodyScrollHeight": 1075,
+        "viewportHeight": 844,
+        "horizontalOverflow": false,
+        "overflowNodes": [],
+        "activeMode": "組牌模式",
+        "deckSheetExpanded": true,
+        "visibleTextSample": "控訴-查卡＆組牌＆QA\n查牌模式\n組牌模式\n常見問題\n篩選條件\n搜尋卡名或效果\n\n教團\n\n所有教團\n\n種類\n\n所有種類\n\n符號\n\n所有符號\n\n效果關鍵字\n\n所有效果關鍵字\n套用篩選\n我的牌組\n0/24\n\n構築規則\n\n規則一\n單一教團\n規則二\n主＋次教團\n\n主牌組限同一教團，搭配中立（放逐者）卡。主牌組上限 20 張。\n\n主要教團\n\n鴉教團\n\n次要教團\n\n── 請選擇次要教團 ──\n套用中：\n鴉教團 單教團\n套用規則並過濾卡池\n清空牌組\n重置規則\n\n教團配額進度：\n\n鴉教團\n\n0/20\n\n教主 (0/1)\n無卡片\n儀式 (0/3)\n無卡片\n主牌組 (0/20)\n無卡片\n牌組管理\n儲存\nmobile-430-531232\n載入\n刪除\n複製牌組清單\n匯出備份(JSON)\n匯出牌組圖片\n匯入牌組\n可選卡牌池\n隱藏已選\n\n共 30 張可選 · 在列表內捲動瀏覽\n\n第十三夜\n\n鴉教團\n教主\n夜幕\n知識\n異畫\n加入\n\n黑色葬禮\n\n鴉教團\n儀式\n凋零\n災厄\n3\n加入\n\n群鴉風暴\n\n鴉教團\n儀式\n夜幕\n災厄\n1\n加入\n\n無聲奉獻\n\n鴉教團\n儀式\n知識\n災厄\n2\n加入\n\n鴉仕女\n\n鴉教團\n信徒\n夜幕\n聲量\n4\n災厄\n3\n異畫\n加入\n\n鴉司祭\n\n鴉教團\n信徒\n夜幕\n知識\n聲量\n3\n災厄\n3\n加入\nLine 社群\nDiscord 頻道\n工作室粉專\n下載規則書\n\n© 愚人古堡工作室 | 版權所有\n\nWebs"
+      },
+      "consoleWarningsAndErrors": [],
+      "requestFailures": []
+    }
+  ],
+  "supplemental": [
+    {
+      "width": 768,
+      "status": "completed",
+      "metrics": {
+        "scrollWidth": 768,
+        "clientWidth": 768,
+        "bodyScrollHeight": 1495,
+        "viewportHeight": 1024,
+        "horizontalOverflow": false,
+        "overflowNodes": [],
+        "activeMode": "組牌模式",
+        "deckSheetExpanded": false,
+        "visibleTextSample": "控訴-查卡＆組牌＆QA\n查牌模式\n組牌模式\n常見問題\n所有教團\n所有種類\n所有符號\n所有效果關鍵字\n共 102 張卡牌\n我的牌組\n0/24\n\n構築規則\n\n規則一\n單一教團\n規則二\n主＋次教團\n\n主牌組限同一教團，搭配中立（放逐者）卡。主牌組上限 20 張。\n\n主要教團\n\n── 請選擇主要教團 ──\n\n次要教團\n\n── 請選擇次要教團 ──\n套用規則並過濾卡池\n清空牌組\n重置規則\n教主 (0/1)\n無卡片\n儀式 (0/3)\n無卡片\n主牌組 (0/20)\n無卡片\n牌組管理\n儲存\n\n尚無儲存的牌組\n\n複製牌組清單\n匯出備份(JSON)\n匯出牌組圖片\n匯入牌組\n可選卡牌池\n隱藏已選\n\n共 102 張可選 · 在列表內捲動瀏覽\n\n第十三夜\n\n鴉教團\n教主\n夜幕\n知識\n取得方式：夜與序幕\n異畫\n加入\n\n黑色葬禮\n\n鴉教團\n儀式\n凋零\n災厄\n3\n取得方式：夜與序幕\n加入\n\n群鴉風暴\n\n鴉教團\n儀式\n夜幕\n災厄\n1\n取得方式：夜與序幕\n加入\n\n無聲奉獻\n\n鴉教團\n儀式\n知識\n災厄\n2\n取得方式：夜與序幕\n加入\nLine 社群\nDiscord 頻道\n工作室粉專\n下載規則書\n\n© 愚人古堡工作室 | 版權所有\n\nWebsite Developed by 羊肝"
+      },
+      "consoleWarningsAndErrors": [],
+      "requestFailures": []
+    }
+  ],
+  "offline": {
+    "status": "completed",
+    "cold": {
+      "scrollWidth": 390,
+      "clientWidth": 390,
+      "bodyScrollHeight": 5848,
+      "viewportHeight": 844,
+      "horizontalOverflow": false,
+      "overflowNodes": [],
+      "activeMode": "查牌模式",
+      "deckSheetExpanded": false,
+      "visibleTextSample": "控訴-查卡＆組牌＆QA\n查牌模式\n組牌模式\n常見問題\n篩選條件\n搜尋卡名或效果\n\n教團\n\n所有教團\n\n種類\n\n所有種類\n\n符號\n\n所有符號\n\n效果關鍵字\n\n所有效果關鍵字\n套用篩選\n\n找到 102 張符合條件的卡片\n\n第十三夜\n\n鴉教團\n教主\n夜幕\n知識\n取得方式：夜與序幕\n異畫\n\n黑色葬禮\n\n鴉教團\n儀式\n凋零\n災厄\n3\n取得方式：夜與序幕\n\n群鴉風暴\n\n鴉教團\n儀式\n夜幕\n災厄\n1\n取得方式：夜與序幕\n\n無聲奉獻\n\n鴉教團\n儀式\n知識\n災厄\n2\n取得方式：夜與序幕\n\n鴉仕女\n\n鴉教團\n信徒\n夜幕\n聲量\n4\n災厄\n3\n取得方式：夜與序幕\n異畫\n\n鴉司祭\n\n鴉教團\n信徒\n夜幕\n知識\n聲量\n3\n災厄\n3\n取得方式：夜與序幕\n\n信使\n\n鴉教團\n信徒\n夜幕\n聲量\n3\n災厄\n3\n取得方式：夜與序幕\n\n烏血醫生\n\n鴉教團\n信徒\n禁忌\n聲量\n3\n災厄\n3\n取得方式：夜與序幕\n\n失眠掘墓人\n\n鴉教團\n信徒\n凋零\n聲量\n3\n災厄\n3\n取得方式：夜與序幕\n異畫\n\n迷路的亡魂\n\n鴉教團\n信徒\n夜幕\n聲量\n2\n災厄\n2\n取得方式：夜與序幕\n\n割舌的僧侶\n\n鴉教團\n信徒\n禁忌\n聲量\n3\n災厄\n0\n取得方式：夜與序幕\n\n鐘塔守衛\n\n鴉教團\n信徒\n禁忌\n聲量\n3\n災厄\n0\n取得方式：夜與序幕\n異畫\n\n灰眼童\n\n鴉教團\n信徒\n夜幕\n凋零\n聲量\n5\n災厄\n0\n取得方式：夜與序幕\n\n鴉雛\n\n鴉教團\n信徒\n知識\n聲量"
+    },
+    "warm": {
+      "scrollWidth": 390,
+      "clientWidth": 390,
+      "bodyScrollHeight": 5848,
+      "viewportHeight": 844,
+      "horizontalOverflow": false,
+      "overflowNodes": [],
+      "activeMode": "查牌模式",
+      "deckSheetExpanded": false,
+      "visibleTextSample": "控訴-查卡＆組牌＆QA\n查牌模式\n組牌模式\n常見問題\n篩選條件\n搜尋卡名或效果\n\n教團\n\n所有教團\n\n種類\n\n所有種類\n\n符號\n\n所有符號\n\n效果關鍵字\n\n所有效果關鍵字\n套用篩選\n\n找到 102 張符合條件的卡片\n\n第十三夜\n\n鴉教團\n教主\n夜幕\n知識\n取得方式：夜與序幕\n異畫\n\n黑色葬禮\n\n鴉教團\n儀式\n凋零\n災厄\n3\n取得方式：夜與序幕\n\n群鴉風暴\n\n鴉教團\n儀式\n夜幕\n災厄\n1\n取得方式：夜與序幕\n\n無聲奉獻\n\n鴉教團\n儀式\n知識\n災厄\n2\n取得方式：夜與序幕\n\n鴉仕女\n\n鴉教團\n信徒\n夜幕\n聲量\n4\n災厄\n3\n取得方式：夜與序幕\n異畫\n\n鴉司祭\n\n鴉教團\n信徒\n夜幕\n知識\n聲量\n3\n災厄\n3\n取得方式：夜與序幕\n\n信使\n\n鴉教團\n信徒\n夜幕\n聲量\n3\n災厄\n3\n取得方式：夜與序幕\n\n烏血醫生\n\n鴉教團\n信徒\n禁忌\n聲量\n3\n災厄\n3\n取得方式：夜與序幕\n\n失眠掘墓人\n\n鴉教團\n信徒\n凋零\n聲量\n3\n災厄\n3\n取得方式：夜與序幕\n異畫\n\n迷路的亡魂\n\n鴉教團\n信徒\n夜幕\n聲量\n2\n災厄\n2\n取得方式：夜與序幕\n\n割舌的僧侶\n\n鴉教團\n信徒\n禁忌\n聲量\n3\n災厄\n0\n取得方式：夜與序幕\n\n鐘塔守衛\n\n鴉教團\n信徒\n禁忌\n聲量\n3\n災厄\n0\n取得方式：夜與序幕\n異畫\n\n灰眼童\n\n鴉教團\n信徒\n夜幕\n凋零\n聲量\n5\n災厄\n0\n取得方式：夜與序幕\n\n鴉雛\n\n鴉教團\n信徒\n知識\n聲量"
+    },
+    "offline": {
+      "scrollWidth": 390,
+      "clientWidth": 390,
+      "bodyScrollHeight": 5848,
+      "viewportHeight": 844,
+      "horizontalOverflow": false,
+      "overflowNodes": [],
+      "activeMode": "查牌模式",
+      "deckSheetExpanded": false,
+      "visibleTextSample": "控訴-查卡＆組牌＆QA\n查牌模式\n組牌模式\n常見問題\n篩選條件\n搜尋卡名或效果\n\n教團\n\n所有教團\n\n種類\n\n所有種類\n\n符號\n\n所有符號\n\n效果關鍵字\n\n所有效果關鍵字\n套用篩選\n\n找到 102 張符合條件的卡片\n\n第十三夜\n\n鴉教團\n教主\n夜幕\n知識\n取得方式：夜與序幕\n異畫\n\n黑色葬禮\n\n鴉教團\n儀式\n凋零\n災厄\n3\n取得方式：夜與序幕\n\n群鴉風暴\n\n鴉教團\n儀式\n夜幕\n災厄\n1\n取得方式：夜與序幕\n\n無聲奉獻\n\n鴉教團\n儀式\n知識\n災厄\n2\n取得方式：夜與序幕\n\n鴉仕女\n\n鴉教團\n信徒\n夜幕\n聲量\n4\n災厄\n3\n取得方式：夜與序幕\n異畫\n\n鴉司祭\n\n鴉教團\n信徒\n夜幕\n知識\n聲量\n3\n災厄\n3\n取得方式：夜與序幕\n\n信使\n\n鴉教團\n信徒\n夜幕\n聲量\n3\n災厄\n3\n取得方式：夜與序幕\n\n烏血醫生\n\n鴉教團\n信徒\n禁忌\n聲量\n3\n災厄\n3\n取得方式：夜與序幕\n\n失眠掘墓人\n\n鴉教團\n信徒\n凋零\n聲量\n3\n災厄\n3\n取得方式：夜與序幕\n異畫\n\n迷路的亡魂\n\n鴉教團\n信徒\n夜幕\n聲量\n2\n災厄\n2\n取得方式：夜與序幕\n\n割舌的僧侶\n\n鴉教團\n信徒\n禁忌\n聲量\n3\n災厄\n0\n取得方式：夜與序幕\n\n鐘塔守衛\n\n鴉教團\n信徒\n禁忌\n聲量\n3\n災厄\n0\n取得方式：夜與序幕\n異畫\n\n灰眼童\n\n鴉教團\n信徒\n夜幕\n凋零\n聲量\n5\n災厄\n0\n取得方式：夜與序幕\n\n鴉雛\n\n鴉教團\n信徒\n知識\n聲量"
+    },
+    "offlineError": null,
+    "offlineHasCards": true,
+    "consoleWarningsAndErrors": [],
+    "requestFailures": []
+  }
+}
