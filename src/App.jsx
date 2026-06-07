@@ -1,4 +1,4 @@
-import { lazy, Suspense, useCallback, useEffect, useState, useMemo } from 'react';
+import { lazy, Suspense, useCallback, useState, useMemo } from 'react';
 import { useGridColumnCount } from './hooks/useGridColumnCount.js';
 import {
   estimateGalleryMinHeight,
@@ -12,7 +12,7 @@ import { useDeck }        from './hooks/useDeck.js';
 import { useCardModal }   from './hooks/useCardModal.js';
 import { useToast }       from './hooks/useToast.js';
 import { useDialog }      from './hooks/useDialog.js';
-import { parseHashRoute, useHashRoute } from './hooks/useHashRoute.js';
+import { useHashRoute } from './hooks/useHashRoute.js';
 import { useLayoutInvariant } from './hooks/useLayoutInvariant.js';
 import { filterCardsByRule } from './rules/index.js';
 import {
@@ -51,23 +51,24 @@ function SectionFallback({ label = '載入中…' }) {
 function resolveModeFromRoute(route) {
   if (route.kind === 'admin') return 'admin';
   if (route.kind === 'deck-detail' || route.kind === 'share') return 'share';
+  if (route.kind === 'deck') return 'deck';
+  if (route.kind === 'guestbook') return 'guestbook';
+  if (route.kind === 'qa') return 'qa';
   return 'gallery';
 }
 
 function App() {
-  const [currentMode, setCurrentMode] = useState(() => resolveModeFromRoute(parseHashRoute()));
   const [deckSubmitOpen, setDeckSubmitOpen] = useState(false);
   const [deckSubmitting, setDeckSubmitting] = useState(false);
   const { route, navigate } = useHashRoute();
-
-  useEffect(() => {
-    setCurrentMode(resolveModeFromRoute(route));
-  }, [route]);
+  const currentMode = resolveModeFromRoute(route);
 
   const handleModeChange = useCallback((mode) => {
-    setCurrentMode(mode);
     if (mode === 'share') navigate('decks');
     else if (mode === 'admin') navigate('admin');
+    else if (mode === 'deck') navigate('deck');
+    else if (mode === 'guestbook') navigate('guestbook');
+    else if (mode === 'qa') navigate('qa');
     else navigate('');
   }, [navigate]);
 
