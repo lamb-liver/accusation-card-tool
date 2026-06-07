@@ -4,6 +4,6 @@ pages_build_output_dir = "dist"
 
 [[d1_databases]]
 binding = "DB"
-database_name = "accusation-share-wall"
-database_id = "00000000-0000-0000-0000-000000000000"
+database_name = "accusation-card-tooldb"
+database_id = "940c8db3-67fb-4321-84bd-3be478a70b38"
 migrations_dir = "migrations"
