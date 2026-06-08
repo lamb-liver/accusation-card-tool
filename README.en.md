@@ -63,7 +63,16 @@ npm run preview      # serve dist/ (default http://localhost:4173)
 | `npm run build:ci` | Build + verify PWA `sw.js` (CI) |
 | `npm run build:deploy` | Build and sync to `deploy-output/` |
 | `npm run preview` | Preview production build |
+| `npm run validate:repo` | Full repo check for assets, generated files, lockfile, deploy flow, lint, and core tests |
+| `npm run validate:browser` | Start or reuse a local site, then run deck layout and horizontal overflow checks |
 | `npm run lint` | ESLint |
+| `npm run check:assets` | Verify the current `public/` asset reference chain is present |
+| `npm run check:generated` | Verify generated files match their source data |
+| `npm run check:lockfile` | Verify `package-lock.json` matches `package.json` |
+| `npm run check:public-orphans` | Report files under `public/` not used by the current reference chain |
+| `npm run clean:public-orphans` | Dry-run safe public asset cleanup; add `-- --apply` to remove files |
+| `npm run check:deploy-flow` | Audit deploy workflow, `wrangler.toml`, and `sync-deploy` high-risk settings |
+| `npm run doctor:build-env` | Diagnose local Node/Vite/Rolldown native binding state |
 | `npm run test:rule-engine` | Deck construction rule tests |
 | `npm run test:card-catalog` | Card catalog loader tests |
 | `npm run test:deck` | Deck domain module tests |
@@ -120,6 +129,8 @@ This repository is **source only**. Suggested static hosting flow:
 
 1. `npm run build:deploy` — builds `dist/` and copies to `deploy-output/`
 2. Publish the contents of `deploy-output/` (e.g. a separate repo wired to Cloudflare Pages)
+
+The GitHub Actions workflow only builds and uploads a `deploy-output` artifact on `main` or manual runs; it does not force-push or rewrite any deployment repo.
 
 `dist/` and `deploy-output/` are gitignored and should not be committed here.
 

@@ -135,12 +135,16 @@ function createPwaPlugins(viteMode) {
 })
 }
 
+// Keep @vitejs/plugin-react-swc on its SWC build transform so Vite 8/Rolldown
+// does not receive the plugin's deprecated esbuild JSX config.
+function keepSwcBuildTransform() {}
+
 // https://vite.dev/config/
 export default defineConfig(({ mode }) => {
   const pwaPlugins = createPwaPlugins(mode)
   return {
   plugins: [
-    react(),
+    react({ useAtYourOwnRisk_mutateSwcOptions: keepSwcBuildTransform }),
     tailwindcss(),
     ...pwaPlugins,
     ensurePwaSwOutput(pwaPlugins),

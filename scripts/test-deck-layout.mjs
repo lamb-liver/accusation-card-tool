@@ -6,6 +6,7 @@
  */
 import { chromium } from 'playwright';
 import { collectDeckLayoutMetrics } from './lib/deck-layout-metrics.mjs';
+import { getChromiumLaunchOptions } from './lib/playwright-browser.mjs';
 
 const MAX_DECK_SCROLL_CONTAINERS = 2;
 
@@ -39,7 +40,7 @@ async function openDeckMode(page, baseUrl, { beforeDeck } = {}) {
   await page.goto(baseUrl, { waitUntil: 'domcontentloaded' });
   await page.waitForTimeout(1200);
   if (beforeDeck) await beforeDeck(page);
-  await page.getByRole('button', { name: '組牌模式' }).click();
+  await page.getByRole('button', { name: /組牌(?:模式)?/ }).click();
   await page.getByRole('heading', { name: '可選卡牌池' }).waitFor({ timeout: 20000 });
   return page.evaluate(collectDeckLayoutMetrics);
 }
@@ -71,7 +72,7 @@ function assertDeckLayout(
 async function run() {
   const baseUrl = await resolveBaseUrl();
   console.log(`Using ${baseUrl}`);
-  const browser = await chromium.launch({ headless: true });
+  const browser = await chromium.launch(getChromiumLaunchOptions());
 
   try {
     {

@@ -59,7 +59,16 @@ npm run preview      # 預覽 dist/（預設 http://localhost:4173）
 | `npm run build:ci` | 建置並檢查 PWA `sw.js`（CI） |
 | `npm run build:deploy` | 建置後同步至 `deploy-output/` |
 | `npm run preview` | 預覽建置結果 |
+| `npm run validate:repo` | 資產、generated 檔、lockfile、部署流程、lint 與核心測試總檢查 |
+| `npm run validate:browser` | 啟動或使用既有本機站台，跑組牌版面與水平溢位檢查 |
 | `npm run lint` | ESLint |
+| `npm run check:assets` | 檢查目前引用鏈需要的 `public/` 資產是否齊全 |
+| `npm run check:generated` | 檢查 generated 檔是否與來源資料同步 |
+| `npm run check:lockfile` | 檢查 `package-lock.json` 是否與 `package.json` 對齊 |
+| `npm run check:public-orphans` | 列出 `public/` 未被目前引用鏈使用的檔案 |
+| `npm run clean:public-orphans` | dry-run 顯示可安全清理的 `public/` 檔案；加 `-- --apply` 才會刪除 |
+| `npm run check:deploy-flow` | 檢查部署 workflow、`wrangler.toml` 與 `sync-deploy` 的高風險設定 |
+| `npm run doctor:build-env` | 診斷本機 Node/Vite/Rolldown native binding 狀態 |
 | `npm run test:rule-engine` | 構築規則單元測試 |
 | `npm run test:card-catalog` | 卡牌目錄載入測試 |
 | `npm run test:deck` | 牌組領域模組測試 |
@@ -116,6 +125,8 @@ accusation-v2/
 
 1. `npm run build:deploy` — 建置 `dist/` 並複製到 `deploy-output/`
 2. 將 `deploy-output/` 內容部署至靜態主機（例如 Cloudflare Pages 用的獨立 repo）
+
+GitHub Actions workflow 只負責在 `main` 或手動觸發時建置並上傳 `deploy-output` artifact；它不會 force-push 或改寫部署 repo。
 
 `dist/` 與 `deploy-output/` 已在 `.gitignore`，不應 commit 進原始碼 repo。
 

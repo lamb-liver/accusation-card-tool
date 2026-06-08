@@ -1,29 +1,40 @@
-name: Push Commit to Deploy Repo
+name: Build Deploy Artifact
 
 on:
   workflow_dispatch:
-  schedule:
-    - cron: '0 0 * * 1' # 每週一早上 8:00 (台灣時間) 自動執行
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: read
 
 jobs:
-  push-commit:
+  build-deploy-artifact:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout Source Repo at specific commit
+      - name: Checkout source
         uses: actions/checkout@v4
-        with:
-          repository: 'lamb-liver/accusation-card-tool'
-          ref: 'fdcfe12'
-          fetch-depth: 0
 
-      - name: Push to Destination Repository
-        env:
-          DEST_TOKEN: ${{ secrets.DEPLOY_REPO_TOKEN }}
-        run: |
-          git config --global user.name "github-actions[bot]"
-          git config --global user.email "github-actions[bot]@users.noreply.github.com"
-          
-          REMOTE_URL="https://x-access-token:${DEST_TOKEN}@github.com/lamb-liver/accusation-card-tool.git"
-          
-          git push $REMOTE_URL HEAD:main --force
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Validate repository
+        run: npm run validate:repo
+
+      - name: Build deploy output
+        run: npm run build:deploy
+
+      - name: Upload deploy output
+        uses: actions/upload-artifact@v4
+        with:
+          name: deploy-output
+          path: deploy-output
+          if-no-files-found: error

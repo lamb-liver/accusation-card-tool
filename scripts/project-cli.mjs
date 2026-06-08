@@ -4,6 +4,8 @@ import { dirname, relative, resolve, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { spawn, spawnSync } from 'node:child_process';
 
+import { resolveNodeForPackageBin } from './lib/node-runner.mjs';
+
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const projectRoot = resolve(__dirname, '..');
 
@@ -20,6 +22,12 @@ const commands = new Map([
   ['build:ci', runBuildCi],
   ['build:deploy', runBuildDeploy],
   ['check:assets', (_name, args) => runNodeScript('check-assets.mjs', args)],
+  ['check:generated', (_name, args) => runNodeScript('check-generated.mjs', args)],
+  ['check:lockfile', (_name, args) => runNodeScript('check-lockfile.mjs', args)],
+  ['check:public-orphans', (_name, args) => runNodeScript('check-public-orphans.mjs', args)],
+  ['clean:public-orphans', (_name, args) => runNodeScript('clean-public-orphans.mjs', args)],
+  ['check:deploy-flow', (_name, args) => runNodeScript('check-deploy-flow.mjs', args)],
+  ['doctor:build-env', (_name, args) => runNodeScript('doctor-build-env.mjs', args)],
   ['check:pwa-sw', (_name, args) => runNodeScript('check-pwa-sw.mjs', args)],
   ['lint', (_name, args) => runPackageBin('eslint', 'bin/eslint.js', ['.', ...args])],
   ['test', runAllTests],
@@ -35,6 +43,8 @@ const commands = new Map([
   ['cards:manifest', (_name, args) => runNodeScript('generate-card-manifest.mjs', args)],
   ['api:constants', (_name, args) => runNodeScript('generate-api-constants.mjs', args)],
   ['test:share-wall', runShareWallTests],
+  ['validate:repo', runValidateRepo],
+  ['validate:browser', (_name, args) => runNodeScript('validate-browser.mjs', args)],
   ['cf:dev', runCfDev],
   ['d1:migrations:apply:local', (_name, args) => runWrangler(['d1', 'migrations', 'apply', 'DB', '--local', ...args])],
   ['d1:migrations:apply:remote', (_name, args) => runWrangler(['d1', 'migrations', 'apply', 'DB', '--remote', ...args])],
@@ -68,9 +78,11 @@ function printHelp() {
 
 Commands:
   dev, preview
-  build, build:ci, build:deploy, check:assets, check:pwa-sw
+  build, build:ci, build:deploy, check:assets, check:generated, check:lockfile, check:pwa-sw
+  check:public-orphans, clean:public-orphans, check:deploy-flow, doctor:build-env
   lint
   test, test:rule-engine, test:card-catalog, test:deck, test:gallery-layout, test:deck-layout
+  validate:repo, validate:browser
   audit:deck-layout
   optimize:images, split:cards, sync:qa
   cards:manifest, api:constants, test:share-wall [--integration]
@@ -173,6 +185,26 @@ async function runAllTests() {
   return 0;
 }
 
+async function runValidateRepo() {
+  for (const commandName of [
+    'check:assets',
+    'check:generated',
+    'check:lockfile',
+    'check:deploy-flow',
+    'lint',
+    'test:rule-engine',
+    'test:card-catalog',
+    'test:deck',
+    'test:gallery-layout',
+    'test:share-wall',
+  ]) {
+    console.log(`\n> ${commandName}`);
+    const code = await commands.get(commandName)(commandName, []);
+    if (code !== 0) return code;
+  }
+  return 0;
+}
+
 function runNodeScript(scriptName, args = []) {
   return run(process.execPath, [resolve(projectRoot, 'scripts', scriptName), ...args]);
 }
@@ -184,7 +216,11 @@ function runPackageBin(packageName, binPath, args = []) {
     console.error('Run `npm install` before using project scripts.');
     return 1;
   }
-  return run(process.execPath, [packageBin, ...args]);
+  const nodePath = resolveNodeForPackageBin(projectRoot, packageName);
+  if (nodePath !== process.execPath && packageName === 'vite') {
+    console.log(`Using Node runtime for Vite: ${nodePath}`);
+  }
+  return run(nodePath, [packageBin, ...args]);
 }
 
 function run(command, args) {

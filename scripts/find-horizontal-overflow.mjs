@@ -2,16 +2,17 @@
  * 找出 scrollWidth > clientWidth 的元素
  */
 import { chromium } from 'playwright';
+import { getChromiumLaunchOptions } from './lib/playwright-browser.mjs';
 
 const VIEWPORT = { width: 453, height: 737 };
 const URL = process.env.BASE_URL ?? 'http://localhost:5176/';
 
-const browser = await chromium.launch({ headless: true });
+const browser = await chromium.launch(getChromiumLaunchOptions());
 const page = await browser.newPage({ viewport: VIEWPORT });
 
 try {
-  await page.goto(URL, { waitUntil: 'networkidle', timeout: 60_000 });
-  await page.getByRole('button', { name: '組牌模式' }).click();
+  await page.goto(URL, { waitUntil: 'domcontentloaded', timeout: 60_000 });
+  await page.getByRole('button', { name: /組牌(?:模式)?/ }).click();
   await page.getByRole('heading', { name: '可選卡牌池' }).waitFor({ timeout: 30_000 });
   await page.waitForTimeout(2000);
 

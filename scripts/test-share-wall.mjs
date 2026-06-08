@@ -46,6 +46,16 @@ function assert(condition, message) {
   if (!condition) fail(message);
 }
 
+async function withMutedConsole(method, callback) {
+  const original = console[method];
+  console[method] = () => {};
+  try {
+    return await callback();
+  } finally {
+    console[method] = original;
+  }
+}
+
 function sampleDeckJson() {
   return {
     leader: ['cro01'],
@@ -172,9 +182,11 @@ assert(parseOffsetParam(new URL('http://test/')) === 0, 'default offset zero');
 {
   const localSkip = await verifyTurnstileToken(undefined, {}, { headers: { get: () => null } });
   assert(localSkip === null, 'local env without Turnstile secret should skip verification');
-  const prodFail = await verifyTurnstileToken(undefined, { ENVIRONMENT: 'production' }, {
-    headers: { get: () => null },
-  });
+  const prodFail = await withMutedConsole('warn', () =>
+    verifyTurnstileToken(undefined, { ENVIRONMENT: 'production' }, {
+      headers: { get: () => null },
+    }),
+  );
   assert(prodFail?.status === 500, 'production without Turnstile secret should return 500');
 }
 
@@ -197,16 +209,18 @@ assert(validateApiRuleJson({ type: 'rule1', primary: '鴉教團', secondary: '' 
 assert(validateApiRuleJson({ type: 'nope', primary: 'x', secondary: '' }) !== null, 'invalid rule type');
 
 assert(
-  mapPublicDeckRow({
-    share_id: 'abc123',
-    title: 't',
-    author_name: 'a',
-    description: '',
-    deck_json: '{bad',
-    rule_json: '{"type":"rule1","primary":"鴉教團","secondary":""}',
-    reviewed_at: null,
-    created_at: '2026-01-01 00:00:00',
-  }) === null,
+  (await withMutedConsole('error', () =>
+    mapPublicDeckRow({
+      share_id: 'abc123',
+      title: 't',
+      author_name: 'a',
+      description: '',
+      deck_json: '{bad',
+      rule_json: '{"type":"rule1","primary":"鴉教團","secondary":""}',
+      reviewed_at: null,
+      created_at: '2026-01-01 00:00:00',
+    }),
+  )) === null,
   'corrupt deck_json should return null from mapPublicDeckRow',
 );
 assert(

@@ -11,7 +11,7 @@ async function dump(page, label, beforeDeck) {
   await page.goto(BASE_URL, { waitUntil: 'domcontentloaded' });
   await page.waitForTimeout(1200);
   if (beforeDeck) await beforeDeck(page);
-  await page.getByRole('button', { name: '組牌模式' }).click();
+  await page.getByRole('button', { name: /組牌(?:模式)?/ }).click();
   await page.getByRole('heading', { name: '可選卡牌池' }).waitFor({ timeout: 20000 });
   const metrics = await page.evaluate(collectDeckLayoutMetrics);
   console.log(`\n=== ${label} ===`);

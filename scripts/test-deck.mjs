@@ -25,6 +25,16 @@ function fail(message) {
   failed += 1;
 }
 
+async function withMutedConsoleError(callback) {
+  const original = console.error;
+  console.error = () => {};
+  try {
+    return await callback();
+  } finally {
+    console.error = original;
+  }
+}
+
 const sampleCard = {
   id: 'cro01',
   name: '測試卡',
@@ -420,10 +430,10 @@ if (!savedWithRule?.rule || savedWithRule.rule.type !== 'rule1') {
     showConfirm: async () => true,
     showPrompt: async () => null,
   });
-  persistCtl.setDeck({ leader: [], rituals: [], main: [sampleCard] });
+  await withMutedConsoleError(() => persistCtl.setDeck({ leader: [], rituals: [], main: [sampleCard] }));
   const deckBefore = getDeckTotal(persistCtl.getSnapshot().deck);
 
-  await persistCtl.saveDeckAs('應失敗');
+  await withMutedConsoleError(() => persistCtl.saveDeckAs('應失敗'));
 
   const deckAfter = getDeckTotal(persistCtl.getSnapshot().deck);
   const hasPersistError = toasts.some((t) => t.type === 'error' && t.message.includes('存檔失敗'));

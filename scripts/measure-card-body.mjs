@@ -27,7 +27,7 @@ async function run() {
 
   await page.goto(baseUrl, { waitUntil: 'domcontentloaded' });
   await page.waitForTimeout(1200);
-  await page.getByRole('button', { name: '組牌模式' }).click();
+  await page.getByRole('button', { name: /組牌(?:模式)?/ }).click();
   await page.getByRole('heading', { name: '可選卡牌池' }).waitFor({ timeout: 20000 });
   await page.waitForTimeout(800);
 

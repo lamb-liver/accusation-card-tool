@@ -1081,6 +1081,8 @@
   },
   {
     "id": "asy12",
+    "hasAlternateArt": true,
+    "alternateSource": "閃卡包",
     "name": "催眠師",
     "faction": "瘋人院",
     "type": "信徒",
