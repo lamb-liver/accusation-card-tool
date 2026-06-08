@@ -19,6 +19,7 @@ const commands = new Map([
   ['build', runBuild],
   ['build:ci', runBuildCi],
   ['build:deploy', runBuildDeploy],
+  ['check:assets', (_name, args) => runNodeScript('check-assets.mjs', args)],
   ['check:pwa-sw', (_name, args) => runNodeScript('check-pwa-sw.mjs', args)],
   ['lint', (_name, args) => runPackageBin('eslint', 'bin/eslint.js', ['.', ...args])],
   ['test', runAllTests],
@@ -67,7 +68,7 @@ function printHelp() {
 
 Commands:
   dev, preview
-  build, build:ci, build:deploy, check:pwa-sw
+  build, build:ci, build:deploy, check:assets, check:pwa-sw
   lint
   test, test:rule-engine, test:card-catalog, test:deck, test:gallery-layout, test:deck-layout
   audit:deck-layout
