@@ -2,12 +2,15 @@ import { ArrowLeft, Hammer } from 'lucide-react';
 import { useCallback } from 'react';
 import { fetchPublicDeck } from '../../api/shareWallApi.js';
 import { useAsyncResource } from '../../hooks/useAsyncResource.js';
+import { usePageTitle } from '../../hooks/usePageTitle.js';
 import { formatApiDate } from '../../utils/formatApiDate.js';
 import AsyncPanel from '../common/AsyncPanel.jsx';
 
 export default function DeckShareDetail({ shareId, onBack, onLoadDeck, isLoadingCards }) {
   const loadDeck = useCallback(() => fetchPublicDeck(shareId), [shareId]);
   const { data, isLoading, isRetrying, isError, errorMessage, reload } = useAsyncResource(loadDeck);
+
+  usePageTitle(data?.title ? `控訴 - ${data.title}` : '控訴 - 牌組詳情');
 
   const deckCount = data
     ? data.deck_json.leader.length + data.deck_json.rituals.length + data.deck_json.main.length
@@ -28,7 +31,7 @@ export default function DeckShareDetail({ shareId, onBack, onLoadDeck, isLoading
         className="mb-4 inline-flex items-center gap-2 text-sm text-gray-400 transition hover:text-brand-gold"
       >
         <ArrowLeft className="h-4 w-4" aria-hidden strokeWidth={2.25} />
-        返回分享牆
+        返回交流區
       </button>
 
       <AsyncPanel

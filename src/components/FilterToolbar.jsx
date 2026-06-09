@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { BarChart3, Hammer, HelpCircle, LayoutGrid, MessageSquare, Search, X } from 'lucide-react';
+import { BarChart3, Hammer, HelpCircle, MessageSquare, Search, Timer, X } from 'lucide-react';
 import { FILTER_OPTIONS, ICON_MENU_SVG } from '../constants/filterOptions.js';
 import CustomDropdown from './common/CustomDropdown.jsx';
 
@@ -23,9 +23,9 @@ export default function FilterToolbar({
   const modes = [
     { id: 'gallery', label: '查牌', Icon: Search },
     { id: 'deck', label: '組牌', Icon: Hammer },
-    { id: 'share', label: '分享牆', Icon: LayoutGrid },
-    { id: 'guestbook', label: '留言板', Icon: MessageSquare },
+    { id: 'community', label: '交流', Icon: MessageSquare },
     { id: 'qa', label: 'QA', Icon: HelpCircle },
+    { id: 'clock', label: '計時', Icon: Timer },
   ];
 
   const dropdowns = [

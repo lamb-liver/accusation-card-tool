@@ -36,6 +36,7 @@ const commands = new Map([
   ['test:deck', (_name, args) => runNodeScript('test-deck.mjs', args)],
   ['test:gallery-layout', (_name, args) => runNodeScript('test-gallery-layout.mjs', args)],
   ['test:deck-layout', (_name, args) => runNodeScript('test-deck-layout.mjs', args)],
+  ['test:clock', (_name, args) => runNodeScript('test-clock.mjs', args)],
   ['audit:deck-layout', (_name, args) => runNodeScript('audit-deck-layout.mjs', args)],
   ['optimize:images', (_name, args) => runNodeScript('optimize-images.mjs', args)],
   ['split:cards', (_name, args) => runNodeScript('split-cards.mjs', args)],
@@ -81,7 +82,7 @@ Commands:
   build, build:ci, build:deploy, check:assets, check:generated, check:lockfile, check:pwa-sw
   check:public-orphans, clean:public-orphans, check:deploy-flow, doctor:build-env
   lint
-  test, test:rule-engine, test:card-catalog, test:deck, test:gallery-layout, test:deck-layout
+  test, test:rule-engine, test:card-catalog, test:deck, test:gallery-layout, test:deck-layout, test:clock
   validate:repo, validate:browser
   audit:deck-layout
   optimize:images, split:cards, sync:qa
@@ -176,6 +177,7 @@ async function runAllTests() {
     'test:deck',
     'test:gallery-layout',
     'test:deck-layout',
+    'test:clock',
     'test:share-wall',
   ]) {
     console.log(`\n> ${commandName}`);
@@ -196,6 +198,7 @@ async function runValidateRepo() {
     'test:card-catalog',
     'test:deck',
     'test:gallery-layout',
+    'test:clock',
     'test:share-wall',
   ]) {
     console.log(`\n> ${commandName}`);

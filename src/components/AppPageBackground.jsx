@@ -1,6 +1,6 @@
 import { APP_BACKGROUND_IMAGE } from '../constants/appBackground.js';
 
-const MODES = ['gallery', 'deck', 'share', 'guestbook', 'qa', 'admin'];
+const MODES = ['gallery', 'deck', 'community', 'qa', 'admin'];
 
 /**
  * 三個模式各一層背景，圖片相同（背景.webp）。

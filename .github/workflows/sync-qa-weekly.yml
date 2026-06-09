@@ -1,0 +1,56 @@
+name: Sync QA Weekly
+
+on:
+  schedule:
+    # 每週一 01:00 UTC（台北時間 09:00）
+    - cron: '0 1 * * 1'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+concurrency:
+  group: sync-qa-weekly
+  cancel-in-progress: true
+
+jobs:
+  sync-qa:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Sync QA from Google Sheets
+        run: npm run sync:qa
+
+      - name: Create pull request
+        uses: peter-evans/create-pull-request@v7
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          branch: automation/sync-qa
+          delete-branch: true
+          commit-message: 'chore: sync QA from Google Sheets'
+          title: 'chore: 同步 QA（Google 試算表）'
+          body: |
+            ## Summary
+            每週自動從 Google 試算表同步常見問題至 `src/data/qaData.js`。
+
+            ## 合併後
+            - `main` 上的 [Build Deploy Artifact](.github/workflows/deploy.yml) 會自動建置部署產物
+            - 或依專案流程手動部署 `deploy-output`
+
+            ---
+            _此 PR 由 [sync-qa-weekly](.github/workflows/sync-qa-weekly.yml) 產生。_
+          add-paths: |
+            src/data/qaData.js

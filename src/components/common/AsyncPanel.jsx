@@ -10,11 +10,15 @@ export default function AsyncPanel({
   emptyIcon: EmptyIcon,
   emptyTitle = '尚無資料',
   emptyHint = '',
+  loadingMinHeight = 'min-h-52',
   children,
 }) {
   if (isLoading) {
     return (
-      <div className="flex min-h-48 items-center justify-center text-gray-400" aria-busy="true">
+      <div
+        className={`flex ${loadingMinHeight} items-center justify-center rounded-lg bg-neutral-900/40 text-gray-400`}
+        aria-busy="true"
+      >
         載入中…
       </div>
     );
@@ -23,7 +27,7 @@ export default function AsyncPanel({
   if (isError) {
     return (
       <div
-        className="flex min-h-48 flex-col items-center justify-center gap-4 rounded-lg border border-red-500/60 bg-red-950/40 px-6 py-8 text-center text-red-300"
+        className={`flex ${loadingMinHeight} flex-col items-center justify-center gap-4 rounded-lg border border-red-500/60 bg-red-950/40 px-6 py-8 text-center text-red-300`}
         role="alert"
       >
         <TriangleAlert className="h-8 w-8 shrink-0" aria-hidden strokeWidth={2.25} />
@@ -44,7 +48,7 @@ export default function AsyncPanel({
 
   if (isEmpty) {
     return (
-      <div className="flex min-h-48 items-center justify-center">
+      <div className={`flex ${loadingMinHeight} items-center justify-center`}>
         <div className="max-w-md rounded-lg border-4 border-dashed border-brand-gold/30 p-12 text-center">
           {EmptyIcon && (
             <EmptyIcon className="mx-auto mb-4 h-12 w-12 text-gray-400" aria-hidden strokeWidth={2} />

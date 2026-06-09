@@ -28,6 +28,7 @@
     "test:deck": "node scripts/project-cli.mjs test:deck",
     "test:gallery-layout": "node scripts/project-cli.mjs test:gallery-layout",
     "test:deck-layout": "node scripts/project-cli.mjs test:deck-layout",
+    "test:clock": "node scripts/project-cli.mjs test:clock",
     "validate:repo": "node scripts/project-cli.mjs validate:repo",
     "validate:browser": "node scripts/project-cli.mjs validate:browser",
     "audit:deck-layout": "node scripts/project-cli.mjs audit:deck-layout",

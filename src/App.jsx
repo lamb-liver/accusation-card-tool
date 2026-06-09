@@ -1,4 +1,4 @@
-import { lazy, Suspense, useCallback, useState, useMemo } from 'react';
+import { lazy, Suspense, useCallback, useEffect, useState, useMemo } from 'react';
 import { useGridColumnCount } from './hooks/useGridColumnCount.js';
 import {
   estimateGalleryMinHeight,
@@ -21,6 +21,11 @@ import {
   submitDeckShareForm,
 } from './deck/shareWallHandlers.js';
 import { formatShareWallError } from './utils/formatShareWallError.js';
+import {
+  clearCommunityListState,
+  consumeCommunityReturnPath,
+  saveCommunityListState,
+} from './utils/communityScroll.js';
 import DeckSubmitModal from './components/shareWall/DeckSubmitModal.jsx';
 
 import FilterToolbar       from './components/FilterToolbar.jsx';
@@ -35,10 +40,10 @@ import AppPageBackground  from './components/AppPageBackground.jsx';
 const DeckBuilder = lazy(() => import('./components/DeckBuilder.jsx'));
 const QASection = lazy(() => import('./components/QASection.jsx'));
 const CardModal = lazy(() => import('./components/CardModal.jsx'));
-const ShareWallSection = lazy(() => import('./components/shareWall/ShareWallSection.jsx'));
+const CommunitySection = lazy(() => import('./components/community/CommunitySection.jsx'));
 const DeckShareDetail = lazy(() => import('./components/shareWall/DeckShareDetail.jsx'));
-const GuestbookSection = lazy(() => import('./components/guestbook/GuestbookSection.jsx'));
 const AdminSection = lazy(() => import('./components/admin/AdminSection.jsx'));
+const ClockPage = lazy(() => import('./features/clock/ClockPage.jsx'));
 
 function SectionFallback({ label = '載入中…' }) {
   return (
@@ -50,10 +55,10 @@ function SectionFallback({ label = '載入中…' }) {
 
 function resolveModeFromRoute(route) {
   if (route.kind === 'admin') return 'admin';
-  if (route.kind === 'deck-detail' || route.kind === 'share') return 'share';
+  if (route.kind === 'deck-detail' || route.kind === 'community') return 'community';
   if (route.kind === 'deck') return 'deck';
-  if (route.kind === 'guestbook') return 'guestbook';
   if (route.kind === 'qa') return 'qa';
+  if (route.kind === 'clock') return 'clock';
   return 'gallery';
 }
 
@@ -64,16 +69,33 @@ function App() {
   const currentMode = resolveModeFromRoute(route);
 
   const handleModeChange = useCallback((mode) => {
-    if (mode === 'share') navigate('decks');
+    if (mode === 'community') navigate('community');
     else if (mode === 'admin') navigate('admin');
     else if (mode === 'deck') navigate('deck');
-    else if (mode === 'guestbook') navigate('guestbook');
     else if (mode === 'qa') navigate('qa');
+    else if (mode === 'clock') navigate('clock');
     else navigate('');
   }, [navigate]);
 
   const showDeckDetail = route.kind === 'deck-detail';
   const detailShareId = route.kind === 'deck-detail' ? route.shareId : null;
+  const communityScrollTarget =
+    route.kind === 'community' ? route.communityScroll : undefined;
+
+  const handleOpenShareDeck = useCallback((shareId) => {
+    saveCommunityListState();
+    navigate(`decks/${shareId}`);
+  }, [navigate]);
+
+  const handleBackToCommunity = useCallback(() => {
+    navigate(consumeCommunityReturnPath());
+  }, [navigate]);
+
+  useEffect(() => {
+    if (currentMode !== 'community') {
+      clearCommunityListState();
+    }
+  }, [currentMode]);
 
   // ── 資料層 ────────────────────────────────────────────────────────────────
   const { allCards, isLoading, isError, retry }                         = useCardData();
@@ -185,7 +207,8 @@ function App() {
     closeModal,
   } = useCardModal();
 
-  const backgroundMode = currentMode === 'admin' ? 'admin' : currentMode;
+  const backgroundMode =
+    currentMode === 'admin' ? 'admin' : currentMode === 'clock' ? 'gallery' : currentMode;
 
   // ── Render ────────────────────────────────────────────────────────────────
   return (
@@ -320,30 +343,34 @@ function App() {
           </Suspense>
         )}
 
-        {currentMode === 'share' && (
-          <Suspense fallback={<SectionFallback label="載入分享牆…" />}>
+        {currentMode === 'community' && (
+          <Suspense fallback={<SectionFallback label="載入交流區…" />}>
             {showDeckDetail && detailShareId ? (
               <DeckShareDetail
                 shareId={detailShareId}
-                onBack={() => navigate('decks')}
+                onBack={handleBackToCommunity}
                 onLoadDeck={handleLoadShareDeck}
                 isLoadingCards={isLoading}
               />
             ) : (
-              <ShareWallSection onOpenDeck={(shareId) => navigate(`decks/${shareId}`)} />
+              <CommunitySection
+                showToast={showToast}
+                onOpenDeck={handleOpenShareDeck}
+                initialSection={communityScrollTarget}
+              />
             )}
-          </Suspense>
-        )}
-
-        {currentMode === 'guestbook' && (
-          <Suspense fallback={<SectionFallback label="載入留言板…" />}>
-            <GuestbookSection showToast={showToast} />
           </Suspense>
         )}
 
         {currentMode === 'qa' && (
           <Suspense fallback={<SectionFallback label="載入常見問題…" />}>
             <QASection />
+          </Suspense>
+        )}
+
+        {currentMode === 'clock' && (
+          <Suspense fallback={<SectionFallback label="載入計時器…" />}>
+            <ClockPage />
           </Suspense>
         )}
 

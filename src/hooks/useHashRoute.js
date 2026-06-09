@@ -1,8 +1,8 @@
 import { useCallback, useEffect, useState } from 'react';
 
 /**
- * @typedef {'home' | 'deck' | 'share' | 'deck-detail' | 'guestbook' | 'qa' | 'admin'} HashRouteKind
- * @typedef {{ kind: HashRouteKind, shareId?: string }} HashRoute
+ * @typedef {'home' | 'deck' | 'community' | 'deck-detail' | 'qa' | 'clock' | 'admin'} HashRouteKind
+ * @typedef {{ kind: HashRouteKind, shareId?: string, communityScroll?: 'guestbook' | 'decks' }} HashRoute
  */
 
 /** @param {string} hash @returns {HashRoute} */
@@ -11,10 +11,14 @@ export function parseHashRoute(hash = window.location.hash) {
   if (!raw) return { kind: 'home' };
   const parts = raw.split('/').filter(Boolean);
   if (parts[0] === 'deck') return { kind: 'deck' };
-  if (parts[0] === 'decks' && parts[1]) return { kind: 'deck-detail', shareId: decodeURIComponent(parts[1]) };
-  if (parts[0] === 'decks') return { kind: 'share' };
-  if (parts[0] === 'guestbook') return { kind: 'guestbook' };
+  if (parts[0] === 'decks' && parts[1]) {
+    return { kind: 'deck-detail', shareId: decodeURIComponent(parts[1]) };
+  }
+  if (parts[0] === 'decks') return { kind: 'community', communityScroll: 'decks' };
+  if (parts[0] === 'guestbook') return { kind: 'community', communityScroll: 'guestbook' };
+  if (parts[0] === 'community') return { kind: 'community' };
   if (parts[0] === 'qa') return { kind: 'qa' };
+  if (parts[0] === 'clock') return { kind: 'clock' };
   if (parts[0] === 'admin') return { kind: 'admin' };
   return { kind: 'home' };
 }

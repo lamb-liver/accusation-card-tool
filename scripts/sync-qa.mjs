@@ -79,4 +79,7 @@ async function main() {
   console.log(`\n✅ 已寫入 ${OUTPUT_PATH}，共 ${qaData.length} 分類，${total} 題`);
 }
 
-main();
+main().catch((error) => {
+  console.error('❌ QA 同步失敗:', error);
+  process.exit(1);
+});

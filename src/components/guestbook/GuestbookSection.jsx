@@ -12,7 +12,7 @@ import AsyncPanel, { LoadMoreButton } from '../common/AsyncPanel.jsx';
 import TurnstileWidget from '../common/TurnstileWidget.jsx';
 import { isTurnstileEnabled } from '../../utils/turnstileConfig.js';
 
-export default function GuestbookSection({ showToast }) {
+export default function GuestbookSection({ showToast, embedded = false }) {
   const loadMessages = useCallback(
     () => fetchGuestbookMessages({ limit: PUBLIC_PAGE_SIZE, offset: 0 }),
     [],
@@ -88,11 +88,18 @@ export default function GuestbookSection({ showToast }) {
   }
 
   return (
-    <section className="mx-auto max-w-3xl space-y-8">
-      <header className="text-center">
-        <h2 className="text-xl font-bold text-brand-gold">留言板</h2>
-        <p className="mt-1 text-sm text-gray-400">留言需經審核後才會公開顯示</p>
-      </header>
+    <section className={embedded ? 'space-y-8' : 'mx-auto max-w-3xl space-y-8'}>
+      {embedded ? (
+        <header>
+          <h3 className="text-center text-lg font-bold text-brand-gold">留言板</h3>
+          <p className="mt-1 text-center text-sm text-gray-400">留言需經審核後才會公開顯示</p>
+        </header>
+      ) : (
+        <header className="text-center">
+          <h2 className="text-xl font-bold text-brand-gold">留言板</h2>
+          <p className="mt-1 text-sm text-gray-400">留言需經審核後才會公開顯示</p>
+        </header>
+      )}
 
       <form
         onSubmit={handleSubmit}
@@ -154,6 +161,7 @@ export default function GuestbookSection({ showToast }) {
           emptyIcon={MessageSquare}
           emptyTitle="尚無公開留言"
           emptyHint="成為第一位留言者吧"
+          loadingMinHeight="min-h-52"
         >
           <ul className="space-y-3">
             {messages.map((entry, index) => (
