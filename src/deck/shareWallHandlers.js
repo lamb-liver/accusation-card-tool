@@ -52,10 +52,7 @@ export async function submitDeckShareForm(deck, currentRule, form) {
  *   deckJson: unknown,
  *   ruleJson: unknown,
  *   allCards: Card[],
- *   setDeck: (deck: Deck) => boolean,
- *   setCurrentRule: (rule: DeckRule) => boolean,
- *   setPrimaryFaction: (faction: string) => boolean,
- *   setSecondaryFaction: (faction: string) => boolean,
+ *   applyShareWallLoad: (deck: Deck, rule: DeckRule) => boolean,
  *   showConfirm: (message: string, opts?: object) => Promise<boolean>,
  *   showToast: (message: string, type?: string) => void,
  * }} ctx
@@ -65,10 +62,7 @@ export async function loadShareWallDeckIntoBuilder(ctx) {
     deckJson,
     ruleJson,
     allCards,
-    setDeck,
-    setCurrentRule,
-    setPrimaryFaction,
-    setSecondaryFaction,
+    applyShareWallLoad,
     showConfirm,
     showToast,
   } = ctx;
@@ -102,10 +96,7 @@ export async function loadShareWallDeckIntoBuilder(ctx) {
   });
   if (!ok) return false;
 
-  const ruleOk =
-    setCurrentRule(rule) && setPrimaryFaction(rule.primary) && setSecondaryFaction(rule.secondary);
-  const deckOk = setDeck(newDeck);
-  if (!ruleOk || !deckOk) {
+  if (!applyShareWallLoad(newDeck, rule)) {
     showToast('載入失敗，請稍後再試', 'error');
     return false;
   }

@@ -199,8 +199,15 @@ export function createDeckController(deps) {
     setDeck: patchDeck,
     setCurrentRule: (updater) => {
       const next = typeof updater === 'function' ? updater(state.currentRule) : updater;
-      commit({ currentRule: next });
+      return commit({ currentRule: next });
     },
+    applyShareWallLoad: (deck, rule) =>
+      commit({
+        deck,
+        currentRule: rule,
+        primaryFaction: rule.primary || '',
+        secondaryFaction: rule.secondary || '',
+      }),
     setPrimaryFaction: (faction) => commit({ primaryFaction: faction }),
     setSecondaryFaction: (faction) => commit({ secondaryFaction: faction }),
 

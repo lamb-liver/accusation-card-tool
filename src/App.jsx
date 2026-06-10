@@ -140,6 +140,7 @@ function App() {
     exportDeckAsImage,
     importDeck,
     getPoolBlockedCardIds,
+    applyShareWallLoad,
   } = useDeck(allCards, showToast, showConfirm, showPrompt);
 
   const handleSubmitToShareWall = useCallback(() => {
@@ -165,20 +166,14 @@ function App() {
       deckJson: shareDeck.deck_json,
       ruleJson: shareDeck.rule_json,
       allCards,
-      setDeck,
-      setCurrentRule,
-      setPrimaryFaction,
-      setSecondaryFaction,
+      applyShareWallLoad,
       showConfirm,
       showToast,
     });
     if (loaded) handleModeChange('deck');
   }, [
     allCards,
-    setDeck,
-    setCurrentRule,
-    setPrimaryFaction,
-    setSecondaryFaction,
+    applyShareWallLoad,
     showConfirm,
     showToast,
     handleModeChange,

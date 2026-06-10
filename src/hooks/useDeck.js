@@ -41,6 +41,7 @@ export function useDeck(
     setDeck: controller.setDeck,
     currentRule,
     setCurrentRule: controller.setCurrentRule,
+    applyShareWallLoad: controller.applyShareWallLoad,
     primaryFaction,
     setPrimaryFaction: controller.setPrimaryFaction,
     handleSetPrimaryFaction: controller.handleSetPrimaryFaction,

@@ -17,6 +17,7 @@ import { sanitizePersistedDeckState } from '../src/deck/persistedState.js';
 import { collectDeckStructureViolations } from '../src/deck/deckCompositionRules.js';
 import { STORAGE_KEY, SAVED_DECKS_KEY, RULE_STATE_KEY } from '../src/deck/constants.js';
 import { createDeckController } from '../src/deck/createDeckController.js';
+import { loadShareWallDeckIntoBuilder } from '../src/deck/shareWallHandlers.js';
 
 let failed = 0;
 
@@ -443,6 +444,57 @@ if (!savedWithRule?.rule || savedWithRule.rule.type !== 'rule1') {
 
   if (previousLs) globalThis.localStorage = previousLs;
   else delete globalThis.localStorage;
+}
+
+// setCurrentRule 應回傳 commit 結果（供分享牌組載入等流程判斷成功與否）
+{
+  const ctl = createDeckController({
+    allCards: [sampleCard],
+    showToast: () => {},
+    showConfirm: async () => true,
+    showPrompt: async () => null,
+  });
+  const applied = ctl.setCurrentRule(() => ({
+    isActive: true,
+    type: 'rule1',
+    primary: '鴉教團',
+    secondary: '',
+  }));
+  if (applied !== true) fail('setCurrentRule should return true when commit succeeds');
+}
+
+// loadShareWallDeckIntoBuilder：確認後應原子寫入牌組與規則
+{
+  const shareToasts = [];
+  const ctl = createDeckController({
+    allCards: [sampleCard],
+    showToast: (message, type) => shareToasts.push({ message, type }),
+    showConfirm: async () => true,
+    showPrompt: async () => null,
+  });
+  ctl.setDeck({ leader: [], rituals: [], main: [sampleCard] });
+  ctl.setCurrentRule(() => ({ isActive: true, type: 'rule1', primary: '鴉教團', secondary: '' }));
+
+  const loaded = await loadShareWallDeckIntoBuilder({
+    deckJson: { leader: [], rituals: [], main: ['cro01'] },
+    ruleJson: { type: 'rule1', primary: '鴉教團', secondary: '' },
+    allCards: [sampleCard],
+    applyShareWallLoad: ctl.applyShareWallLoad.bind(ctl),
+    showConfirm: async () => true,
+    showToast: (message, type) => shareToasts.push({ message, type }),
+  });
+
+  const snap = ctl.getSnapshot();
+  if (!loaded) fail('loadShareWallDeckIntoBuilder should succeed for valid share deck');
+  if (snap.deck.main.length !== 1 || snap.deck.main[0].id !== 'cro01') {
+    fail('loadShareWallDeckIntoBuilder should replace deck contents');
+  }
+  if (!snap.currentRule.isActive || snap.primaryFaction !== '鴉教團') {
+    fail('loadShareWallDeckIntoBuilder should apply rule and factions');
+  }
+  if (!shareToasts.some((t) => t.message === '已載入分享牌組')) {
+    fail('loadShareWallDeckIntoBuilder should toast success');
+  }
 }
 
 if (failed === 0) {
