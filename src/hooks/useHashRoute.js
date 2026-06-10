@@ -17,6 +17,9 @@ export function parseHashRoute(hash = window.location.hash) {
   if (parts[0] === 'decks') return { kind: 'community', communityScroll: 'decks' };
   if (parts[0] === 'guestbook') return { kind: 'community', communityScroll: 'guestbook' };
   if (parts[0] === 'community') return { kind: 'community' };
+  // 舊版錨點 #community-decks / #community-guestbook（勿與路由混用，會誤判為查牌）
+  if (raw === 'community-decks') return { kind: 'community', communityScroll: 'decks' };
+  if (raw === 'community-guestbook') return { kind: 'community', communityScroll: 'guestbook' };
   if (parts[0] === 'qa') return { kind: 'qa' };
   if (parts[0] === 'clock') return { kind: 'clock' };
   if (parts[0] === 'admin') return { kind: 'admin' };

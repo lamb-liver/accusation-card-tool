@@ -50,13 +50,13 @@ export default function CommunitySection({ showToast, onOpenDeck, initialSection
         aria-label="交流區捷徑"
       >
         <a
-          href="#community-guestbook"
+          href="#/guestbook"
           className="rounded-md border border-[#555] px-3 py-1.5 text-sm font-semibold text-gray-200 transition hover:border-brand-gold hover:text-brand-gold"
         >
           留言板
         </a>
         <a
-          href="#community-decks"
+          href="#/decks"
           className="rounded-md border border-[#555] px-3 py-1.5 text-sm font-semibold text-gray-200 transition hover:border-brand-gold hover:text-brand-gold"
         >
           分享牌組
