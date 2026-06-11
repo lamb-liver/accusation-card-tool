@@ -188,11 +188,11 @@
 }
 
 .clock-coin--heads {
-  transform: rotateY(0deg);
+  transform: none;
 }
 
 .clock-coin--tails {
-  transform: rotateY(180deg);
+  transform: none;
 }
 
 .clock-coin--flipping {
@@ -212,6 +212,13 @@
     inset 0 -0.45rem 0.75rem rgba(0, 0, 0, 0.2),
     inset 0 0.35rem 0.65rem rgba(255, 255, 255, 0.28);
   backface-visibility: hidden;
+  opacity: 0;
+  transition: opacity 0.15s;
+}
+
+.clock-coin--heads .clock-coin__face--heads,
+.clock-coin--tails .clock-coin__face--tails {
+  opacity: 1;
 }
 
 .clock-coin__face::before {
@@ -276,7 +283,6 @@
 }
 
 .clock-coin__face--tails {
-  transform: rotateY(180deg);
   background:
     radial-gradient(circle at 35% 28%, #f8fafc 0%, #93c5fd 42%, #0284c7 72%, #0f172a 100%);
   color: #083344;
