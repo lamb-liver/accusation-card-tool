@@ -9,6 +9,7 @@ import {
 import {
   reduceEndTurn,
   reducePauseFromRunning,
+  reduceSetStartingPlayer,
   reduceStart,
   reduceTick,
   reduceToggleRun,
@@ -84,6 +85,26 @@ state = reducePauseFromRunning(state, INITIAL_MS);
 assert(state.status === 'finished', 'reducePause timeout → finished');
 assert(state.winner === 'B', 'reducePause timeout winner B');
 assert(state.playerA.remainingMs === 0, 'reducePause timeout zero remaining');
+
+// ── clockEngine: starting player ──────────────────────────────────────────
+
+state = createInitialState();
+state = reduceSetStartingPlayer(state, 'B');
+assert(state.activePlayer === 'B', 'reduceSetStartingPlayer switches idle active player');
+assert(state.playerA.moves === 0 && state.playerB.moves === 0, 'reduceSetStartingPlayer preserves moves');
+
+const startingPlayerState = state;
+assert(
+  reduceSetStartingPlayer(startingPlayerState, 'B') === startingPlayerState,
+  'reduceSetStartingPlayer same player no-op',
+);
+
+state = reduceStart(state);
+assert(state.activePlayer === 'B', 'reduceStart preserves selected active player');
+assert(
+  reduceSetStartingPlayer(state, 'A') === state,
+  'reduceSetStartingPlayer running no-op',
+);
 
 // ── clockEngine: tick ──────────────────────────────────────────────────────
 

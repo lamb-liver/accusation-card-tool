@@ -15,6 +15,7 @@ export default function MobileFilterDrawer({
   filters = { faction: '', type: '', symbol: '', mechanic: '' },
   onApply = () => {},
   fabVisible = true,
+  fabZIndex = 900,
 }) {
   const [open, setOpen] = useState(false);
   const [openDropdown, setOpenDropdown] = useState(null);
@@ -75,6 +76,7 @@ export default function MobileFilterDrawer({
           id="mobileFilterFab"
           aria-label="開啟篩選"
           className="md:hidden fixed bottom-20 right-4 z-[900] flex h-14 w-14 items-center justify-center rounded-full bg-brand-gold text-neutral-900 shadow-[0_4px_20px_rgba(255,215,0,0.4)] hover:bg-amber-300 active:scale-95 transition"
+          style={{ zIndex: fabZIndex }}
           onClick={openDrawer}
         >
           <Funnel className="h-6 w-6" aria-hidden strokeWidth={2} />

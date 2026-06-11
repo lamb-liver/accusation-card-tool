@@ -3,6 +3,7 @@ import {
   createInitialState,
   reduceEndTurn,
   reducePauseFromRunning,
+  reduceSetStartingPlayer,
   reduceStart,
   reduceTick,
   reduceToggleRun,
@@ -83,6 +84,10 @@ export function useGameClock() {
     setState(createInitialState);
   }, []);
 
+  const setStartingPlayer = useCallback((playerId) => {
+    setState((prev) => reduceSetStartingPlayer(prev, playerId));
+  }, []);
+
   const endTurn = useCallback(() => {
     setState((prev) => {
       if (prev.status !== 'running') return prev;
@@ -116,6 +121,7 @@ export function useGameClock() {
     start,
     pause,
     reset,
+    setStartingPlayer,
     endTurn,
     toggleRun,
   };

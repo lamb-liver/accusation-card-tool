@@ -1,20 +1,19 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Eye, Shield } from 'lucide-react';
 import {
   adminLogin,
   adminLogout,
-  ADMIN_PAGE_SIZE,
   fetchAdminDeck,
   fetchAdminSubmissions,
   patchDeckStatus,
   patchMessageStatus,
   ShareWallApiError,
 } from '../../api/shareWallApi.js';
-import { useAsyncResource } from '../../hooks/useAsyncResource.js';
 import { formatApiDate } from '../../utils/formatApiDate.js';
 import { formatShareWallError } from '../../utils/formatShareWallError.js';
 import { cardNamesById } from '../../data/cardNames.generated.js';
 import AsyncPanel, { LoadMoreButton } from '../common/AsyncPanel.jsx';
+import { useAdminSubmissions } from './useAdminSubmissions.js';
 
 const STATUS_OPTIONS = [
   { id: 'pending', label: '待審核' },
@@ -39,17 +38,6 @@ export default function AdminSection({ showToast, showConfirm }) {
   const [typeFilter, setTypeFilter] = useState('all');
   const [actionId, setActionId] = useState(null);
 
-  const [decks, setDecks] = useState([]);
-  const [messages, setMessages] = useState([]);
-  const [decksHasMore, setDecksHasMore] = useState(false);
-  const [messagesHasMore, setMessagesHasMore] = useState(false);
-  const [deckOffset, setDeckOffset] = useState(0);
-  const [messageOffset, setMessageOffset] = useState(0);
-  const [isLoadingMoreDecks, setIsLoadingMoreDecks] = useState(false);
-  const [isLoadingMoreMessages, setIsLoadingMoreMessages] = useState(false);
-  const [loadMoreDecksError, setLoadMoreDecksError] = useState('');
-  const [loadMoreMessagesError, setLoadMoreMessagesError] = useState('');
-
   const [previewDeck, setPreviewDeck] = useState(null);
   const [previewLoadingId, setPreviewLoadingId] = useState(null);
 
@@ -72,31 +60,23 @@ export default function AdminSection({ showToast, showConfirm }) {
     };
   }, []);
 
-  const loader = useCallback(async () => {
-    if (authState !== true) {
-      return { decks: [], messages: [], decksHasMore: false, messagesHasMore: false };
-    }
-    return fetchAdminSubmissions({
-      type: typeFilter,
-      status: statusFilter,
-      limit: ADMIN_PAGE_SIZE,
-      offset: 0,
-    });
-  }, [typeFilter, statusFilter, authState]);
-
-  const { data, isLoading, isRetrying, isError, errorMessage, reload } = useAsyncResource(loader);
-
-  useEffect(() => {
-    if (!data) return;
-    setDecks(data.decks ?? []);
-    setMessages(data.messages ?? []);
-    setDecksHasMore(data.decksHasMore ?? false);
-    setMessagesHasMore(data.messagesHasMore ?? false);
-    setDeckOffset((data.decks ?? []).length);
-    setMessageOffset((data.messages ?? []).length);
-    setLoadMoreDecksError('');
-    setLoadMoreMessagesError('');
-  }, [data]);
+  const {
+    decks,
+    messages,
+    decksHasMore,
+    messagesHasMore,
+    isLoading,
+    isRetrying,
+    isError,
+    errorMessage,
+    reload,
+    isLoadingMoreDecks,
+    isLoadingMoreMessages,
+    loadMoreDecksError,
+    loadMoreMessagesError,
+    handleLoadMoreDecks,
+    handleLoadMoreMessages,
+  } = useAdminSubmissions({ authState, typeFilter, statusFilter });
 
   async function handleLogin(event) {
     event.preventDefault();
@@ -157,48 +137,6 @@ export default function AdminSection({ showToast, showConfirm }) {
       showToast(formatShareWallError(error, '無法載入牌組'), 'error');
     } finally {
       setPreviewLoadingId(null);
-    }
-  }
-
-  async function handleLoadMoreDecks() {
-    if (isLoadingMoreDecks || !decksHasMore) return;
-    setIsLoadingMoreDecks(true);
-    setLoadMoreDecksError('');
-    try {
-      const next = await fetchAdminSubmissions({
-        type: 'deck',
-        status: statusFilter,
-        limit: ADMIN_PAGE_SIZE,
-        offset: deckOffset,
-      });
-      setDecks((prev) => [...prev, ...(next.decks ?? [])]);
-      setDecksHasMore(next.decksHasMore ?? false);
-      setDeckOffset((prev) => prev + (next.decks ?? []).length);
-    } catch (error) {
-      setLoadMoreDecksError(formatShareWallError(error, '載入更多失敗'));
-    } finally {
-      setIsLoadingMoreDecks(false);
-    }
-  }
-
-  async function handleLoadMoreMessages() {
-    if (isLoadingMoreMessages || !messagesHasMore) return;
-    setIsLoadingMoreMessages(true);
-    setLoadMoreMessagesError('');
-    try {
-      const next = await fetchAdminSubmissions({
-        type: 'guestbook',
-        status: statusFilter,
-        limit: ADMIN_PAGE_SIZE,
-        offset: messageOffset,
-      });
-      setMessages((prev) => [...prev, ...(next.messages ?? [])]);
-      setMessagesHasMore(next.messagesHasMore ?? false);
-      setMessageOffset((prev) => prev + (next.messages ?? []).length);
-    } catch (error) {
-      setLoadMoreMessagesError(formatShareWallError(error, '載入更多失敗'));
-    } finally {
-      setIsLoadingMoreMessages(false);
     }
   }
 

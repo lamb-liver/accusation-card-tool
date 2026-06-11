@@ -73,7 +73,8 @@ npm run preview      # 預覽 dist/（預設 http://localhost:4173）
 | `npm run test:card-catalog` | 卡牌目錄載入測試 |
 | `npm run test:deck` | 牌組領域模組測試 |
 | `npm run test:gallery-layout` | 卡池版面估算測試 |
-| `npm run test:deck-layout` | 組牌模式 viewport／scroll 容器 Playwright 斷言 |
+| `npm run test:utils` | 路由、篩選、卡片 metadata、分享牆 API client 等純工具測試 |
+| `npm run test:deck-layout` | 組牌模式 viewport／scroll 容器 Playwright 斷言（需先啟動 dev 或 preview server） |
 | `npm run audit:deck-layout` | 組牌版面詳細 dump（除錯用） |
 | `npm run split:cards` | 將 `public/cards.json` 拆成 `public/cards/*.json` |
 | `npm run optimize:images` | 由 master WebP 產生 `-w160` / `-w320` / `-w640` 的 WebP、AVIF |

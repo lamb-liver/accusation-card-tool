@@ -1,4 +1,4 @@
-import { lazy, Suspense, useCallback, useEffect, useState, useMemo } from 'react';
+import { lazy, Suspense, useCallback, useMemo } from 'react';
 import { useGridColumnCount } from './hooks/useGridColumnCount.js';
 import {
   estimateGalleryMinHeight,
@@ -14,18 +14,8 @@ import { useToast }       from './hooks/useToast.js';
 import { useDialog }      from './hooks/useDialog.js';
 import { useHashRoute } from './hooks/useHashRoute.js';
 import { useLayoutInvariant } from './hooks/useLayoutInvariant.js';
+import { useCommunityDeckFlow } from './hooks/useCommunityDeckFlow.js';
 import { filterCardsByRule } from './rules/index.js';
-import {
-  canSubmitDeckToShareWall,
-  loadShareWallDeckIntoBuilder,
-  submitDeckShareForm,
-} from './deck/shareWallHandlers.js';
-import { formatShareWallError } from './utils/formatShareWallError.js';
-import {
-  clearCommunityListState,
-  consumeCommunityReturnPath,
-  saveCommunityListState,
-} from './utils/communityScroll.js';
 import DeckSubmitModal from './components/shareWall/DeckSubmitModal.jsx';
 
 import FilterToolbar       from './components/FilterToolbar.jsx';
@@ -63,8 +53,6 @@ function resolveModeFromRoute(route) {
 }
 
 function App() {
-  const [deckSubmitOpen, setDeckSubmitOpen] = useState(false);
-  const [deckSubmitting, setDeckSubmitting] = useState(false);
   const { route, navigate } = useHashRoute();
   const currentMode = resolveModeFromRoute(route);
 
@@ -81,21 +69,6 @@ function App() {
   const detailShareId = route.kind === 'deck-detail' ? route.shareId : null;
   const communityScrollTarget =
     route.kind === 'community' ? route.communityScroll : undefined;
-
-  const handleOpenShareDeck = useCallback((shareId) => {
-    saveCommunityListState();
-    navigate(`decks/${shareId}`);
-  }, [navigate]);
-
-  const handleBackToCommunity = useCallback(() => {
-    navigate(consumeCommunityReturnPath());
-  }, [navigate]);
-
-  useEffect(() => {
-    if (currentMode !== 'community') {
-      clearCommunityListState();
-    }
-  }, [currentMode]);
 
   // ── 資料層 ────────────────────────────────────────────────────────────────
   const { allCards, isLoading, isError, retry }                         = useCardData();
@@ -119,11 +92,9 @@ function App() {
   // ── 牌組層 ────────────────────────────────────────────────────────────────
   const {
     deck,
-    setDeck,
     currentRule,
-    setCurrentRule,
     primaryFaction,   handleSetPrimaryFaction,
-    secondaryFaction, setSecondaryFaction, setPrimaryFaction,
+    secondaryFaction, setSecondaryFaction,
     savedDecks,
     applyRuleLogic,
     addToDeck,
@@ -143,41 +114,25 @@ function App() {
     applyShareWallLoad,
   } = useDeck(allCards, showToast, showConfirm, showPrompt);
 
-  const handleSubmitToShareWall = useCallback(() => {
-    if (!canSubmitDeckToShareWall(deck, currentRule, showToast)) return;
-    setDeckSubmitOpen(true);
-  }, [deck, currentRule, showToast]);
-
-  const handleDeckShareSubmit = useCallback(async (form) => {
-    setDeckSubmitting(true);
-    try {
-      await submitDeckShareForm(deck, currentRule, form);
-      showToast('投稿成功，等待管理員審核', 'success');
-      setDeckSubmitOpen(false);
-    } catch (error) {
-      showToast(formatShareWallError(error, '投稿失敗'), 'error');
-    } finally {
-      setDeckSubmitting(false);
-    }
-  }, [deck, currentRule, showToast]);
-
-  const handleLoadShareDeck = useCallback(async (shareDeck) => {
-    const loaded = await loadShareWallDeckIntoBuilder({
-      deckJson: shareDeck.deck_json,
-      ruleJson: shareDeck.rule_json,
-      allCards,
-      applyShareWallLoad,
-      showConfirm,
-      showToast,
-    });
-    if (loaded) handleModeChange('deck');
-  }, [
+  const {
+    deckSubmitOpen,
+    deckSubmitting,
+    closeDeckSubmitModal,
+    handleOpenShareDeck,
+    handleBackToCommunity,
+    handleSubmitToShareWall,
+    handleDeckShareSubmit,
+    handleLoadShareDeck,
+  } = useCommunityDeckFlow({
+    currentMode,
+    navigate,
+    deck,
+    currentRule,
     allCards,
     applyShareWallLoad,
     showConfirm,
     showToast,
-    handleModeChange,
-  ]);
+  });
 
   // ── 組牌模式：套用規則後的卡牌數量（供 FilterToolbar 顯示）────────────────
   const deckFilteredCount = useMemo(() => {
@@ -228,6 +183,7 @@ function App() {
         searchTerm={searchTerm}
         filters={filters}
         fabVisible={currentMode === 'gallery' || currentMode === 'deck'}
+        fabZIndex={currentMode === 'deck' ? 350 : 900}
         onApply={({ searchTerm: nextSearch, filters: nextFilters }) => {
           setSearchTerm(nextSearch);
           setFilters(nextFilters);
@@ -395,7 +351,7 @@ function App() {
       <DeckSubmitModal
         open={deckSubmitOpen}
         isSubmitting={deckSubmitting}
-        onClose={() => !deckSubmitting && setDeckSubmitOpen(false)}
+        onClose={closeDeckSubmitModal}
         onSubmit={handleDeckShareSubmit}
       />
       </div>

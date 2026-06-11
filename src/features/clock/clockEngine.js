@@ -16,6 +16,16 @@ export function reduceStart(prev) {
 
 /**
  * @param {import('./clockUtils.js').GameClockState} prev
+ * @param {import('./clockUtils.js').PlayerId} playerId
+ * @returns {import('./clockUtils.js').GameClockState}
+ */
+export function reduceSetStartingPlayer(prev, playerId) {
+  if (prev.status !== 'idle' || prev.activePlayer === playerId) return prev;
+  return { ...prev, activePlayer: playerId };
+}
+
+/**
+ * @param {import('./clockUtils.js').GameClockState} prev
  * @param {number} elapsedMs
  * @returns {import('./clockUtils.js').GameClockState}
  */
