@@ -66,6 +66,15 @@
   background: rgba(26, 26, 26, 0.88);
 }
 
+.clock-coin-panel--collapsed {
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  gap: 0.5rem;
+  min-height: 2.875rem;
+  padding: 0.375rem 0.625rem;
+  border-color: rgba(255, 215, 0, 0.36);
+  background: rgba(26, 26, 26, 0.76);
+}
+
 .clock-coin-panel__main {
   display: flex;
   min-width: 0;
@@ -167,6 +176,17 @@
   content: '';
 }
 
+.clock-coin--mini {
+  width: 2rem;
+  height: 2rem;
+  flex: 0 0 auto;
+  filter: drop-shadow(0 0.18rem 0.3rem rgba(0, 0, 0, 0.32));
+}
+
+.clock-coin--mini::before {
+  inset: 0.16rem -0.04rem 0.16rem 0.04rem;
+}
+
 .clock-coin--heads {
   transform: rotateY(0deg);
 }
@@ -218,10 +238,35 @@
 .clock-coin__mark {
   position: relative;
   z-index: 1;
+  font-family: "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", "Heiti TC", "Arial Black", sans-serif;
   font-size: 1.45rem;
   font-weight: 900;
   line-height: 1;
+  letter-spacing: 0;
   text-shadow: 0 1px 0 rgba(255, 255, 255, 0.3), 0 -1px 0 rgba(0, 0, 0, 0.24);
+}
+
+.clock-coin--mini .clock-coin__face {
+  border-width: 0.08rem;
+  box-shadow:
+    inset 0 0 0 0.15rem rgba(23, 23, 23, 0.12),
+    inset 0 -0.24rem 0.42rem rgba(0, 0, 0, 0.22),
+    inset 0 0.2rem 0.34rem rgba(255, 255, 255, 0.28);
+}
+
+.clock-coin--mini .clock-coin__face::before {
+  inset: 0.25rem;
+}
+
+.clock-coin--mini .clock-coin__face::after {
+  top: 0.32rem;
+  left: 0.42rem;
+  width: 0.9rem;
+  height: 0.32rem;
+}
+
+.clock-coin--mini .clock-coin__mark {
+  font-size: 0.875rem;
 }
 
 .clock-coin__face--heads {
@@ -307,6 +352,53 @@
   color: var(--clock-text-muted);
   font-size: 0.75rem;
   line-height: 1.35;
+}
+
+.clock-coin-panel__summary {
+  display: flex;
+  min-width: 0;
+  flex-wrap: wrap;
+  gap: 0.125rem 0.5rem;
+  align-items: baseline;
+  margin: 0;
+  line-height: 1.25;
+}
+
+.clock-coin-panel__summary-result {
+  color: var(--clock-text-muted);
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+.clock-coin-panel__summary-order {
+  color: var(--clock-text-primary);
+  font-size: 0.8125rem;
+  font-weight: 800;
+}
+
+.clock-coin-panel__reselect {
+  min-height: 1.875rem;
+  padding: 0.25rem 0.5rem;
+  border: 1px solid var(--clock-border-control);
+  border-radius: 0.375rem;
+  background: var(--clock-surface-raised);
+  color: var(--clock-text-primary);
+  font-size: 0.6875rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s, color 0.15s;
+  white-space: nowrap;
+}
+
+.clock-coin-panel__reselect:hover:not(:disabled) {
+  border-color: var(--clock-brand-gold);
+  background: rgba(255, 215, 0, 0.1);
+  color: var(--clock-brand-gold);
+}
+
+.clock-coin-panel__reselect:focus-visible {
+  outline: 2px solid var(--clock-focus-ring);
+  outline-offset: 2px;
 }
 
 .clock-page__board {
@@ -503,6 +595,7 @@
   .clock-coin,
   .clock-coin-flip,
   .clock-choice-btn,
+  .clock-coin-panel__reselect,
   .clock-btn,
   .clock-player {
     transition: none;
@@ -520,6 +613,12 @@
     grid-template-columns: 4.625rem minmax(0, 1fr);
     gap: 0.5rem;
     padding: 0.5rem;
+  }
+
+  .clock-coin-panel--collapsed {
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    min-height: 2.75rem;
+    padding: 0.375rem 0.5rem;
   }
 
   .clock-coin-panel__icon {

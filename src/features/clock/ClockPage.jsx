@@ -88,6 +88,7 @@ export default function ClockPage() {
   const canChooseTurnOrder = status === 'idle' && coinStatus === 'done';
   const coinResultLabel = coinResult ? COIN_FACE_BY_RESULT[coinResult].label : '正面';
   const playerATurnOrderLabel = getPlayerATurnOrderLabel(activePlayer, selectedFirstPlayer);
+  const isCoinSetupCollapsed = selectedFirstPlayer !== null;
 
   useEffect(() => {
     if (!isRunning) return;
@@ -121,6 +122,11 @@ export default function ClockPage() {
     setSelectedFirstPlayer(firstPlayer);
   };
 
+  const handleReopenCoinSetup = () => {
+    if (status !== 'idle') return;
+    setSelectedFirstPlayer(null);
+  };
+
   const handleReset = () => {
     clearTimeout(coinTimerRef.current);
     setCoinStatus('idle');
@@ -142,82 +148,123 @@ export default function ClockPage() {
         </p>
       </header>
 
-      <section className="clock-coin-panel" aria-labelledby="clock-coin-title">
-        <button
-          type="button"
-          className="clock-coin-flip"
-          onClick={handleFlipCoin}
-          disabled={!canFlipCoin}
-          aria-describedby="clock-coin-status"
-        >
-          <span
-            className={[
-              'clock-coin',
-              coinStatus === 'flipping' ? 'clock-coin--flipping' : '',
-              coinResult === 'tails' ? 'clock-coin--tails' : 'clock-coin--heads',
-            ]
-              .filter(Boolean)
-              .join(' ')}
-            aria-hidden
-          >
-            <span className="clock-coin__face clock-coin__face--heads">
-              <span className="clock-coin__mark">正</span>
+      <section
+        className={`clock-coin-panel ${isCoinSetupCollapsed ? 'clock-coin-panel--collapsed' : ''}`}
+        aria-labelledby="clock-coin-title"
+      >
+        {isCoinSetupCollapsed ? (
+          <>
+            <span id="clock-coin-title" className="clock-sr-only">
+              擲硬幣設定結果
             </span>
-            <span className="clock-coin__face clock-coin__face--tails">
-              <span className="clock-coin__mark">反</span>
+            <span
+              className={[
+                'clock-coin',
+                'clock-coin--mini',
+                coinResult === 'tails' ? 'clock-coin--tails' : 'clock-coin--heads',
+              ]
+                .filter(Boolean)
+                .join(' ')}
+              aria-hidden
+            >
+              <span className="clock-coin__face clock-coin__face--heads">
+                <span className="clock-coin__mark">正</span>
+              </span>
+              <span className="clock-coin__face clock-coin__face--tails">
+                <span className="clock-coin__mark">反</span>
+              </span>
             </span>
-          </span>
-          <span className="clock-coin-flip__label">
-            {coinStatus === 'flipping' ? '擲硬幣中…' : '擲硬幣'}
-          </span>
-        </button>
 
-        <div className="clock-coin-panel__main">
-          <div className="clock-coin-panel__header">
-            <span className="clock-coin-panel__icon" aria-hidden>
-              <Coins strokeWidth={2.25} />
-            </span>
-            <div>
-              <h3 id="clock-coin-title" className="clock-coin-panel__title">
-                擲硬幣決定先後手
-              </h3>
-              <p className="clock-coin-panel__rule">規則：擲硬幣贏的人可以選擇先手或後手。</p>
-            </div>
-          </div>
-
-          <div className="clock-coin-panel__content">
-            <p id="clock-coin-status" className="clock-coin-panel__status" role="status">
-              {coinStatus === 'flipping'
-                ? '硬幣旋轉中…'
-                : coinStatus === 'done'
-                  ? `擲出${coinResultLabel}。請設定玩家 A 先手或後手。`
-                  : '擲出正反面後，由贏家選擇玩家 A 的先後手。'}
+            <p className="clock-coin-panel__summary" role="status">
+              <span className="clock-coin-panel__summary-result">擲出{coinResultLabel}</span>
+              <span className="clock-coin-panel__summary-order">{playerATurnOrderLabel}</span>
             </p>
 
-            <div className="clock-coin-panel__choices" aria-label="設定玩家 A 先後手">
-              <button
-                type="button"
-                className="clock-choice-btn"
-                onClick={() => handleChoosePlayerATurnOrder(true)}
-                disabled={!canChooseTurnOrder}
-              >
-                玩家 A 先手
+            {status === 'idle' && (
+              <button type="button" className="clock-coin-panel__reselect" onClick={handleReopenCoinSetup}>
+                重選
               </button>
-              <button
-                type="button"
-                className="clock-choice-btn"
-                onClick={() => handleChoosePlayerATurnOrder(false)}
-                disabled={!canChooseTurnOrder}
+            )}
+          </>
+        ) : (
+          <>
+            <button
+              type="button"
+              className="clock-coin-flip"
+              onClick={handleFlipCoin}
+              disabled={!canFlipCoin}
+              aria-describedby="clock-coin-status"
+            >
+              <span
+                className={[
+                  'clock-coin',
+                  coinStatus === 'flipping' ? 'clock-coin--flipping' : '',
+                  coinResult === 'tails' ? 'clock-coin--tails' : 'clock-coin--heads',
+                ]
+                  .filter(Boolean)
+                  .join(' ')}
+                aria-hidden
               >
-                玩家 A 後手
-              </button>
-            </div>
+                <span className="clock-coin__face clock-coin__face--heads">
+                  <span className="clock-coin__mark">正</span>
+                </span>
+                <span className="clock-coin__face clock-coin__face--tails">
+                  <span className="clock-coin__mark">反</span>
+                </span>
+              </span>
+              <span className="clock-coin-flip__label">
+                {coinStatus === 'flipping' ? '擲硬幣中…' : '擲硬幣'}
+              </span>
+            </button>
 
-            <p className="clock-coin-panel__selection">
-              {playerATurnOrderLabel}
-            </p>
-          </div>
-        </div>
+            <div className="clock-coin-panel__main">
+              <div className="clock-coin-panel__header">
+                <span className="clock-coin-panel__icon" aria-hidden>
+                  <Coins strokeWidth={2.25} />
+                </span>
+                <div>
+                  <h3 id="clock-coin-title" className="clock-coin-panel__title">
+                    擲硬幣決定先後手
+                  </h3>
+                  <p className="clock-coin-panel__rule">規則：擲硬幣贏的人可以選擇先手或後手。</p>
+                </div>
+              </div>
+
+              <div className="clock-coin-panel__content">
+                <p id="clock-coin-status" className="clock-coin-panel__status" role="status">
+                  {coinStatus === 'flipping'
+                    ? '硬幣旋轉中…'
+                    : coinStatus === 'done'
+                      ? `擲出${coinResultLabel}。請設定玩家 A 先手或後手。`
+                      : '擲出正反面後，由贏家選擇玩家 A 的先後手。'}
+                </p>
+
+                <div className="clock-coin-panel__choices" aria-label="設定玩家 A 先後手">
+                  <button
+                    type="button"
+                    className="clock-choice-btn"
+                    onClick={() => handleChoosePlayerATurnOrder(true)}
+                    disabled={!canChooseTurnOrder}
+                  >
+                    玩家 A 先手
+                  </button>
+                  <button
+                    type="button"
+                    className="clock-choice-btn"
+                    onClick={() => handleChoosePlayerATurnOrder(false)}
+                    disabled={!canChooseTurnOrder}
+                  >
+                    玩家 A 後手
+                  </button>
+                </div>
+
+                <p className="clock-coin-panel__selection">
+                  {playerATurnOrderLabel}
+                </p>
+              </div>
+            </div>
+          </>
+        )}
       </section>
 
       <div className="clock-page__board">
