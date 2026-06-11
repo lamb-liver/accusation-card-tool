@@ -1,14 +1,14 @@
 import { useEffect, useRef, useState } from 'react';
 import { Coins, Pause, Play, RotateCcw } from 'lucide-react';
-import { formatTime, INITIAL_MINUTES, otherPlayer } from './clockUtils.js';
+import { formatTime, INITIAL_MINUTES } from './clockUtils.js';
 import { useGameClock } from './useGameClock.js';
 import './ClockPage.css';
 
 const LOW_TIME_MS = 60_000;
 const COIN_FLIP_MS = 1100;
 const COIN_FACE_BY_RESULT = {
-  heads: { label: '正面', playerId: 'A' },
-  tails: { label: '反面', playerId: 'B' },
+  heads: { label: '正面' },
+  tails: { label: '反面' },
 };
 
 function getRandomCoinResult() {
@@ -19,6 +19,12 @@ function getRandomCoinResult() {
   }
 
   return Math.random() < 0.5 ? 'heads' : 'tails';
+}
+
+function getPlayerATurnOrderLabel(activePlayer, selectedFirstPlayer) {
+  if (selectedFirstPlayer === 'A') return '已設定玩家 A 先手';
+  if (selectedFirstPlayer === 'B') return '已設定玩家 A 後手';
+  return `目前玩家 ${activePlayer} 先手`;
 }
 
 function PlayerPanel({ playerId, label, player, isActive, isRunning, onEndTurn }) {
@@ -74,7 +80,6 @@ export default function ClockPage() {
   const [turnAnnounce, setTurnAnnounce] = useState('');
   const [coinStatus, setCoinStatus] = useState('idle');
   const [coinResult, setCoinResult] = useState(null);
-  const [coinWinner, setCoinWinner] = useState(null);
   const [selectedFirstPlayer, setSelectedFirstPlayer] = useState(null);
   const prevActiveRef = useRef(activePlayer);
   const coinTimerRef = useRef(0);
@@ -82,6 +87,7 @@ export default function ClockPage() {
   const canFlipCoin = status === 'idle' && coinStatus !== 'flipping';
   const canChooseTurnOrder = status === 'idle' && coinStatus === 'done';
   const coinResultLabel = coinResult ? COIN_FACE_BY_RESULT[coinResult].label : '正面';
+  const playerATurnOrderLabel = getPlayerATurnOrderLabel(activePlayer, selectedFirstPlayer);
 
   useEffect(() => {
     if (!isRunning) return;
@@ -97,11 +103,9 @@ export default function ClockPage() {
     if (!canFlipCoin) return;
 
     const nextResult = getRandomCoinResult();
-    const nextWinner = COIN_FACE_BY_RESULT[nextResult].playerId;
     clearTimeout(coinTimerRef.current);
     setCoinStatus('flipping');
     setCoinResult(nextResult);
-    setCoinWinner(nextWinner);
     setSelectedFirstPlayer(null);
 
     coinTimerRef.current = window.setTimeout(() => {
@@ -109,10 +113,10 @@ export default function ClockPage() {
     }, COIN_FLIP_MS);
   };
 
-  const handleChooseWinnerTurnOrder = (winnerGoesFirst) => {
-    if (!coinWinner || !canChooseTurnOrder) return;
+  const handleChoosePlayerATurnOrder = (playerAGoesFirst) => {
+    if (!canChooseTurnOrder) return;
 
-    const firstPlayer = winnerGoesFirst ? coinWinner : otherPlayer(coinWinner);
+    const firstPlayer = playerAGoesFirst ? 'A' : 'B';
     setStartingPlayer(firstPlayer);
     setSelectedFirstPlayer(firstPlayer);
   };
@@ -121,7 +125,6 @@ export default function ClockPage() {
     clearTimeout(coinTimerRef.current);
     setCoinStatus('idle');
     setCoinResult(null);
-    setCoinWinner(null);
     setSelectedFirstPlayer(null);
     reset();
   };
@@ -140,74 +143,78 @@ export default function ClockPage() {
       </header>
 
       <section className="clock-coin-panel" aria-labelledby="clock-coin-title">
-        <div className="clock-coin-panel__header">
-          <span className="clock-coin-panel__icon" aria-hidden>
-            <Coins strokeWidth={2.25} />
-          </span>
-          <div>
-            <h3 id="clock-coin-title" className="clock-coin-panel__title">
-              擲硬幣決定先後手
-            </h3>
-            <p className="clock-coin-panel__rule">規則：擲硬幣贏的人可以選擇先手或後手。</p>
-          </div>
-        </div>
-
-        <div className="clock-coin-panel__body">
-          <button
-            type="button"
-            className="clock-coin-flip"
-            onClick={handleFlipCoin}
-            disabled={!canFlipCoin}
-            aria-describedby="clock-coin-status"
+        <button
+          type="button"
+          className="clock-coin-flip"
+          onClick={handleFlipCoin}
+          disabled={!canFlipCoin}
+          aria-describedby="clock-coin-status"
+        >
+          <span
+            className={[
+              'clock-coin',
+              coinStatus === 'flipping' ? 'clock-coin--flipping' : '',
+              coinResult === 'tails' ? 'clock-coin--tails' : 'clock-coin--heads',
+            ]
+              .filter(Boolean)
+              .join(' ')}
+            aria-hidden
           >
-            <span
-              className={[
-                'clock-coin',
-                coinStatus === 'flipping' ? 'clock-coin--flipping' : '',
-                coinResult === 'tails' ? 'clock-coin--tails' : 'clock-coin--heads',
-              ]
-                .filter(Boolean)
-                .join(' ')}
-              aria-hidden
-            >
-              <span className="clock-coin__face clock-coin__face--heads">正</span>
-              <span className="clock-coin__face clock-coin__face--tails">反</span>
+            <span className="clock-coin__face clock-coin__face--heads">
+              <span className="clock-coin__mark">正</span>
             </span>
-            <span className="clock-coin-flip__label">
-              {coinStatus === 'flipping' ? '擲硬幣中…' : '擲硬幣'}
+            <span className="clock-coin__face clock-coin__face--tails">
+              <span className="clock-coin__mark">反</span>
             </span>
-          </button>
+          </span>
+          <span className="clock-coin-flip__label">
+            {coinStatus === 'flipping' ? '擲硬幣中…' : '擲硬幣'}
+          </span>
+        </button>
+
+        <div className="clock-coin-panel__main">
+          <div className="clock-coin-panel__header">
+            <span className="clock-coin-panel__icon" aria-hidden>
+              <Coins strokeWidth={2.25} />
+            </span>
+            <div>
+              <h3 id="clock-coin-title" className="clock-coin-panel__title">
+                擲硬幣決定先後手
+              </h3>
+              <p className="clock-coin-panel__rule">規則：擲硬幣贏的人可以選擇先手或後手。</p>
+            </div>
+          </div>
 
           <div className="clock-coin-panel__content">
             <p id="clock-coin-status" className="clock-coin-panel__status" role="status">
               {coinStatus === 'flipping'
                 ? '硬幣旋轉中…'
                 : coinStatus === 'done'
-                  ? `${coinResultLabel}，玩家 ${coinWinner} 贏。`
-                  : '玩家 A 代表正面，玩家 B 代表反面。'}
+                  ? `擲出${coinResultLabel}。請設定玩家 A 先手或後手。`
+                  : '擲出正反面後，由贏家選擇玩家 A 的先後手。'}
             </p>
 
-            <div className="clock-coin-panel__choices" aria-label="擲硬幣贏家選擇先後手">
+            <div className="clock-coin-panel__choices" aria-label="設定玩家 A 先後手">
               <button
                 type="button"
                 className="clock-choice-btn"
-                onClick={() => handleChooseWinnerTurnOrder(true)}
+                onClick={() => handleChoosePlayerATurnOrder(true)}
                 disabled={!canChooseTurnOrder}
               >
-                贏家先手
+                玩家 A 先手
               </button>
               <button
                 type="button"
                 className="clock-choice-btn"
-                onClick={() => handleChooseWinnerTurnOrder(false)}
+                onClick={() => handleChoosePlayerATurnOrder(false)}
                 disabled={!canChooseTurnOrder}
               >
-                贏家後手
+                玩家 A 後手
               </button>
             </div>
 
             <p className="clock-coin-panel__selection">
-              {selectedFirstPlayer ? `已設定玩家 ${selectedFirstPlayer} 先手` : `目前玩家 ${activePlayer} 先手`}
+              {playerATurnOrderLabel}
             </p>
           </div>
         </div>
