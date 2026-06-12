@@ -61,6 +61,10 @@ assertDeepEqual(
   'legacy guestbook anchor route',
 );
 assertDeepEqual(parseHashRoute('#/admin'), { kind: 'admin' }, 'admin hash route');
+assertDeepEqual(parseHashRoute('#/tools'), { kind: 'tools', toolId: 'coin' }, 'tools route defaults to coin');
+assertDeepEqual(parseHashRoute('#/tools/coin'), { kind: 'tools', toolId: 'coin' }, 'coin tool route');
+assertDeepEqual(parseHashRoute('#/tools/dice'), { kind: 'tools', toolId: 'dice' }, 'dice tool route');
+assertDeepEqual(parseHashRoute('#/tools/timer'), { kind: 'tools', toolId: 'timer' }, 'timer tool route');
 assertDeepEqual(parseHashRoute('#/unknown'), { kind: 'home' }, 'unknown hash routes home');
 
 // ── card filter pure logic ─────────────────────────────────────────────────
