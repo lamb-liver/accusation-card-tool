@@ -15,7 +15,7 @@ export default function PaginationControls({
   if (totalCards === 0) return null;
 
   return (
-    <div className="flex justify-center items-center gap-1.5 flex-wrap my-5">
+    <div className="pagination-controls flex justify-center items-center gap-1.5 flex-wrap my-5">
       {isPaginationMode && (
         <>
           <button

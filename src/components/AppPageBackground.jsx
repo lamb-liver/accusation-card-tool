@@ -16,7 +16,7 @@ export default function AppPageBackground({ activeMode }) {
           data-mode={mode}
           hidden={activeMode !== mode}
           aria-hidden
-          style={{ backgroundImage: `linear-gradient(rgba(0,0,0,0.55), rgba(0,0,0,0.55)), url('${APP_BACKGROUND_IMAGE}')` }}
+          style={{ '--app-background-image': `url('${APP_BACKGROUND_IMAGE}')` }}
         />
       ))}
     </>

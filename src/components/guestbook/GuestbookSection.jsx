@@ -103,7 +103,7 @@ export default function GuestbookSection({ showToast, embedded = false }) {
 
       <form
         onSubmit={handleSubmit}
-        className="rounded-lg border-2 border-[#444] bg-[#252525] p-4 space-y-3"
+        className="guestbook-form rounded-lg border-2 border-[#444] bg-[#252525] p-4 space-y-3"
       >
         <div>
           <label htmlFor="guestbook-author" className="mb-1 block text-sm text-gray-400">
@@ -167,7 +167,7 @@ export default function GuestbookSection({ showToast, embedded = false }) {
             {messages.map((entry, index) => (
               <li
                 key={`${entry.author_name}-${entry.reviewed_at}-${index}`}
-                className="rounded-lg border border-[#444] bg-[#252525] p-4"
+                className="guestbook-message-card rounded-lg border border-[#444] bg-[#252525] p-4"
               >
                 <div className="mb-2 flex items-center justify-between gap-2 text-sm">
                   <span className="font-semibold text-brand-gold">{entry.author_name}</span>

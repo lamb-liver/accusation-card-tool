@@ -96,7 +96,7 @@ function Card({
 
   return (
     <div
-      className={`group relative flex min-w-0 flex-col overflow-hidden rounded-lg ${
+      className={`card-shell group relative flex min-w-0 flex-col overflow-hidden rounded-lg ${
         alignActionBar ? 'h-full' : compact ? 'h-auto' : 'h-full'
       }`}
     >
@@ -109,7 +109,7 @@ function Card({
         } ${showActionButton ? 'rounded-t-lg' : 'rounded-lg'}`}
       >
         <div
-          className={`relative flex flex-col overflow-hidden border-2 border-gray-600 bg-black shadow-lg transition-[border-color,box-shadow] duration-300 group-hover:border-brand-gold group-hover:shadow-brand-gold/50 focus-visible:border-brand-gold ${
+          className={`card-face relative flex flex-col overflow-hidden border-2 border-gray-600 bg-black shadow-lg transition-[border-color,box-shadow] duration-300 group-hover:border-brand-gold group-hover:shadow-brand-gold/50 focus-visible:border-brand-gold ${
             alignActionBar ? 'h-full min-h-0' : compact ? 'shrink-0' : 'h-full min-h-0'
           } ${showActionButton ? 'rounded-t-lg border-b-0' : 'rounded-lg'}`}
         >
@@ -295,7 +295,7 @@ function Card({
           onClick={isInDeck ? handleRemove : handleAdd}
           disabled={!isInDeck && isAtLimit}
           aria-label={isInDeck ? `移除 ${card.name}` : `加入 ${card.name} 到牌組`}
-          className={`z-10 flex w-full shrink-0 items-center justify-center border-2 border-t-0 border-gray-600 font-bold rounded-b-lg transition-colors duration-200 group-hover:border-brand-gold
+          className={`card-action-button z-10 flex w-full shrink-0 items-center justify-center border-2 border-t-0 border-gray-600 font-bold rounded-b-lg transition-colors duration-200 group-hover:border-brand-gold
             ${compact ? 'gap-1 py-2 text-[10px]' : 'gap-1.5 py-2.5 text-xs'}
             ${isInDeck
               ? 'bg-red-900 hover:bg-red-800 text-red-200 cursor-pointer active:scale-95'

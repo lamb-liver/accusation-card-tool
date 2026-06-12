@@ -45,7 +45,7 @@ export default function DeckShareDetail({ shareId, onBack, onLoadDeck, isLoading
         emptyHint="可能尚未核准或已被移除"
       >
         {data && (
-          <article className="rounded-lg border-2 border-brand-gold bg-[#252525] p-6">
+          <article className="share-detail-card rounded-lg border-2 border-brand-gold bg-[#252525] p-6">
             <header className="mb-4 border-b border-[#444] pb-4">
               <h2 className="text-2xl font-bold text-brand-gold">{data.title}</h2>
               <p className="mt-1 text-gray-400">作者：{data.author_name}</p>

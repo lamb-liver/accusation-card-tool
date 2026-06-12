@@ -5,7 +5,7 @@ const iconClass = 'h-4 w-4 shrink-0';
 /** LINE／Discord／Facebook 為官方常見向量形狀（內嵌 SVG）；規則書連結維持 Lucide。 */
 export default function AppFooter() {
   return (
-    <footer className="mt-8 border-t border-[#2a2a2a] bg-[#111] py-8 text-center">
+    <footer className="app-footer mt-8 border-t border-[#2a2a2a] bg-[#111] py-8 text-center">
       <div className="mx-auto max-w-2xl px-4">
         <div className="flex flex-col items-center gap-3">
           <div className="flex gap-3">

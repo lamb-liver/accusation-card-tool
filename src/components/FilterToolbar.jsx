@@ -38,7 +38,7 @@ export default function FilterToolbar({
   return (
     <>
       <header className="w-full px-4 pt-3 text-center">
-        <h1 className="m-0 break-words text-lg font-bold text-brand-gold sm:text-xl md:text-2xl">
+        <h1 className="app-brand-title m-0 break-words text-lg font-bold text-brand-gold sm:text-xl md:text-2xl">
           控訴-查卡＆組牌＆QA
         </h1>
       </header>
@@ -76,7 +76,7 @@ export default function FilterToolbar({
                 onChange={(event) => onSearchChange(event.target.value)}
                 placeholder="搜尋卡名或效果..."
                 aria-label="搜尋卡片"
-                className="w-full rounded-md border-none bg-[#222] py-3 pl-3 pr-10 text-base text-white placeholder-gray-400 outline-none ring-0"
+                className="toolbar-search-input w-full rounded-md border-none bg-[#222] py-3 pl-3 pr-10 text-base text-white placeholder-gray-400 outline-none ring-0"
               />
               {searchTerm && (
                 <button

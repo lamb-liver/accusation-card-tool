@@ -14,6 +14,13 @@
   --color-scrollbar-thumb: #444444;
 }
 
+:root {
+  --ritual-ink: #090807;
+  --ritual-panel: rgba(28, 25, 22, 0.88);
+  --ritual-panel-strong: rgba(35, 31, 27, 0.95);
+  --ritual-line-strong: rgba(255, 215, 0, 0.58);
+}
+
 /* 卡圖槽位：固定比例避免 lazy / responsive 造成 CLS */
 .card-image-slot {
   position: relative;
@@ -90,7 +97,7 @@
 
   body {
     @apply text-text-light;
-    background-color: #1a1a1a;
+    background-color: var(--ritual-ink);
   }
 
   button {
@@ -108,15 +115,138 @@
   inset: 0;
   z-index: 0;
   pointer-events: none;
-  background-color: #1a1a1a;
+  overflow: hidden;
+  background-color: var(--ritual-ink);
+  background-image:
+    linear-gradient(180deg, rgba(5, 4, 4, 0.52) 0%, rgba(8, 7, 7, 0.76) 50%, rgba(5, 4, 4, 0.9) 100%),
+    linear-gradient(90deg, rgba(0, 0, 0, 0.64) 0%, rgba(0, 0, 0, 0.28) 48%, rgba(0, 0, 0, 0.68) 100%),
+    var(--app-background-image);
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
+  filter: saturate(0.86) brightness(0.82) contrast(1.06);
+}
+
+.app-page-background::before,
+.app-page-background::after {
+  position: absolute;
+  inset: 0;
+  content: "";
+}
+
+.app-page-background::before {
+  background:
+    linear-gradient(90deg, transparent 0 calc(50% - 1px), rgba(255, 215, 0, 0.12) 50%, transparent calc(50% + 1px)),
+    linear-gradient(180deg, transparent 0%, rgba(255, 215, 0, 0.07) 18%, transparent 55%),
+    linear-gradient(90deg, rgba(116, 19, 19, 0.18), transparent 26%, transparent 74%, rgba(116, 19, 19, 0.15));
+  opacity: 0.74;
+  mask-image: linear-gradient(to bottom, transparent 0%, black 18%, black 78%, transparent 100%);
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 18%, black 78%, transparent 100%);
+}
+
+.app-page-background::after {
+  background-image:
+    repeating-linear-gradient(90deg, transparent 0 118px, rgba(255, 215, 0, 0.045) 119px 120px),
+    repeating-linear-gradient(0deg, transparent 0 94px, rgba(255, 215, 0, 0.025) 95px 96px);
+  opacity: 0.28;
+  mix-blend-mode: screen;
+  mask-image: linear-gradient(to bottom, transparent 0%, black 16%, black 72%, transparent 100%);
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 16%, black 72%, transparent 100%);
 }
 
 .app-shell-content {
   position: relative;
   z-index: 10;
+}
+
+.app-brand-title {
+  display: inline-block;
+  text-shadow:
+    0 0 16px rgba(255, 215, 0, 0.22),
+    0 1px 0 rgba(0, 0, 0, 0.9);
+}
+
+.sticky-toolbar {
+  background:
+    linear-gradient(180deg, rgba(20, 17, 15, 0.98), rgba(13, 12, 11, 0.94)),
+    linear-gradient(90deg, transparent, rgba(255, 215, 0, 0.08), transparent);
+  border-bottom-color: var(--ritual-line-strong);
+  box-shadow:
+    0 12px 32px rgba(0, 0, 0, 0.46),
+    0 1px 0 rgba(255, 255, 255, 0.04) inset,
+    0 -1px 0 rgba(255, 215, 0, 0.08) inset;
+}
+
+.mode-btn {
+  position: relative;
+  overflow: hidden;
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.04) inset,
+    0 8px 20px rgba(0, 0, 0, 0.16);
+}
+
+.mode-btn::before {
+  position: absolute;
+  inset: 0;
+  content: "";
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.08), transparent 46%);
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.mode-btn:hover::before,
+.mode-btn[aria-pressed="true"]::before {
+  opacity: 1;
+}
+
+.mode-btn[aria-pressed="true"] {
+  background-image: linear-gradient(180deg, #ffdf58, #d9ad2f);
+  box-shadow:
+    0 0 0 1px rgba(255, 244, 184, 0.28) inset,
+    0 0 18px rgba(255, 215, 0, 0.24);
+}
+
+.toolbar-search-input,
+.custom-select-trigger,
+.deck-rules-setup select,
+.deck-manager-input input,
+.guestbook-form input,
+.guestbook-form textarea {
+  border: 1px solid rgba(255, 215, 0, 0.16);
+  background:
+    linear-gradient(180deg, rgba(18, 16, 15, 0.98), rgba(8, 8, 8, 0.92));
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.04) inset,
+    0 0 0 1px rgba(0, 0, 0, 0.38);
+}
+
+.toolbar-search-input:focus,
+.custom-select-trigger:focus,
+.deck-rules-setup select:focus,
+.deck-manager-input input:focus,
+.guestbook-form input:focus,
+.guestbook-form textarea:focus {
+  border-color: rgba(255, 215, 0, 0.72);
+  box-shadow:
+    0 0 0 1px rgba(255, 215, 0, 0.18),
+    0 0 18px rgba(255, 215, 0, 0.12);
+}
+
+.custom-select-dropdown {
+  background:
+    linear-gradient(180deg, rgba(35, 31, 28, 0.98), rgba(18, 16, 15, 0.98));
+  border-color: rgba(255, 215, 0, 0.22);
+  box-shadow:
+    0 16px 36px rgba(0, 0, 0, 0.62),
+    0 0 0 1px rgba(255, 215, 0, 0.06) inset;
+}
+
+.custom-option {
+  position: relative;
+}
+
+.filter-stats {
+  text-shadow: 0 0 10px rgba(255, 215, 0, 0.18);
 }
 
 /* ===== 卡牌標籤樣式 ===== */
@@ -131,8 +261,13 @@
 
 .deck-list-section,
 .deck-pool-section {
-  background-color: var(--color-bg-card);
-  border-color: var(--color-brand-gold);
+  background:
+    linear-gradient(180deg, var(--ritual-panel-strong), var(--ritual-panel)),
+    linear-gradient(135deg, rgba(255, 215, 0, 0.08), transparent 45%);
+  border-color: rgba(255, 215, 0, 0.56);
+  box-shadow:
+    0 18px 46px rgba(0, 0, 0, 0.38),
+    0 0 0 1px rgba(255, 215, 0, 0.06) inset;
 }
 
 /* 桌面組牌：左右欄同高，內容各自捲動（手機不受影響） */
@@ -196,7 +331,7 @@
 }
 
 .slot-list-item:hover {
-  background-color: #4a4a4a;
+  background-color: rgba(255, 215, 0, 0.1);
 }
 
 .deck-group {
@@ -205,8 +340,6 @@
 
 .deck-rules-setup select,
 .deck-manager-input input {
-  background-color: #2a2a2a;
-  border-color: #444;
   color: #fff;
 }
 
@@ -335,4 +468,106 @@
 }
 .sortable-chosen {
   background: #3a3a3a;
+}
+
+.card-shell {
+  transform: translateZ(0);
+}
+
+.card-face {
+  background:
+    linear-gradient(180deg, rgba(14, 12, 11, 1), rgba(5, 5, 5, 1));
+  border-color: rgba(255, 215, 0, 0.22);
+  box-shadow:
+    0 12px 28px rgba(0, 0, 0, 0.36),
+    0 0 0 1px rgba(255, 215, 0, 0.05) inset;
+}
+
+.card-shell:hover .card-face,
+.card-shell:focus-within .card-face {
+  box-shadow:
+    0 16px 32px rgba(0, 0, 0, 0.48),
+    0 0 24px rgba(255, 215, 0, 0.18),
+    0 0 0 1px rgba(255, 215, 0, 0.12) inset;
+}
+
+.card-image-slot::after {
+  position: absolute;
+  inset: 0;
+  content: "";
+  pointer-events: none;
+  box-shadow:
+    0 0 0 1px rgba(255, 215, 0, 0.06) inset,
+    0 -18px 28px rgba(0, 0, 0, 0.32) inset;
+}
+
+.card-action-button {
+  box-shadow: 0 -1px 0 rgba(255, 215, 0, 0.08) inset;
+}
+
+.qa-container,
+.community-subnav,
+.share-detail-card,
+.guestbook-form,
+.guestbook-message-card,
+.share-wall-card {
+  box-shadow:
+    0 14px 34px rgba(0, 0, 0, 0.26),
+    0 0 0 1px rgba(255, 215, 0, 0.04) inset;
+}
+
+.qa-item,
+.guestbook-form,
+.guestbook-message-card,
+.share-wall-card,
+.share-detail-card {
+  background:
+    linear-gradient(180deg, rgba(35, 31, 28, 0.96), rgba(22, 20, 18, 0.96));
+}
+
+.share-wall-card:hover,
+.guestbook-message-card:hover,
+.qa-item:hover {
+  box-shadow:
+    0 16px 34px rgba(0, 0, 0, 0.34),
+    0 0 18px rgba(255, 215, 0, 0.08);
+}
+
+.community-subnav {
+  top: 0.75rem;
+  background:
+    linear-gradient(180deg, rgba(21, 18, 16, 0.98), rgba(13, 12, 11, 0.96));
+  border-color: rgba(255, 215, 0, 0.18);
+}
+
+.pagination-controls button,
+.pagination-controls select,
+.app-footer a {
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.04) inset,
+    0 8px 20px rgba(0, 0, 0, 0.18);
+}
+
+.app-footer {
+  background:
+    linear-gradient(180deg, rgba(15, 13, 12, 0.92), rgba(7, 6, 6, 0.98));
+  border-top-color: rgba(255, 215, 0, 0.18);
+}
+
+.mobile-drawer {
+  background:
+    linear-gradient(180deg, rgba(25, 22, 20, 0.98), rgba(10, 9, 8, 0.98));
+  box-shadow:
+    0 -18px 46px rgba(0, 0, 0, 0.62),
+    0 1px 0 rgba(255, 215, 0, 0.08) inset;
+  translate: none !important;
+  transform: translateY(100%);
+}
+
+.mobile-drawer.translate-y-0 {
+  transform: translateY(0);
+}
+
+.mobile-drawer.translate-y-full {
+  transform: translateY(100%);
 }

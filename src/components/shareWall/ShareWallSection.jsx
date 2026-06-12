@@ -73,7 +73,7 @@ export default function ShareWallSection({
             <button
               type="button"
               onClick={() => onOpenDeck(deck.share_id)}
-              className="w-full rounded-lg border-2 border-[#444] bg-[#252525] p-4 text-left transition hover:border-brand-gold"
+              className="share-wall-card w-full rounded-lg border-2 border-[#444] bg-[#252525] p-4 text-left transition hover:border-brand-gold"
             >
               <div className="flex items-start justify-between gap-3">
                 <div className="min-w-0">
