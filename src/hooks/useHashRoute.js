@@ -1,8 +1,8 @@
 import { useCallback, useEffect, useState } from 'react';
 
 /**
- * @typedef {'home' | 'deck' | 'community' | 'deck-detail' | 'qa' | 'tools' | 'clock' | 'admin'} HashRouteKind
- * @typedef {{ kind: HashRouteKind, shareId?: string, communityScroll?: 'guestbook' | 'decks', toolId?: 'coin' | 'dice' | 'timer' }} HashRoute
+ * @typedef {'home' | 'deck' | 'community' | 'deck-detail' | 'qa' | 'clock' | 'admin'} HashRouteKind
+ * @typedef {{ kind: HashRouteKind, shareId?: string, communityScroll?: 'guestbook' | 'decks' }} HashRoute
  */
 
 /** @param {string} hash @returns {HashRoute} */
@@ -21,11 +21,6 @@ export function parseHashRoute(hash = window.location.hash) {
   if (raw === 'community-decks') return { kind: 'community', communityScroll: 'decks' };
   if (raw === 'community-guestbook') return { kind: 'community', communityScroll: 'guestbook' };
   if (parts[0] === 'qa') return { kind: 'qa' };
-  if (parts[0] === 'tools') {
-    const toolId = parts[1];
-    if (toolId === 'dice' || toolId === 'timer') return { kind: 'tools', toolId };
-    return { kind: 'tools', toolId: 'coin' };
-  }
   if (parts[0] === 'clock') return { kind: 'clock' };
   if (parts[0] === 'admin') return { kind: 'admin' };
   return { kind: 'home' };

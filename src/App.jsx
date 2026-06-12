@@ -34,7 +34,6 @@ const CommunitySection = lazy(() => import('./components/community/CommunitySect
 const DeckShareDetail = lazy(() => import('./components/shareWall/DeckShareDetail.jsx'));
 const AdminSection = lazy(() => import('./components/admin/AdminSection.jsx'));
 const ClockPage = lazy(() => import('./features/clock/ClockPage.jsx'));
-const ToolsPage = lazy(() => import('./features/tools/ToolsPage.jsx'));
 
 function SectionFallback({ label = '載入中…' }) {
   return (
@@ -49,7 +48,6 @@ function resolveModeFromRoute(route) {
   if (route.kind === 'deck-detail' || route.kind === 'community') return 'community';
   if (route.kind === 'deck') return 'deck';
   if (route.kind === 'qa') return 'qa';
-  if (route.kind === 'tools') return 'tools';
   if (route.kind === 'clock') return 'clock';
   return 'gallery';
 }
@@ -63,7 +61,6 @@ function App() {
     else if (mode === 'admin') navigate('admin');
     else if (mode === 'deck') navigate('deck');
     else if (mode === 'qa') navigate('qa');
-    else if (mode === 'tools') navigate('tools');
     else if (mode === 'clock') navigate('clock');
     else navigate('');
   }, [navigate]);
@@ -161,11 +158,7 @@ function App() {
   } = useCardModal();
 
   const backgroundMode =
-    currentMode === 'admin'
-      ? 'admin'
-      : currentMode === 'clock' || currentMode === 'tools'
-        ? 'gallery'
-        : currentMode;
+    currentMode === 'admin' ? 'admin' : currentMode === 'clock' ? 'gallery' : currentMode;
 
   // ── Render ────────────────────────────────────────────────────────────────
   return (
@@ -323,12 +316,6 @@ function App() {
         {currentMode === 'qa' && (
           <Suspense fallback={<SectionFallback label="載入常見問題…" />}>
             <QASection />
-          </Suspense>
-        )}
-
-        {currentMode === 'tools' && (
-          <Suspense fallback={<SectionFallback label="載入對局工具…" />}>
-            <ToolsPage activeTool={route.kind === 'tools' ? route.toolId : 'coin'} />
           </Suspense>
         )}
 

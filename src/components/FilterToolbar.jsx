@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { BarChart3, Hammer, HelpCircle, MessageSquare, Search, Wrench, X } from 'lucide-react';
+import { BarChart3, Hammer, HelpCircle, MessageSquare, Search, Timer, X } from 'lucide-react';
 import { FILTER_OPTIONS, ICON_MENU_SVG } from '../constants/filterOptions.js';
 import CustomDropdown from './common/CustomDropdown.jsx';
 
@@ -25,7 +25,7 @@ export default function FilterToolbar({
     { id: 'deck', label: '組牌', Icon: Hammer },
     { id: 'community', label: '交流', Icon: MessageSquare },
     { id: 'qa', label: 'QA', Icon: HelpCircle },
-    { id: 'tools', label: '工具', Icon: Wrench },
+    { id: 'clock', label: '計時', Icon: Timer },
   ];
 
   const dropdowns = [
