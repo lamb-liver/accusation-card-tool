@@ -4,7 +4,6 @@ import { resolve } from 'node:path'
 import react from '@vitejs/plugin-react-swc'
 import tailwindcss from '@tailwindcss/vite'
 import { VitePWA } from 'vite-plugin-pwa'
-import { compression } from 'vite-plugin-compression2'
 
 function ensurePwaSwOutput(pwaPlugins) {
   let resolvedConfig
@@ -37,17 +36,6 @@ function ensurePwaSwOutput(pwaPlugins) {
       },
     },
   }
-}
-
-/** @param {string} id */
-function manualChunkFor(id) {
-  if (!id.includes('node_modules')) return undefined
-
-  if (id.includes('react-dom') || id.includes('/react/')) return 'vendor-react-core'
-  if (id.includes('lucide-react')) return 'vendor-icons'
-  if (id.includes('html2canvas')) return 'vendor-html2canvas'
-  if (id.includes('sortablejs')) return 'vendor-sortable'
-  return 'vendor-common'
 }
 
 /** @param {'development' | 'production'} viteMode */
@@ -148,11 +136,6 @@ export default defineConfig(({ mode }) => {
     tailwindcss(),
     ...pwaPlugins,
     ensurePwaSwOutput(pwaPlugins),
-    compression({
-      algorithms: ['gzip', 'brotliCompress'],
-      exclude: [/\.(br|gz)$/, /\.map$/],
-      threshold: 1024,
-    }),
   ],
   build: {
     target: 'esnext',
@@ -166,7 +149,6 @@ export default defineConfig(({ mode }) => {
     rollupOptions: {
       treeshake: true,
       output: {
-        manualChunks: manualChunkFor,
         chunkFileNames: 'assets/[name]-[hash].js',
         entryFileNames: 'assets/[name]-[hash].js',
         assetFileNames: 'assets/[name]-[hash][extname]',

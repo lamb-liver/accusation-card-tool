@@ -2,11 +2,7 @@
 
 An unofficial **card search, filter, and deck-building** web app (PWA) for the *Accusation* living card game. Works in the browser and can be installed for offline card lookup and deck editing.
 
-<<<<<<< HEAD
-> This tool is for community fan support. Card images and game content copyright belong to the respective rights holders.
-=======
 > Community fan tool only. Card art and game text remain the property of their respective rights holders.
->>>>>>> 522d7f5628fccd4b0d2917c11f337da89738d387
 
 ## Features
 
@@ -20,18 +16,17 @@ An unofficial **card search, filter, and deck-building** web app (PWA) for the *
 
 ### Technical highlights
 
-- **Card catalog**: sharded JSON under `public/cards/` + versioned `index.json`; IndexedDB cache; cold start loads the first shard (`cro`) early for faster first paint
-- **Filtering**: Web Worker when the catalog has ≥ 80 cards; virtualized gallery via `react-window` when more than 24 cards are shown at once
-- **Deck pool**: virtualized when the pool has more than 24 cards (including mobile); flex layout locks the viewport—only the pool and deck panels scroll
-- **Dev tooling**: `useLayoutInvariant()` in deck mode (dev only—console warn, overlay, and node highlight on violations)
+- **Card catalog**: sharded JSON under `public/cards/` + versioned `index.json`; browser and Workbox caching handle repeat requests
+- **Filtering**: React transition / deferred value with synchronous filtering; pagination limits gallery render size
+- **Deck pool**: single scroll container for the card pool, avoiding nested page/pool scroll conflicts
 - **Images**: responsive AVIF / WebP `srcset` (160 / 320 / 640); HTML preload for the LCP hero card image
 - **PWA**: Workbox caches static assets, card JSON, and images; `autoUpdate` service worker
 
 ## Stack
 
 - [Vite](https://vite.dev/) 8 · [React](https://react.dev/) 19 · [Tailwind CSS](https://tailwindcss.com/) 4
-- [vite-plugin-pwa](https://vite-pwa-org.netlify.app/) (Workbox) · [vite-plugin-compression2](https://github.com/nonzzz/vite-plugin-compression)
-- [react-window](https://github.com/bvaughn/react-window) · [sortablejs](https://sortablejs.github.io/Sortable/) · [lucide-react](https://lucide.dev/)
+- [vite-plugin-pwa](https://vite-pwa-org.netlify.app/) (Workbox)
+- [sortablejs](https://sortablejs.github.io/Sortable/) · [lucide-react](https://lucide.dev/)
 - Image pipeline: [sharp](https://sharp.pixelplumbing.com/) (build-time)
 
 ## Requirements
@@ -101,10 +96,8 @@ accusation-v2/
 │   ├── components/         # UI (Card, CardGallery, FilterToolbar, deckBuilder/…)
 │   ├── deck/               # deck domain (controller, storage, import/export)
 │   ├── rules/              # pool display vs add-to-deck validity
-│   ├── hooks/              # useCardData, useDeck, useLayoutInvariant, …
-│   ├── dev/                # dev-build only (layout invariant checks)
+│   ├── hooks/              # useCardData, useDeck, …
 │   ├── utils/              # catalog, filters, images, LCP preload
-│   ├── workers/            # cardFilter.worker.js
 │   ├── constants/
 │   └── data/               # qaData.js
 ├── index.html

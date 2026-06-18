@@ -16,18 +16,17 @@
 
 ### 進階能力
 
-- **卡牌目錄**：`public/cards/` 分片 JSON + `index.json` 版本號；IndexedDB 快取，冷啟動先載入首個分片（`cro`）以縮短首屏
-- **篩選效能**：卡牌數 ≥ 80 時以 Web Worker 過濾；查卡列表超過 24 張時啟用 `react-window` 虛擬列表
-- **組牌卡池**：卡數 > 24 時一律虛擬化（含手機）；`flex` 版面鎖定 viewport，僅卡池／牌組欄內滾動
-- **開發除錯**：組牌模式啟用 `useLayoutInvariant()`（dev only，違規時 console / overlay / 節點高亮）
+- **卡牌目錄**：`public/cards/` 分片 JSON + `index.json` 版本號；瀏覽器與 Workbox 快取重複請求
+- **篩選效能**：React transition / deferred value 搭配同步篩選；查卡列表以分頁控制渲染量
+- **組牌卡池**：單一卡池 scroll 容器，避免整頁與卡池雙層搶捲動
 - **圖片**：AVIF / WebP 響應式 `srcset`（160 / 320 / 640）；首屏 LCP 卡圖 HTML preload
 - **PWA**：Workbox 快取靜態資源、卡牌 JSON 與圖片；`autoUpdate` Service Worker
 
 ## 技術棧
 
 - [Vite](https://vite.dev/) 8 · [React](https://react.dev/) 19 · [Tailwind CSS](https://tailwindcss.com/) 4
-- [vite-plugin-pwa](https://vite-pwa-org.netlify.app/)（Workbox）· [vite-plugin-compression2](https://github.com/nonzzz/vite-plugin-compression)
-- [react-window](https://github.com/bvaughn/react-window) · [sortablejs](https://sortablejs.github.io/Sortable/) · [lucide-react](https://lucide.dev/)
+- [vite-plugin-pwa](https://vite-pwa-org.netlify.app/)（Workbox）
+- [sortablejs](https://sortablejs.github.io/Sortable/) · [lucide-react](https://lucide.dev/)
 - 建置期圖片處理：[sharp](https://sharp.pixelplumbing.com/)
 
 ## 環境需求
@@ -98,14 +97,12 @@ accusation-v2/
 │   ├── components/         # UI（Card、CardGallery、FilterToolbar、deckBuilder/…）
 │   ├── deck/               # 牌組領域（controller、storage、importExport）
 │   ├── rules/              # 構築規則（展示篩選 vs 加入合法性）
-│   ├── hooks/              # useCardData、useDeck、useLayoutInvariant 等
-│   ├── dev/                # 僅開發建置（layout invariant 檢查）
+│   ├── hooks/              # useCardData、useDeck 等
 │   ├── utils/              # cardCatalog、篩選、圖片、LCP preload
-│   ├── workers/            # cardFilter.worker.js
 │   ├── constants/          # 篩選選項、符號、背景主題
 │   └── data/               # qaData.js
 ├── index.html              # LCP preload、PWA manifest 連結
-├── vite.config.js          # chunk 分割、PWA、壓縮
+├── vite.config.js          # PWA 與 build 設定
 └── package.json
 ```
 

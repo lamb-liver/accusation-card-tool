@@ -64,7 +64,6 @@ export default [
   {
     files: [
       'scripts/lib/deck-layout-metrics.mjs',
-      'scripts/measure-card-body.mjs',
       'scripts/test-deck-layout.mjs',
       'scripts/audit-deck-layout.mjs',
       'scripts/find-horizontal-overflow.mjs',

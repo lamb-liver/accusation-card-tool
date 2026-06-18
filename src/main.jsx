@@ -4,7 +4,6 @@ import { createRoot } from 'react-dom/client'
 import { registerSW } from 'virtual:pwa-register'
 import './index.css';
 import App from './App.jsx'
-import { reportWebVitals } from './utils/reportWebVitals.js'
 
 /** 舊 chunk / 動態 import 失敗時強制重載（避免一般視窗卡在快取、無痕卻正常） */
 window.addEventListener('vite:preloadError', () => {
@@ -18,8 +17,6 @@ window.addEventListener(
   },
   { once: true },
 )
-
-reportWebVitals()
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>

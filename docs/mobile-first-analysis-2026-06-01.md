@@ -15,21 +15,7 @@
 
 ## Evidence
 
-Evidence folder:
-
-- `docs/evidence/mobile-first-analysis-2026-06-01/results.json`
-- `docs/evidence/mobile-first-analysis-2026-06-01/390-01-gallery.png`
-- `docs/evidence/mobile-first-analysis-2026-06-01/390-02-deck-initial.png`
-- `docs/evidence/mobile-first-analysis-2026-06-01/390-03-deck-with-cards.png`
-- `docs/evidence/mobile-first-analysis-2026-06-01/390-04-after-imports.png`
-- `docs/evidence/mobile-first-analysis-2026-06-01/390-offline-reload.png`
-- `docs/evidence/mobile-first-analysis-2026-06-01/430-01-gallery.png`
-- `docs/evidence/mobile-first-analysis-2026-06-01/430-02-deck-initial.png`
-- `docs/evidence/mobile-first-analysis-2026-06-01/430-03-deck-with-cards.png`
-- `docs/evidence/mobile-first-analysis-2026-06-01/430-04-after-imports.png`
-- `docs/evidence/mobile-first-analysis-2026-06-01/768-supplemental-deck.png`
-
-UI 類證據以截圖為主；資料與離線可靠性以 `results.json`、console/request failure 狀態與畫面文字為主。
+原始截圖與 `results.json` 是一次性驗證產物，已不常駐 repo；本文件保留當輪文字摘要。
 
 ## Verified Baseline
 
@@ -98,7 +84,7 @@ Status:
 390px offline run:
 
 - Cold cache style run：全新 browser context 首次訪問可載入 102 張卡。
-- Warm IndexedDB run：正常載入一次後 reload，仍可顯示 102 張卡。
+- Warm cache run：正常載入一次後 reload，仍可顯示 102 張卡。
 - Offline reload：等待 Service Worker ready 後設為 offline，再 reload，仍可顯示 102 張卡。
 - `offlineError`: `null`。
 - `requestFailures`: 空陣列。
@@ -113,7 +99,7 @@ Status:
 
 ### [P0] 舊格式文字匯入在手機 UI 無法穩定完成
 
-- Evidence：`390-04-after-imports.png`、`430-04-after-imports.png`、`results.json`。
+- Evidence：當輪手機 journey 文字摘要。
 - Repro：進入組牌頁 -> 儲存/載入任一牌組 -> 點擊「匯入牌組」-> 貼上含換行的舊格式文字清單 -> 確定。
 - Impact：Required Mobile Deck Journey 第 13 步失敗；舊格式匯入屬於資料可靠性與相容性路徑。
 - Observed：dialog input value 變成 `【控訴】牌組清單 儀式（1/3）   · 黑色葬禮（鴉教團）`，換行未保留；UI toast 顯示找不到任何卡牌。
@@ -127,7 +113,7 @@ Status:
 
 ### [P0] JSON 匯出再匯入的手機 UI round-trip 觀察到資料不一致
 
-- Evidence：`390-04-after-imports.png`、`430-04-after-imports.png`、`results.json`。
+- Evidence：當輪手機 journey 文字摘要。
 - Repro：390px 或 430px -> 組牌 -> 套用鴉教團規則 -> 加入兩張卡 -> 移除一張 -> 儲存 -> reload -> 載入 saved deck -> 匯出 JSON -> 立刻匯入剛才的 JSON。
 - Impact：Required Mobile Deck Journey 第 11、12 步資料一致性風險；若真實使用者遇到，屬於匯入匯出錯誤。
 - Observed：JSON 可解析，但 UI toast 顯示 `JSON 匯入完成，共 0 張（1 個 ID 無法對應已略過）`；最終牌組顯示 0/24。

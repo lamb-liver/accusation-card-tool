@@ -34,7 +34,7 @@ function fail(message) {
   failed += 1;
 }
 
-// 無 IndexedDB（Node）：應從網路載入並合併
+// Node mock fetch：應從 index + shards 載入並合併
 const updates = [];
 const { unchanged, hadDisplayableCache } = await loadCardCatalog({
   fetch: mockFetch,
@@ -42,7 +42,7 @@ const { unchanged, hadDisplayableCache } = await loadCardCatalog({
 });
 
 if (unchanged) fail('fresh load should not report unchanged');
-if (hadDisplayableCache) fail('Node has no IndexedDB cache');
+if (hadDisplayableCache) fail('fresh load should not report displayable cache');
 if (updates.length < 1) fail(`expected at least 1 onUpdate, got ${updates.length}`);
 
 const lastUpdate = updates[updates.length - 1];

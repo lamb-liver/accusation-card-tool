@@ -1,8 +1,10 @@
 import { useMemo } from 'react';
 import { RotateCcw, Trash2 } from 'lucide-react';
-import NativeSelect from '../common/NativeSelect.jsx';
 import FactionStatBar from './FactionStatBar.jsx';
 import { buildFactionOptions } from './factionOptions.js';
+
+const selectClass =
+  'native-select w-full rounded-md border bg-[#2a2a2a] py-3 pl-3 pr-3 text-sm leading-snug text-white outline-none transition focus:outline focus:outline-2 focus:outline-brand-gold';
 
 export default function DeckRuleConfigurator({
   currentRule,
@@ -93,15 +95,19 @@ export default function DeckRuleConfigurator({
           主要教團
         </p>
         <div className="mb-2">
-          <NativeSelect
+          <select
             id="deck-primary-faction"
             value={primaryFaction}
-            onChange={onSetPrimaryFaction}
-            options={primaryOptions}
-            labelId="primary-faction-label"
-            variant="toolbar"
-            className="text-sm"
-          />
+            onChange={(event) => onSetPrimaryFaction(event.target.value)}
+            aria-labelledby="primary-faction-label"
+            className={selectClass}
+          >
+            {primaryOptions.map((option) => (
+              <option key={option.value} value={option.value}>
+                {option.label}
+              </option>
+            ))}
+          </select>
         </div>
 
         <div
@@ -116,15 +122,19 @@ export default function DeckRuleConfigurator({
             次要教團
           </p>
           <div className="mb-2">
-            <NativeSelect
+            <select
               id="deck-secondary-faction"
               value={secondaryFaction}
-              onChange={onSetSecondaryFaction}
-              options={secondaryOptions}
-              labelId="secondary-faction-label"
-              variant="toolbar"
-              className="text-sm"
-            />
+              onChange={(event) => onSetSecondaryFaction(event.target.value)}
+              aria-labelledby="secondary-faction-label"
+              className={selectClass}
+            >
+              {secondaryOptions.map((option) => (
+                <option key={option.value} value={option.value}>
+                  {option.label}
+                </option>
+              ))}
+            </select>
           </div>
         </div>
 

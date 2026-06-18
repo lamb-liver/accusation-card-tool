@@ -13,7 +13,6 @@ import { useCardModal }   from './hooks/useCardModal.js';
 import { useToast }       from './hooks/useToast.js';
 import { useDialog }      from './hooks/useDialog.js';
 import { useHashRoute } from './hooks/useHashRoute.js';
-import { useLayoutInvariant } from './hooks/useLayoutInvariant.js';
 import { useCommunityDeckFlow } from './hooks/useCommunityDeckFlow.js';
 import { filterCardsByRule } from './rules/index.js';
 import DeckSubmitModal from './components/shareWall/DeckSubmitModal.jsx';
@@ -139,13 +138,6 @@ function App() {
     if (currentMode !== 'deck' || !currentRule.isActive) return deferredFilteredCards.length;
     return filterCardsByRule(deferredFilteredCards, currentRule).length;
   }, [currentMode, deferredFilteredCards, currentRule]);
-
-  useLayoutInvariant(currentMode === 'deck', [
-    currentMode,
-    isLoading,
-    deferredFilteredCards.length,
-    deckFilteredCount,
-  ]);
 
   // ── Modal 層 ──────────────────────────────────────────────────────────────
   const {

@@ -1,32 +1,7 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import CardGallery from '../CardGallery.jsx';
 
-function useDeckPoolColumns() {
-  const [columns, setColumns] = useState(2);
-  useEffect(() => {
-    const mq = window.matchMedia('(min-width: 1024px)');
-    const update = () => setColumns(mq.matches ? 3 : 2);
-    update();
-    mq.addEventListener('change', update);
-    return () => mq.removeEventListener('change', update);
-  }, []);
-  return columns;
-}
-
-/** 手機 overscan 較小，桌面維持較順的捲動體驗 */
-function useDeckPoolOverscan() {
-  const [overscan, setOverscan] = useState(2);
-  useEffect(() => {
-    const mq = window.matchMedia('(min-width: 1024px)');
-    const update = () => setOverscan(mq.matches ? 2 : 1);
-    update();
-    mq.addEventListener('change', update);
-    return () => mq.removeEventListener('change', update);
-  }, []);
-  return overscan;
-}
-
-/** 手機底部 FAB / 安全區：改由虛擬 grid 的 padding-bottom 提供，避免雙層捲動 */
+/** 手機底部 FAB / 安全區留白 */
 function useDeckPoolScrollPadding() {
   const [padding, setPadding] = useState(64);
   useEffect(() => {
@@ -49,11 +24,6 @@ export default function DeckPoolSection({
   limitedCardIds,
   inDeckIds,
 }) {
-  const poolScrollRef = useRef(null);
-  const deckColumns = useDeckPoolColumns();
-  // 組牌池一律虛擬化（含 <24 張）；避免篩選後切換 CSS grid + overflow-hidden 造成裁切
-  const useVirtualPool = displayCards.length > 0;
-  const deckOverscan = useDeckPoolOverscan();
   const scrollPaddingBottom = useDeckPoolScrollPadding();
 
   return (
@@ -95,13 +65,8 @@ export default function DeckPoolSection({
       </div>
 
       <div
-        ref={poolScrollRef}
-        className={`deck-pool-scroll flex min-h-0 min-w-0 w-full flex-col overflow-x-hidden ${
-          useVirtualPool
-            ? 'min-h-[280px] shrink-0 overflow-y-hidden max-lg:h-[min(60vh,720px)] lg:flex-1'
-            : 'overflow-y-auto lg:flex-1'
-        }`}
-        style={useVirtualPool ? undefined : { paddingBottom: scrollPaddingBottom }}
+        className="deck-pool-scroll flex min-h-[280px] min-w-0 w-full flex-col overflow-x-hidden overflow-y-auto max-lg:h-[min(60vh,720px)] lg:min-h-0 lg:flex-1"
+        style={{ paddingBottom: scrollPaddingBottom }}
       >
         <CardGallery
           cards={displayCards}
@@ -110,13 +75,7 @@ export default function DeckPoolSection({
           onCardRemove={onRemoveCard}
           limitedCardIds={limitedCardIds}
           inDeckIds={inDeckIds}
-          columnCount={deckColumns}
           gridClass="grid w-full min-w-0 grid-cols-2 gap-2 *:min-w-0 lg:grid-cols-3 lg:gap-4"
-          virtualize={useVirtualPool}
-          fillContainer={useVirtualPool}
-          layoutContainerRef={poolScrollRef}
-          overscanCount={deckOverscan}
-          scrollPaddingBottom={scrollPaddingBottom}
           contained
         />
       </div>

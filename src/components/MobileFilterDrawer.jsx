@@ -1,7 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { Funnel, X } from 'lucide-react';
 import { FILTER_OPTIONS } from '../constants/filterOptions.js';
-import NativeSelect from './common/NativeSelect.jsx';
 
 function toDraftValue(field) {
   return field === '' || field == null ? 'all' : field;
@@ -9,6 +8,8 @@ function toDraftValue(field) {
 
 const inputClass =
   'w-full px-3 py-2 bg-neutral-800 border-2 border-brand-gold rounded text-white text-sm focus:outline-none focus:ring-2 focus:ring-brand-gold';
+const drawerSelectClass =
+  'native-select w-full rounded border-2 border-brand-gold bg-neutral-800 px-3 py-2 text-sm text-brand-gold outline-none focus:ring-2 focus:ring-brand-gold';
 
 export default function MobileFilterDrawer({
   searchTerm = '',
@@ -123,50 +124,70 @@ export default function MobileFilterDrawer({
 
         <div id="drawerFaction" className="mb-3">
           <p className="mb-1 block text-xs text-gray-400">教團</p>
-          <NativeSelect
+          <select
             id="drawer-faction"
             value={draftFaction}
-            onChange={setDraftFaction}
-            options={FILTER_OPTIONS.faction}
-            variant="drawer"
-            ariaLabel="教團篩選"
-          />
+            onChange={(event) => setDraftFaction(event.target.value)}
+            aria-label="教團篩選"
+            className={drawerSelectClass}
+          >
+            {FILTER_OPTIONS.faction.map((option) => (
+              <option key={option.value} value={option.value}>
+                {option.label}
+              </option>
+            ))}
+          </select>
         </div>
 
         <div id="drawerType" className="mb-3">
           <p className="mb-1 block text-xs text-gray-400">種類</p>
-          <NativeSelect
+          <select
             id="drawer-type"
             value={draftType}
-            onChange={setDraftType}
-            options={FILTER_OPTIONS.type}
-            variant="drawer"
-            ariaLabel="種類篩選"
-          />
+            onChange={(event) => setDraftType(event.target.value)}
+            aria-label="種類篩選"
+            className={drawerSelectClass}
+          >
+            {FILTER_OPTIONS.type.map((option) => (
+              <option key={option.value} value={option.value}>
+                {option.label}
+              </option>
+            ))}
+          </select>
         </div>
 
         <div id="drawerSymbol" className="mb-3">
           <p className="mb-1 block text-xs text-gray-400">符號</p>
-          <NativeSelect
+          <select
             id="drawer-symbol"
             value={draftSymbol}
-            onChange={setDraftSymbol}
-            options={FILTER_OPTIONS.symbol}
-            variant="drawer"
-            ariaLabel="符號篩選"
-          />
+            onChange={(event) => setDraftSymbol(event.target.value)}
+            aria-label="符號篩選"
+            className={drawerSelectClass}
+          >
+            {FILTER_OPTIONS.symbol.map((option) => (
+              <option key={option.value} value={option.value}>
+                {option.label}
+              </option>
+            ))}
+          </select>
         </div>
 
         <div id="drawerMechanic" className="mb-4">
           <p className="mb-1 block text-xs text-gray-400">效果關鍵字</p>
-          <NativeSelect
+          <select
             id="drawer-mechanic"
             value={draftMechanic}
-            onChange={setDraftMechanic}
-            options={FILTER_OPTIONS.mechanic}
-            variant="drawer"
-            ariaLabel="效果關鍵字篩選"
-          />
+            onChange={(event) => setDraftMechanic(event.target.value)}
+            aria-label="效果關鍵字篩選"
+            className={drawerSelectClass}
+          >
+            {FILTER_OPTIONS.mechanic.map((option) => (
+              <option key={option.value} value={option.value}>
+                {option.label}
+              </option>
+            ))}
+          </select>
         </div>
 
         <button

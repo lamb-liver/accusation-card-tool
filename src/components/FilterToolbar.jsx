@@ -1,6 +1,8 @@
 import { BarChart3, Hammer, HelpCircle, MessageSquare, Search, Timer, X } from 'lucide-react';
 import { FILTER_OPTIONS } from '../constants/filterOptions.js';
-import NativeSelect from './common/NativeSelect.jsx';
+
+const toolbarSelectClass =
+  'native-select w-full rounded-md border bg-[#2a2a2a] py-3 pl-3 pr-3 text-base leading-snug text-white outline-none transition focus:outline focus:outline-2 focus:outline-brand-gold';
 
 export default function FilterToolbar({
   currentMode = 'gallery',
@@ -97,15 +99,20 @@ export default function FilterToolbar({
           className="controls mx-auto mb-6 mt-2 hidden w-full max-w-[500px] flex-col gap-2.5 px-4 pb-2 md:flex"
         >
           {dropdowns.map(({ key, fallbackLabel }) => (
-            <NativeSelect
+            <select
               key={key}
               id={`desktop-${key}`}
               value={filters[key] || 'all'}
-              onChange={(next) => onFilterChange(key, next)}
-              options={FILTER_OPTIONS[key]}
-              ariaLabel={fallbackLabel}
-              variant="toolbar"
-            />
+              onChange={(event) => onFilterChange(key, event.target.value)}
+              aria-label={fallbackLabel}
+              className={toolbarSelectClass}
+            >
+              {FILTER_OPTIONS[key].map((option) => (
+                <option key={option.value} value={option.value}>
+                  {option.label}
+                </option>
+              ))}
+            </select>
           ))}
 
           <div className="filter-stats mt-2 flex items-center justify-center gap-1 text-center text-[13px] font-medium text-brand-gold">
