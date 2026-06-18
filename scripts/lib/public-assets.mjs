@@ -6,7 +6,6 @@ import {
   getCardImageAvifSrc,
   getCardPictureSources,
 } from '../../src/utils/cardAlternateArt.js';
-import { FILTER_OPTIONS } from '../../src/constants/filterOptions.js';
 import { FACTION_ORDER, factionIconPath } from '../../src/constants/factionOrder.js';
 import { SYMBOL_ICONS } from '../../src/constants/symbols.js';
 import { APP_BACKGROUND_IMAGE } from '../../src/constants/appBackground.js';
@@ -149,12 +148,6 @@ function collectUiAssets(required) {
 
   for (const src of Object.values(SYMBOL_ICONS)) {
     addRequired(required, src, 'symbol icon');
-  }
-
-  for (const options of Object.values(FILTER_OPTIONS)) {
-    for (const option of options) {
-      addRequired(required, option.iconSrc, `filter option icon ${option.label}`);
-    }
   }
 
   for (const faction of FACTION_ORDER) {

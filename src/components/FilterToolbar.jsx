@@ -1,7 +1,6 @@
-import { useState } from 'react';
 import { BarChart3, Hammer, HelpCircle, MessageSquare, Search, Timer, X } from 'lucide-react';
-import { FILTER_OPTIONS, ICON_MENU_SVG } from '../constants/filterOptions.js';
-import CustomDropdown from './common/CustomDropdown.jsx';
+import { FILTER_OPTIONS } from '../constants/filterOptions.js';
+import NativeSelect from './common/NativeSelect.jsx';
 
 export default function FilterToolbar({
   currentMode = 'gallery',
@@ -17,7 +16,6 @@ export default function FilterToolbar({
   onFilterChange = () => {},
   resultCount = 0,
 }) {
-  const [openDropdown, setOpenDropdown] = useState(null);
   const showCardFilters = currentMode === 'gallery' || currentMode === 'deck';
 
   const modes = [
@@ -99,29 +97,14 @@ export default function FilterToolbar({
           className="controls mx-auto mb-6 mt-2 hidden w-full max-w-[500px] flex-col gap-2.5 px-4 pb-2 md:flex"
         >
           {dropdowns.map(({ key, fallbackLabel }) => (
-            <CustomDropdown
+            <NativeSelect
               key={key}
               id={`desktop-${key}`}
-              listboxId={`listbox-${key}`}
               value={filters[key] || 'all'}
-              onChange={(next) => {
-                onFilterChange(key, next);
-                setOpenDropdown(null);
-              }}
+              onChange={(next) => onFilterChange(key, next)}
               options={FILTER_OPTIONS[key]}
-              placeholder={fallbackLabel}
               ariaLabel={fallbackLabel}
               variant="toolbar"
-              isOpen={openDropdown === key}
-              onOpenChange={(nextOpen) => setOpenDropdown(nextOpen ? key : null)}
-              showSelectedIcon
-              showOptionIcons
-              reserveOptionIconSpace
-              skipIconSrc={ICON_MENU_SVG}
-              wrapperClassName={`custom-select cursor-pointer ${openDropdown === key ? 'open' : ''}`}
-              triggerClassName="custom-select-trigger"
-              menuClassName="custom-select-dropdown z-[100]"
-              optionClassName="custom-option"
             />
           ))}
 

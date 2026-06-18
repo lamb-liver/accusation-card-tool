@@ -6,7 +6,7 @@ const BASE_FACTION_OPTIONS = FILTER_OPTIONS.faction.filter(
 
 export function buildFactionOptions(placeholder, excludeValue = null) {
   return [
-    { value: '', label: placeholder, iconSrc: null, muted: true },
+    { value: '', label: placeholder },
     ...BASE_FACTION_OPTIONS.filter((option) => option.value !== excludeValue),
   ];
 }

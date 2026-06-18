@@ -1,6 +1,6 @@
-import { useMemo, useState } from 'react';
+import { useMemo } from 'react';
 import { RotateCcw, Trash2 } from 'lucide-react';
-import CustomDropdown from '../common/CustomDropdown.jsx';
+import NativeSelect from '../common/NativeSelect.jsx';
 import FactionStatBar from './FactionStatBar.jsx';
 import { buildFactionOptions } from './factionOptions.js';
 
@@ -20,8 +20,6 @@ export default function DeckRuleConfigurator({
   secondaryCount,
   exileCount,
 }) {
-  const [openFaction, setOpenFaction] = useState(null);
-
   const primaryOptions = useMemo(
     () => buildFactionOptions('── 請選擇主要教團 ──'),
     []
@@ -95,24 +93,14 @@ export default function DeckRuleConfigurator({
           主要教團
         </p>
         <div className="mb-2">
-          <CustomDropdown
+          <NativeSelect
             id="deck-primary-faction"
             value={primaryFaction}
-            onChange={(next) => {
-              onSetPrimaryFaction(next);
-              setOpenFaction(null);
-            }}
+            onChange={onSetPrimaryFaction}
             options={primaryOptions}
-            placeholder="── 請選擇主要教團 ──"
             labelId="primary-faction-label"
             variant="toolbar"
-            isOpen={openFaction === 'primary'}
-            onOpenChange={(nextOpen) => setOpenFaction(nextOpen ? 'primary' : null)}
-            showSelectedIcon
-            showOptionIcons
-            reserveOptionIconSpace
-            triggerClassName="text-sm"
-            menuClassName="z-[200]"
+            className="text-sm"
           />
         </div>
 
@@ -128,24 +116,14 @@ export default function DeckRuleConfigurator({
             次要教團
           </p>
           <div className="mb-2">
-            <CustomDropdown
+            <NativeSelect
               id="deck-secondary-faction"
               value={secondaryFaction}
-              onChange={(next) => {
-                onSetSecondaryFaction(next);
-                setOpenFaction(null);
-              }}
+              onChange={onSetSecondaryFaction}
               options={secondaryOptions}
-              placeholder="── 請選擇次要教團 ──"
               labelId="secondary-faction-label"
               variant="toolbar"
-              isOpen={openFaction === 'secondary'}
-              onOpenChange={(nextOpen) => setOpenFaction(nextOpen ? 'secondary' : null)}
-              showSelectedIcon
-              showOptionIcons
-              reserveOptionIconSpace
-              triggerClassName="text-sm"
-              menuClassName="z-[200]"
+              className="text-sm"
             />
           </div>
         </div>

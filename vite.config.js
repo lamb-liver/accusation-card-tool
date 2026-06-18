@@ -124,7 +124,7 @@ function createPwaPlugins(viteMode) {
         options: {
           cacheName: 'accusation-card-data',
           expiration: {
-            maxEntries: 4,
+            maxEntries: 8,
             maxAgeSeconds: 60 * 60 * 24,
           },
           cacheableResponse: { statuses: [0, 200] },

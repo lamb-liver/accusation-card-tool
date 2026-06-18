@@ -49,49 +49,54 @@ export function useAdminSubmissions({ authState, typeFilter, statusFilter }) {
     setLoadMoreMessagesError('');
   }, [data]);
 
-  const handleLoadMoreDecks = useCallback(async () => {
-    if (isLoadingMoreDecks || !decksHasMore) return;
-    setIsLoadingMoreDecks(true);
-    setLoadMoreDecksError('');
-    try {
-      const next = await fetchAdminSubmissions({
-        type: 'deck',
-        status: statusFilter,
-        limit: ADMIN_PAGE_SIZE,
-        offset: deckOffset,
-      });
-      const nextDecks = next.decks ?? [];
-      setDecks((prev) => [...prev, ...nextDecks]);
-      setDecksHasMore(next.decksHasMore ?? false);
-      setDeckOffset((prev) => prev + nextDecks.length);
-    } catch (error) {
-      setLoadMoreDecksError(formatShareWallError(error, '載入更多失敗'));
-    } finally {
-      setIsLoadingMoreDecks(false);
-    }
-  }, [deckOffset, decksHasMore, isLoadingMoreDecks, statusFilter]);
+  const loadMoreSubmissions = useCallback(async (kind) => {
+    const isDeck = kind === 'deck';
+    const isLoadingMore = isDeck ? isLoadingMoreDecks : isLoadingMoreMessages;
+    const hasMore = isDeck ? decksHasMore : messagesHasMore;
+    if (isLoadingMore || !hasMore) return;
 
-  const handleLoadMoreMessages = useCallback(async () => {
-    if (isLoadingMoreMessages || !messagesHasMore) return;
-    setIsLoadingMoreMessages(true);
-    setLoadMoreMessagesError('');
+    const offset = isDeck ? deckOffset : messageOffset;
+    const setItems = isDeck ? setDecks : setMessages;
+    const setHasMore = isDeck ? setDecksHasMore : setMessagesHasMore;
+    const setOffset = isDeck ? setDeckOffset : setMessageOffset;
+    const setLoadingMore = isDeck ? setIsLoadingMoreDecks : setIsLoadingMoreMessages;
+    const setLoadMoreError = isDeck ? setLoadMoreDecksError : setLoadMoreMessagesError;
+    const itemsKey = isDeck ? 'decks' : 'messages';
+    const hasMoreKey = isDeck ? 'decksHasMore' : 'messagesHasMore';
+
+    setLoadingMore(true);
+    setLoadMoreError('');
     try {
       const next = await fetchAdminSubmissions({
-        type: 'guestbook',
+        type: kind,
         status: statusFilter,
         limit: ADMIN_PAGE_SIZE,
-        offset: messageOffset,
+        offset,
       });
-      const nextMessages = next.messages ?? [];
-      setMessages((prev) => [...prev, ...nextMessages]);
-      setMessagesHasMore(next.messagesHasMore ?? false);
-      setMessageOffset((prev) => prev + nextMessages.length);
+      const nextItems = next[itemsKey] ?? [];
+      setItems((prev) => [...prev, ...nextItems]);
+      setHasMore(next[hasMoreKey] ?? false);
+      setOffset((prev) => prev + nextItems.length);
     } catch (error) {
-      setLoadMoreMessagesError(formatShareWallError(error, '載入更多失敗'));
+      setLoadMoreError(formatShareWallError(error, '載入更多失敗'));
     } finally {
-      setIsLoadingMoreMessages(false);
+      setLoadingMore(false);
     }
-  }, [isLoadingMoreMessages, messageOffset, messagesHasMore, statusFilter]);
+  }, [
+    deckOffset,
+    decksHasMore,
+    isLoadingMoreDecks,
+    isLoadingMoreMessages,
+    messageOffset,
+    messagesHasMore,
+    statusFilter,
+  ]);
+
+  const handleLoadMoreDecks = useCallback(() => loadMoreSubmissions('deck'), [loadMoreSubmissions]);
+  const handleLoadMoreMessages = useCallback(
+    () => loadMoreSubmissions('guestbook'),
+    [loadMoreSubmissions],
+  );
 
   return {
     decks,

@@ -207,9 +207,8 @@
 }
 
 .toolbar-search-input,
-.custom-select-trigger,
+.native-select,
 .deck-rules-setup select,
-.deck-manager-input input,
 .guestbook-form input,
 .guestbook-form textarea {
   border: 1px solid rgba(255, 215, 0, 0.16);
@@ -221,9 +220,8 @@
 }
 
 .toolbar-search-input:focus,
-.custom-select-trigger:focus,
+.native-select:focus,
 .deck-rules-setup select:focus,
-.deck-manager-input input:focus,
 .guestbook-form input:focus,
 .guestbook-form textarea:focus {
   border-color: rgba(255, 215, 0, 0.72);
@@ -232,26 +230,8 @@
     0 0 18px rgba(255, 215, 0, 0.12);
 }
 
-.custom-select-dropdown {
-  background:
-    linear-gradient(180deg, rgba(35, 31, 28, 0.98), rgba(18, 16, 15, 0.98));
-  border-color: rgba(255, 215, 0, 0.22);
-  box-shadow:
-    0 16px 36px rgba(0, 0, 0, 0.62),
-    0 0 0 1px rgba(255, 215, 0, 0.06) inset;
-}
-
-.custom-option {
-  position: relative;
-}
-
 .filter-stats {
   text-shadow: 0 0 10px rgba(255, 215, 0, 0.18);
-}
-
-/* ===== 卡牌標籤樣式 ===== */
-.flex-center {
-  @apply flex items-center justify-center;
 }
 
 /* ===== 組牌區相關樣式 ===== */
@@ -338,13 +318,11 @@
   @apply mb-4;
 }
 
-.deck-rules-setup select,
-.deck-manager-input input {
+.deck-rules-setup select {
   color: #fff;
 }
 
-.deck-rules-setup select:focus,
-.deck-manager-input input:focus {
+.deck-rules-setup select:focus {
   border-color: var(--color-brand-gold);
 }
 
@@ -397,15 +375,6 @@
   background-color: #7d868d;
 }
 
-.btn-small {
-  background-color: #555;
-}
-
-.btn-small:hover {
-  background-color: var(--color-brand-gold);
-  color: #000;
-}
-
 .clear-category {
   color: #aaa;
 }
@@ -436,10 +405,6 @@
 
 .deck-pool-header {
   @apply flex justify-between items-center mb-4;
-}
-
-.toggle-switch input:checked ~ .slider {
-  background-color: var(--color-brand-gold);
 }
 
 /* ===== 進度條樣式 ===== */

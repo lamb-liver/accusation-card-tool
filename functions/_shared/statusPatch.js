@@ -1,5 +1,9 @@
-import { errorResponse } from './response.js';
-import { canTransition } from './statusMachine.js';
+import { requireAdmin } from './auth.js';
+import { checkMutatingOrigin } from './origin.js';
+import { readJsonBody } from './request.js';
+import { apiResponse, errorResponse, jsonResponse } from './response.js';
+import { canTransition, isValidStatus } from './statusMachine.js';
+import { validateStatusPatch } from './validation.js';
 
 const TABLES = {
   deck: 'deck_shares',
@@ -53,4 +57,31 @@ export async function patchSubmissionStatus(env, kind, id, nextStatus) {
   }
 
   return { error: errorResponse('Status changed concurrently', 409) };
+}
+
+export async function handleAdminStatusPatch(context, kind) {
+  const { request, env, params } = context;
+  const respond = (response) => apiResponse(response, request);
+
+  const originError = checkMutatingOrigin(request, env);
+  if (originError) return respond(originError);
+
+  const auth = await requireAdmin(request, env);
+  if (auth.error) return respond(auth.error);
+
+  const id = Number.parseInt(params.id, 10);
+  if (!Number.isFinite(id) || id < 1) return respond(errorResponse('Invalid id', 400));
+
+  const { data, error } = await readJsonBody(request);
+  if (error) return respond(error);
+
+  const validationError = validateStatusPatch(data);
+  if (validationError) return respond(errorResponse(validationError, 400));
+
+  const nextStatus = data.status;
+  if (!isValidStatus(nextStatus)) return respond(errorResponse('Invalid status', 400));
+
+  const result = await patchSubmissionStatus(env, kind, id, nextStatus);
+  if (result.error) return respond(result.error);
+  return respond(jsonResponse(result.data));
 }

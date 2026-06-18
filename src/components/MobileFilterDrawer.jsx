@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { Funnel, X } from 'lucide-react';
-import { FILTER_OPTIONS, ICON_MENU_SVG } from '../constants/filterOptions.js';
-import CustomDropdown from './common/CustomDropdown.jsx';
+import { FILTER_OPTIONS } from '../constants/filterOptions.js';
+import NativeSelect from './common/NativeSelect.jsx';
 
 function toDraftValue(field) {
   return field === '' || field == null ? 'all' : field;
@@ -18,7 +18,6 @@ export default function MobileFilterDrawer({
   fabZIndex = 900,
 }) {
   const [open, setOpen] = useState(false);
-  const [openDropdown, setOpenDropdown] = useState(null);
   const [draftSearch, setDraftSearch] = useState('');
   const [draftFaction, setDraftFaction] = useState('all');
   const [draftType, setDraftType] = useState('all');
@@ -37,7 +36,6 @@ export default function MobileFilterDrawer({
     const onKey = (event) => {
       if (event.key === 'Escape' && open) {
         setOpen(false);
-        setOpenDropdown(null);
       }
     };
     document.addEventListener('keydown', onKey);
@@ -46,7 +44,6 @@ export default function MobileFilterDrawer({
 
   const closeDrawer = () => {
     setOpen(false);
-    setOpenDropdown(null);
   };
 
   const applyDrawerFilters = () => {
@@ -126,68 +123,48 @@ export default function MobileFilterDrawer({
 
         <div id="drawerFaction" className="mb-3">
           <p className="mb-1 block text-xs text-gray-400">教團</p>
-          <CustomDropdown
+          <NativeSelect
             id="drawer-faction"
             value={draftFaction}
             onChange={setDraftFaction}
             options={FILTER_OPTIONS.faction}
             variant="drawer"
-            usePortal
-            listboxId="drawer-faction-listbox"
-            isOpen={openDropdown === 'faction'}
-            onOpenChange={(nextOpen) => setOpenDropdown(nextOpen ? 'faction' : null)}
-            showOptionIcons
-            skipIconSrc={ICON_MENU_SVG}
             ariaLabel="教團篩選"
           />
         </div>
 
         <div id="drawerType" className="mb-3">
           <p className="mb-1 block text-xs text-gray-400">種類</p>
-          <CustomDropdown
+          <NativeSelect
             id="drawer-type"
             value={draftType}
             onChange={setDraftType}
             options={FILTER_OPTIONS.type}
             variant="drawer"
-            usePortal
-            listboxId="drawer-type-listbox"
-            isOpen={openDropdown === 'type'}
-            onOpenChange={(nextOpen) => setOpenDropdown(nextOpen ? 'type' : null)}
             ariaLabel="種類篩選"
           />
         </div>
 
         <div id="drawerSymbol" className="mb-3">
           <p className="mb-1 block text-xs text-gray-400">符號</p>
-          <CustomDropdown
+          <NativeSelect
             id="drawer-symbol"
             value={draftSymbol}
             onChange={setDraftSymbol}
             options={FILTER_OPTIONS.symbol}
             variant="drawer"
-            usePortal
-            listboxId="drawer-symbol-listbox"
-            isOpen={openDropdown === 'symbol'}
-            onOpenChange={(nextOpen) => setOpenDropdown(nextOpen ? 'symbol' : null)}
-            showOptionIcons
-            skipIconSrc={ICON_MENU_SVG}
             ariaLabel="符號篩選"
           />
         </div>
 
         <div id="drawerMechanic" className="mb-4">
           <p className="mb-1 block text-xs text-gray-400">效果關鍵字</p>
-          <CustomDropdown
+          <NativeSelect
             id="drawer-mechanic"
             value={draftMechanic}
             onChange={setDraftMechanic}
             options={FILTER_OPTIONS.mechanic}
             variant="drawer"
-            usePortal
-            listboxId="drawer-mechanic-listbox"
-            isOpen={openDropdown === 'mechanic'}
-            onOpenChange={(nextOpen) => setOpenDropdown(nextOpen ? 'mechanic' : null)}
             ariaLabel="效果關鍵字篩選"
           />
         </div>

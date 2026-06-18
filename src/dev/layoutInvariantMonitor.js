@@ -94,20 +94,30 @@ function renderOverlay(violations) {
     document.body.appendChild(overlay);
   }
 
-  const items = violations
-    .map((v) => {
-      const targets = v.elements.map((el) => describeElement(el)).join(', ') || '(無法定位節點)';
-      return `<li><strong>${v.id}</strong> — ${v.message}<br /><span style="opacity:0.85">→ ${targets}</span></li>`;
-    })
-    .join('');
+  const title = document.createElement('h2');
+  title.textContent = 'Layout invariant 違規（dev only）';
 
-  overlay.innerHTML = `
-    <h2>Layout invariant 違規（dev only）</h2>
-    <ul>${items}</ul>
-    <button type="button" data-layout-invariant-dismiss>暫時隱藏</button>
-  `;
+  const list = document.createElement('ul');
+  for (const v of violations) {
+    const targets = v.elements.map((el) => describeElement(el)).join(', ') || '(無法定位節點)';
+    const item = document.createElement('li');
+    const id = document.createElement('strong');
+    const target = document.createElement('span');
+    id.textContent = v.id;
+    target.style.opacity = '0.85';
+    target.textContent = `→ ${targets}`;
+    item.append(id, ` — ${v.message}`, document.createElement('br'), target);
+    list.appendChild(item);
+  }
 
-  overlay.querySelector('[data-layout-invariant-dismiss]')?.addEventListener(
+  const dismissButton = document.createElement('button');
+  dismissButton.type = 'button';
+  dismissButton.textContent = '暫時隱藏';
+  dismissButton.dataset.layoutInvariantDismiss = '';
+
+  overlay.replaceChildren(title, list, dismissButton);
+
+  dismissButton.addEventListener(
     'click',
     () => {
       overlay.remove();
