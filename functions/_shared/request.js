@@ -13,8 +13,13 @@ export async function readJsonBody(request) {
   const contentTypeError = requireJsonContentType(request);
   if (contentTypeError) return { error: contentTypeError };
 
+  const contentLength = Number.parseInt(request.headers.get('Content-Length') ?? '', 10);
+  if (Number.isFinite(contentLength) && contentLength > MAX_BODY_BYTES) {
+    return { error: errorResponse('Request body too large', 413) };
+  }
+
   const raw = await request.text();
-  if (raw.length > MAX_BODY_BYTES) {
+  if (new TextEncoder().encode(raw).byteLength > MAX_BODY_BYTES) {
     return { error: errorResponse('Request body too large', 413) };
   }
 

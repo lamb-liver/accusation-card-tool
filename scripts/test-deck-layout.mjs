@@ -48,7 +48,7 @@ async function openDeckMode(page, baseUrl, { beforeDeck } = {}) {
 function assertDeckLayout(
   metrics,
   label,
-  { maxScrollContainers = MAX_DECK_SCROLL_CONTAINERS, expectVirtual, expectPageScroll } = {},
+  { maxScrollContainers = MAX_DECK_SCROLL_CONTAINERS, expectPageScroll } = {},
 ) {
   if (expectPageScroll) {
     expect(
@@ -61,12 +61,6 @@ function assertDeckLayout(
     metrics.scrollContainerCount <= maxScrollContainers,
     `${label}: expected at most ${maxScrollContainers} top-level scroll containers, got ${metrics.scrollContainerCount}: ${JSON.stringify(metrics.scrollContainers)}`,
   );
-  if (expectVirtual === true) {
-    expect(metrics.hasVirtualGrid, `${label}: expected virtualized card-gallery-grid`);
-  }
-  if (expectVirtual === false) {
-    expect(!metrics.hasVirtualGrid, `${label}: expected non-virtual CSS grid path`);
-  }
 }
 
 async function run() {
@@ -78,7 +72,7 @@ async function run() {
     {
       const page = await browser.newPage({ viewport: { width: 1280, height: 800 } });
       const m = await openDeckMode(page, baseUrl);
-      assertDeckLayout(m, 'desktop-full-pool', { expectVirtual: true, expectPageScroll: true });
+      assertDeckLayout(m, 'desktop-full-pool', { expectPageScroll: true });
       await page.close();
     }
 
@@ -89,14 +83,14 @@ async function run() {
           await p.getByRole('textbox', { name: '搜尋卡片' }).fill('zzznomatchzzz');
         },
       });
-      assertDeckLayout(m, 'desktop-empty-pool', { expectVirtual: false });
+      assertDeckLayout(m, 'desktop-empty-pool');
       await page.close();
     }
 
     {
       const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
       const m = await openDeckMode(page, baseUrl);
-      assertDeckLayout(m, 'mobile-full-pool', { expectVirtual: true });
+      assertDeckLayout(m, 'mobile-full-pool');
       await page.close();
     }
   } finally {

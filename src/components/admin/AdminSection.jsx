@@ -34,6 +34,8 @@ export default function AdminSection({ showToast, showConfirm }) {
   const [authState, setAuthState] = useState(null);
   const [password, setPassword] = useState('');
   const [isLoggingIn, setIsLoggingIn] = useState(false);
+  const [authProbeError, setAuthProbeError] = useState('');
+  const [authProbeRetry, setAuthProbeRetry] = useState(0);
   const [statusFilter, setStatusFilter] = useState('pending');
   const [typeFilter, setTypeFilter] = useState('all');
   const [actionId, setActionId] = useState(null);
@@ -45,20 +47,25 @@ export default function AdminSection({ showToast, showConfirm }) {
     let cancelled = false;
     fetchAdminSubmissions({ type: 'all', status: 'pending', limit: 1, offset: 0 })
       .then(() => {
-        if (!cancelled) setAuthState(true);
+        if (!cancelled) {
+          setAuthProbeError('');
+          setAuthState(true);
+        }
       })
       .catch((error) => {
         if (cancelled) return;
         if (error instanceof ShareWallApiError && error.status === 401) {
+          setAuthProbeError('');
           setAuthState(false);
         } else {
+          setAuthProbeError(formatShareWallError(error, '無法驗證登入狀態'));
           setAuthState(false);
         }
       });
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [authProbeRetry]);
 
   const {
     decks,
@@ -84,6 +91,7 @@ export default function AdminSection({ showToast, showConfirm }) {
     setIsLoggingIn(true);
     try {
       await adminLogin(password);
+      setAuthProbeError('');
       setAuthState(true);
       setPassword('');
       showToast('登入成功', 'success');
@@ -157,29 +165,47 @@ export default function AdminSection({ showToast, showConfirm }) {
           <Shield className="mx-auto mb-2 h-10 w-10 text-brand-gold" aria-hidden strokeWidth={2} />
           <h2 className="text-xl font-bold text-brand-gold">管理後台</h2>
         </header>
-        <form onSubmit={handleLogin} className="rounded-lg border-2 border-[#444] bg-[#252525] p-6 space-y-4">
-          <div>
-            <label htmlFor="admin-password" className="mb-1 block text-sm text-gray-400">
-              管理員密碼
-            </label>
-            <input
-              id="admin-password"
-              type="password"
-              autoComplete="current-password"
-              required
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="w-full rounded border border-[#555] bg-[#222] px-3 py-2 text-white outline-none focus:border-brand-gold"
-            />
+        {authProbeError && (
+          <div className="mb-4 rounded-lg border border-red-500/60 bg-red-950/40 px-4 py-3 text-sm text-red-200" role="alert">
+            <p>{authProbeError}</p>
+            <button
+              type="button"
+              onClick={() => {
+                setAuthState(null);
+                setAuthProbeError('');
+                setAuthProbeRetry((n) => n + 1);
+              }}
+              className="mt-3 rounded border border-red-400 px-3 py-1 text-red-100 transition hover:bg-red-500/20"
+            >
+              重新檢查
+            </button>
           </div>
-          <button
-            type="submit"
-            disabled={isLoggingIn}
-            className="w-full rounded bg-brand-gold py-2.5 font-bold text-neutral-900 transition hover:bg-amber-500 disabled:opacity-50"
-          >
-            {isLoggingIn ? '登入中…' : '登入'}
-          </button>
-        </form>
+        )}
+        {!authProbeError && (
+          <form onSubmit={handleLogin} className="rounded-lg border-2 border-[#444] bg-[#252525] p-6 space-y-4">
+            <div>
+              <label htmlFor="admin-password" className="mb-1 block text-sm text-gray-400">
+                管理員密碼
+              </label>
+              <input
+                id="admin-password"
+                type="password"
+                autoComplete="current-password"
+                required
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className="w-full rounded border border-[#555] bg-[#222] px-3 py-2 text-white outline-none focus:border-brand-gold"
+              />
+            </div>
+            <button
+              type="submit"
+              disabled={isLoggingIn}
+              className="w-full rounded bg-brand-gold py-2.5 font-bold text-neutral-900 transition hover:bg-amber-500 disabled:opacity-50"
+            >
+              {isLoggingIn ? '登入中…' : '登入'}
+            </button>
+          </form>
+        )}
       </section>
     );
   }

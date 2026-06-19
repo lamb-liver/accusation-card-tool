@@ -278,26 +278,9 @@
   contain: inline-size;
 }
 
-/* 虛擬化卡池：垂直捲動僅在 .card-gallery-grid（由元件加上 overflow-y-hidden） */
-.deck-pool-scroll.overflow-y-hidden {
-  overflow-y: hidden;
-}
-
 .deck-pool-scroll::-webkit-scrollbar:horizontal {
   display: none;
   height: 0;
-}
-
-.deck-pool-section .card-gallery-viewport {
-  max-width: 100%;
-  overflow-x: clip;
-}
-
-.deck-pool-section .card-gallery-grid {
-  max-width: 100%;
-  overflow-x: hidden;
-  overflow-y: scroll;
-  scrollbar-gutter: stable;
 }
 
 .slot-list {

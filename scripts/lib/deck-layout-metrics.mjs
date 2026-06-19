@@ -35,7 +35,6 @@ export function collectDeckLayoutMetrics() {
       tag: el.tagName.toLowerCase(),
       className: el.className?.toString?.().slice(0, 140) || '',
     })),
-    hasVirtualGrid: Boolean(document.querySelector('.card-gallery-grid')),
     hasFooter: Boolean(document.querySelector('footer')),
   };
 }

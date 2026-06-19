@@ -50,8 +50,10 @@ export function useCommunityDeckFlow({
       await submitDeckShareForm(deck, currentRule, form);
       showToast('投稿成功，等待管理員審核', 'success');
       setDeckSubmitOpen(false);
+      return true;
     } catch (error) {
       showToast(formatShareWallError(error, '投稿失敗'), 'error');
+      return false;
     } finally {
       setDeckSubmitting(false);
     }

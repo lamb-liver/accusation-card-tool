@@ -59,12 +59,16 @@ export default function DeckSubmitModal({ open, onClose, onSubmit, isSubmitting 
       return;
     }
 
-    await onSubmit({
+    const submitted = await onSubmit({
       title: title.trim(),
       author_name: authorName.trim(),
       description: description.trim(),
       turnstile_token: turnstileToken ?? undefined,
     });
+    if (submitted === false) {
+      setTurnstileToken(null);
+      setTurnstileReset((key) => key + 1);
+    }
   }
 
   return (

@@ -10,11 +10,11 @@ import { mapPublicDeckRow } from '../functions/_shared/db.js';
 import { cardIds, factions } from '../functions/_shared/cardManifest.generated.js';
 import { validateDeckComposition } from '../functions/_shared/deckComposition.js';
 import { collectDeckStructureViolations } from '../shared/deckCompositionCore.js';
-import { CSRF_HEADER_NAME, CSRF_HEADER_VALUE } from '../functions/_shared/constants.js';
+import { CSRF_HEADER_NAME, CSRF_HEADER_VALUE, MAX_BODY_BYTES } from '../functions/_shared/constants.js';
 import { CSRF_HEADER_VALUE as generatedBackendCsrf } from '../functions/_shared/csrf.generated.js';
 import { CSRF_HEADER_VALUE as generatedFrontendCsrf } from '../src/api/csrfHeader.generated.js';
 import { checkCsrfHeader, normalizeOrigin } from '../functions/_shared/origin.js';
-import { parseOffsetParam } from '../functions/_shared/request.js';
+import { parseOffsetParam, readJsonBody } from '../functions/_shared/request.js';
 import { verifyTurnstileToken } from '../functions/_shared/turnstile.js';
 import { stripTurnstileToken } from '../functions/_shared/submissionBody.js';
 import {
@@ -178,6 +178,23 @@ assert(
 );
 assert(parseOffsetParam(new URL('http://test/?offset=5')) === 5, 'parse offset');
 assert(parseOffsetParam(new URL('http://test/')) === 0, 'default offset zero');
+
+{
+  const raw = JSON.stringify({ message: '你'.repeat(11_000) });
+  assert(raw.length < MAX_BODY_BYTES, 'multi-byte body fixture should be under char limit');
+  assert(
+    new TextEncoder().encode(raw).byteLength > MAX_BODY_BYTES,
+    'multi-byte body fixture should exceed byte limit',
+  );
+  const result = await readJsonBody(
+    new Request('http://test/', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: raw,
+    }),
+  );
+  assert(result.error?.status === 413, 'readJsonBody should enforce byte length');
+}
 
 {
   const localSkip = await verifyTurnstileToken(undefined, {}, { headers: { get: () => null } });
