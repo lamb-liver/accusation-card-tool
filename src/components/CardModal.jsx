@@ -177,12 +177,14 @@ export default function CardModal({
           <div className="relative mb-2">
             {hasAlt && (
               <div className="absolute left-2 top-2 z-10 flex items-center gap-1">
-                <span
-                  className="pointer-events-none rounded border border-amber-600/80 bg-black/55 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-amber-200"
-                  aria-hidden
-                >
-                  異畫
-                </span>
+                {artVariant === 'alt' && (
+                  <span
+                    className="pointer-events-none rounded border border-amber-600/80 bg-black/55 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-amber-200"
+                    aria-hidden
+                  >
+                    異畫
+                  </span>
+                )}
                 <button
                   type="button"
                   onClick={handleArtPrev}
@@ -204,7 +206,7 @@ export default function CardModal({
               </div>
             )}
             {/* 骨架佔位：載入中顯示 */}
-            <div className="card-image-slot card-image-slot--contain relative mx-auto w-full max-w-xs">
+            <div className="card-image-slot card-image-slot--contain relative mx-auto w-full max-w-sm">
               {!imgLoaded && (
                 <div className="absolute inset-0 flex items-center justify-center rounded bg-neutral-700 animate-pulse" aria-hidden>
                   <ImageIcon className="h-12 w-12 text-neutral-500" strokeWidth={1.5} />

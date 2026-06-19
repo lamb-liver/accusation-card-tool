@@ -244,12 +244,14 @@ function Card({
 
       {hasAlt && (
         <>
-          <div
-            className="pointer-events-none absolute right-1.5 top-1.5 z-20 rounded border border-amber-600/80 bg-black/55 px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wide text-amber-200"
-            aria-hidden
-          >
-            異畫
-          </div>
+          {artVariant === 'alt' && (
+            <div
+              className="pointer-events-none absolute right-1.5 top-1.5 z-20 rounded border border-amber-600/80 bg-black/55 px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wide text-amber-200"
+              aria-hidden
+            >
+              異畫
+            </div>
+          )}
           <div
             className={`absolute z-20 flex items-center gap-0.5 ${
               compact ? '-left-2 top-0.5' : 'left-1 top-1'

@@ -248,8 +248,8 @@ export default function AdminSection({ showToast, showConfirm }) {
             onClick={() => setStatusFilter(opt.id)}
             className={`rounded px-3 py-1.5 text-sm font-medium transition ${
               statusFilter === opt.id
-                ? 'bg-[#2b5797] text-white'
-                : 'border border-[#555] text-gray-300 hover:border-[#2b5797]'
+                ? 'bg-brand-gold text-neutral-900'
+                : 'border border-[#555] text-gray-300 hover:border-brand-gold hover:text-brand-gold'
             }`}
           >
             {opt.label}
@@ -466,7 +466,12 @@ function AdminItem({
             {previewLoading ? '載入中…' : '預覽'}
           </button>
         )}
-        <ActionButton label="核准" disabled={busy} onClick={() => onAction('approved', '已核准')} />
+        <ActionButton
+          label="核准"
+          tone="primary"
+          disabled={busy}
+          onClick={() => onAction('approved', '已核准')}
+        />
         <ActionButton label="隱藏" disabled={busy} onClick={() => onAction('hidden', '已隱藏')} />
         <ActionButton
           label="刪除"
@@ -479,17 +484,19 @@ function AdminItem({
   );
 }
 
-function ActionButton({ label, onClick, disabled, danger = false }) {
+function ActionButton({ label, onClick, disabled, danger = false, tone = 'neutral' }) {
+  const className = danger
+    ? 'bg-red-800 text-red-100 hover:bg-red-700'
+    : tone === 'primary'
+      ? 'bg-brand-gold text-neutral-900 hover:bg-amber-500'
+      : 'border border-[#555] text-gray-300 hover:border-brand-gold hover:text-brand-gold';
+
   return (
     <button
       type="button"
       disabled={disabled}
       onClick={onClick}
-      className={`rounded px-3 py-1 text-sm font-medium transition disabled:opacity-50 ${
-        danger
-          ? 'bg-red-800 text-red-100 hover:bg-red-700'
-          : 'bg-[#2b5797] text-white hover:bg-[#3a6db3]'
-      }`}
+      className={`rounded px-3 py-1 text-sm font-medium transition disabled:opacity-50 ${className}`}
     >
       {label}
     </button>
