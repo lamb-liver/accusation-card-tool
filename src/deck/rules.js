@@ -16,11 +16,6 @@ export function checkMainCapacity(deck) {
   return null;
 }
 
-/** @deprecated 與 checkMainCapacity 相同；保留相容性 */
-export function checkNeutralCapacity(deck) {
-  return checkMainCapacity(deck);
-}
-
 /**
  * 單卡加入阻擋原因（controller 與組牌池 UI 共用）。
  * @param {import('../types.js').Card} card
@@ -28,9 +23,12 @@ export function checkNeutralCapacity(deck) {
  * @param {import('../types.js').DeckRule} targetRule
  */
 export function getAddBlockReason(card, targetDeck, targetRule) {
-  const allIds = [...targetDeck.leader, ...targetDeck.rituals, ...targetDeck.main].map((c) => c.id);
+  const inDeck =
+    targetDeck.leader.some((c) => c.id === card.id) ||
+    targetDeck.rituals.some((c) => c.id === card.id) ||
+    targetDeck.main.some((c) => c.id === card.id);
 
-  if (allIds.includes(card.id)) return { blocked: true, reason: '此卡已在牌組中' };
+  if (inDeck) return { blocked: true, reason: '此卡已在牌組中' };
   if (card.type === '教主' && targetDeck.leader.length >= DECK_LIMITS.maxLeader) {
     return { blocked: true, reason: '教主欄位已滿（上限 1 張）' };
   }

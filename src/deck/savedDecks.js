@@ -1,4 +1,4 @@
-export function createSavedDeckEntry(name, deck, rule) {
+function createSavedDeckEntry(name, deck, rule) {
   return {
     name,
     deck,

@@ -42,7 +42,10 @@ function DeckBuilder({
 
   const mainListRef = useRef(null);
   const deckMainRef = useRef(deck.main);
-  const mainOrderKey = deck.main.map((card) => card.id).join(',');
+  const mainOrderKey = useMemo(
+    () => deck.main.map((card) => card.id).join(','),
+    [deck.main],
+  );
 
   useLayoutEffect(() => {
     deckMainRef.current = deck.main;

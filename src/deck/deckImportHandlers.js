@@ -44,9 +44,16 @@ export function createDeckImportHandlers({ getState, ctx, commit }) {
       return;
     }
 
+    // try 只包 JSON.parse：分支內的真實錯誤不可被吞掉、誤導性地改走文字解析
+    let json = null;
     try {
-      const json = JSON.parse(text);
-      if (json.deck && json.version) {
+      json = JSON.parse(text);
+    } catch {
+      // 非 JSON，改走文字格式解析
+    }
+
+    if (json?.deck && json.version) {
+      try {
         const schemaErr = validateImportedJson(json);
         if (schemaErr) {
           ctx.showToast(`匯入失敗：${schemaErr}`, 'error');
@@ -91,10 +98,10 @@ export function createDeckImportHandlers({ getState, ctx, commit }) {
         } else {
           ctx.showToast(`JSON 匯入成功！共 ${total} 張卡牌`);
         }
-        return;
+      } catch (err) {
+        ctx.showToast(`匯入失敗：${err?.message ?? '未知錯誤'}`, 'error');
       }
-    } catch {
-      // 非 JSON，改走文字格式解析
+      return;
     }
 
     try {

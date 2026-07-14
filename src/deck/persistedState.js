@@ -12,7 +12,7 @@ import { normalizeDeck, normalizeSavedDeckEntry } from './storage.js';
 
 /** @import { Deck, DeckRule } from '../types.js' */
 
-export function loadActiveDeck() {
+function loadActiveDeck() {
   if (typeof localStorage === 'undefined') return { ...EMPTY_DECK };
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
@@ -22,7 +22,7 @@ export function loadActiveDeck() {
   }
 }
 
-export function loadRuleState() {
+function loadRuleState() {
   if (typeof localStorage === 'undefined') {
     return { currentRule: EMPTY_RULE, primaryFaction: '', secondaryFaction: '' };
   }

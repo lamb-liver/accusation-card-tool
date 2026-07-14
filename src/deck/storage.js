@@ -47,17 +47,17 @@ export function normalizeSavedDeckEntry(entry) {
   };
 }
 
-export function persistActiveDeck(deck) {
+function persistActiveDeck(deck) {
   if (typeof localStorage === 'undefined') return;
   localStorage.setItem(STORAGE_KEY, JSON.stringify(deck));
 }
 
-export function persistSavedDecks(savedDecks) {
+function persistSavedDecks(savedDecks) {
   if (typeof localStorage === 'undefined') return;
   localStorage.setItem(SAVED_DECKS_KEY, JSON.stringify(savedDecks));
 }
 
-export function persistRuleState(currentRule, primaryFaction, secondaryFaction) {
+function persistRuleState(currentRule, primaryFaction, secondaryFaction) {
   if (typeof localStorage === 'undefined') return;
   localStorage.setItem(
     RULE_STATE_KEY,

@@ -44,10 +44,12 @@ function Card({
   const displaySource = getVariantSource(card, artVariant);
 
   useEffect(() => {
-    const onArtChange = () => setArtRev((n) => n + 1);
+    const onArtChange = (e) => {
+      if (e.detail?.cardId === card.id) setArtRev((n) => n + 1);
+    };
     window.addEventListener(CARD_ART_CHANGED_EVENT, onArtChange);
     return () => window.removeEventListener(CARD_ART_CHANGED_EVENT, onArtChange);
-  }, []);
+  }, [card.id]);
 
   const stats = useMemo(() => getCardStats(card), [card]);
   const metaCells = useMemo(() => getCardMetaCells(card), [card]);

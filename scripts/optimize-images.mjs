@@ -4,11 +4,13 @@ import path from 'node:path';
 import { existsSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 
+import { CARD_IMAGE_WIDTHS } from '../src/utils/cardAlternateArt.js';
+
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const IMAGES_DIR = path.join(ROOT, 'public/images');
 
-/** 卡牌響應式寬度（與 cardAlternateArt.js 同步） */
-const CARD_WIDTHS = [160, 320, 640];
+/** 卡牌響應式寬度：與 srcset 產生端共用同一常數，避免手動同步失誤 */
+const CARD_WIDTHS = CARD_IMAGE_WIDTHS;
 const ICON_MAX_WIDTH = 64;
 const ICON_AVIF_WIDTH = 32;
 const WEBP_QUALITY = 72;

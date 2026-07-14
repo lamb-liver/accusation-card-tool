@@ -3,9 +3,13 @@ const RETURN_PATH_KEY = 'community-return-path';
 
 /** 進入牌組詳情前儲存列表捲動位置與 hash（silent alias 用）。 */
 export function saveCommunityListState() {
-  sessionStorage.setItem(SCROLL_KEY, String(window.scrollY));
-  const raw = window.location.hash.replace(/^#\/?/, '').trim();
-  sessionStorage.setItem(RETURN_PATH_KEY, raw || 'community');
+  try {
+    sessionStorage.setItem(SCROLL_KEY, String(window.scrollY));
+    const raw = window.location.hash.replace(/^#\/?/, '').trim();
+    sessionStorage.setItem(RETURN_PATH_KEY, raw || 'community');
+  } catch {
+    // 隱私模式/配額不足時放棄記憶捲動位置；不可因此阻斷導覽
+  }
 }
 
 /** @returns {string} */

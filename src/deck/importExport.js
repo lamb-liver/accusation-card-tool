@@ -102,16 +102,20 @@ export function createDeckFromText(text, allCards) {
   for (let line of lines) {
     line = line.trim();
 
-    if (line.includes('教主')) section = 'leader';
-    else if (line.includes('儀式')) section = 'rituals';
-    else if (line.includes('主牌組')) section = 'main';
-    else if (/^[··]\s*/.test(line) && section) {
+    // 卡牌行優先判定：卡名可能含「儀式」等字樣（如「逆向儀式」），不可誤判為段落標題
+    if (/^[··]\s*/.test(line)) {
+      if (!section) continue;
       const match = line.match(/[··]\s*(.+?)（([^）]*)/);
       if (match) {
         const card = resolveCardFromExportLine(match[1], match[2], byId, byName);
         if (card) newDeck[section].push(card);
       }
+      continue;
     }
+
+    if (line.startsWith('教主')) section = 'leader';
+    else if (line.startsWith('儀式')) section = 'rituals';
+    else if (line.startsWith('主牌組')) section = 'main';
   }
 
   return newDeck;

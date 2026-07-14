@@ -34,7 +34,11 @@ function OptimizedImage({
   const imgRef = useRef(null);
   const usePicture = !usePlainImg && Boolean((webpSrcSet || avifSrcSet) && sizes);
 
-  /** 換圖或卸載時清空 src，釋放 decoded bitmap */
+  /**
+   * 換圖或卸載時清空 src，釋放 decoded bitmap。
+   * lazy 圖在首次 effect 時 <img> 尚未掛載（shouldLoad=false → ref 為 null），
+   * 因此渲染元素切換的 state 也要列入 deps，掛載後重新捕捉元素。
+   */
   useEffect(() => {
     const img = imgRef.current;
     return () => {
@@ -43,7 +47,7 @@ function OptimizedImage({
         img.src = '';
       }
     };
-  }, [src, imgKey]);
+  }, [src, imgKey, shouldLoad, usePlainImg, hasError]);
 
   useEffect(() => {
     setHasError(false);
