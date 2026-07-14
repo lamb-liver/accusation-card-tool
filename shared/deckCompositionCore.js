@@ -13,20 +13,39 @@ export const DECK_COMPOSITION_LIMITS = {
 };
 
 /**
+ * 規則物件的唯一形狀正規化（全專案各正規化入口共用此實作）。
+ * null／非物件輸入一律回傳未啟用空規則。
+ *
  * @param {Partial<{ isActive?: boolean, type?: string, primary?: string, secondary?: string }> | null | undefined} rule
+ * @param {object} [opts]
+ * @param {boolean} [opts.missingIsActive=false] rule 為物件但「缺 isActive 欄位」時的值。
+ *   前端編輯狀態用 false（新規則預設未啟用）；組成驗證／API 用 true
+ *   （分享的 rule_json 不帶 isActive，存在即視為啟用）。
+ * @param {boolean} [opts.keepRule1Secondary=false] rule1 是否保留 secondary 字串。
+ *   前端編輯狀態保留（切回 rule2 不丟失選擇）；驗證路徑一律清空。
  */
-export function normalizeRuleForComposition(rule) {
+export function normalizeRuleShape(
+  rule,
+  { missingIsActive = false, keepRule1Secondary = false } = {},
+) {
   if (!rule || typeof rule !== 'object') {
     return { isActive: false, type: 'rule1', primary: '', secondary: '' };
   }
   const type = rule.type === 'rule2' ? 'rule2' : 'rule1';
-  const isActive = 'isActive' in rule ? Boolean(rule.isActive) : true;
+  const secondary = typeof rule.secondary === 'string' ? rule.secondary : '';
   return {
-    isActive,
+    isActive: 'isActive' in rule ? Boolean(rule.isActive) : missingIsActive,
     type,
     primary: typeof rule.primary === 'string' ? rule.primary : '',
-    secondary: type === 'rule2' && typeof rule.secondary === 'string' ? rule.secondary : '',
+    secondary: type === 'rule2' || keepRule1Secondary ? secondary : '',
   };
+}
+
+/**
+ * @param {Partial<{ isActive?: boolean, type?: string, primary?: string, secondary?: string }> | null | undefined} rule
+ */
+export function normalizeRuleForComposition(rule) {
+  return normalizeRuleShape(rule, { missingIsActive: true });
 }
 
 /**

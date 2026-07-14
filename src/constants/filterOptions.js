@@ -44,5 +44,7 @@ export const FILTER_OPTIONS = {
     { value: '駐守', label: '駐守' },
     { value: '解構', label: '解構' },
     { value: '獻祭', label: '獻祭' },
+    { value: '聖戰', label: '聖戰' },
+    { value: '供品', label: '供品' },
   ],
 };

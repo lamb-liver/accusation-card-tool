@@ -2,6 +2,7 @@ import { useMemo } from 'react';
 import { RotateCcw, Trash2 } from 'lucide-react';
 import FactionStatBar from './FactionStatBar.jsx';
 import { buildFactionOptions } from './factionOptions.js';
+import { DECK_LIMITS } from '../../deck/deckCompositionRules.js';
 
 const selectClass =
   'native-select w-full rounded-md border bg-[#2a2a2a] py-3 pl-3 pr-3 text-sm leading-snug text-white outline-none transition focus:outline focus:outline-2 focus:outline-brand-gold';
@@ -181,14 +182,20 @@ export default function DeckRuleConfigurator({
         <div className="stat-container border-t border-[#444] pt-3 text-sm space-y-3">
           <p className="text-brand-gold font-semibold">教團配額進度：</p>
 
+          {/* 刻意以草稿 ruleSelect（而非已套用規則）計算上限：讓使用者在按「套用」前
+              預覽切換規則後的配額變化（可能顯示超限紅條，屬預期行為） */}
           <FactionStatBar
             factionName={primaryFaction}
             currentCount={primaryCount}
-            maxCount={ruleSelect === 'rule2' ? 12 : 20}
+            maxCount={ruleSelect === 'rule2' ? DECK_LIMITS.rule2PrimaryMain : DECK_LIMITS.maxMain}
           />
 
           {ruleSelect === 'rule2' && secondaryFaction && (
-            <FactionStatBar factionName={secondaryFaction} currentCount={secondaryCount} maxCount={8} />
+            <FactionStatBar
+              factionName={secondaryFaction}
+              currentCount={secondaryCount}
+              maxCount={DECK_LIMITS.rule2SecondaryMain}
+            />
           )}
 
           {exileCount > 0 && (

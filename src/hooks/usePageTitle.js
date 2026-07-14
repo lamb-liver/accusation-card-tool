@@ -1,7 +1,5 @@
 import { useEffect } from 'react';
 
-export const DEFAULT_PAGE_TITLE = '控訴 - 查卡、組牌與常見問題';
-
 /**
  * @param {string | null | undefined} title 為 null 時不變更
  */

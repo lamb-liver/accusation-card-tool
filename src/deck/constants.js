@@ -1,5 +1,6 @@
 export const EMPTY_DECK = { leader: [], rituals: [], main: [] };
-export const EMPTY_RULE = { isActive: false, type: 'rule1', primary: '', secondary: '' };
+/** 單一定義位於 rules/normalizeRule.js；此處轉出口維持既有 import 路徑 */
+export { EMPTY_RULE } from '../rules/normalizeRule.js';
 
 export const STORAGE_KEY = 'accusation_deck_v2';
 export const SAVED_DECKS_KEY = 'accusation_saved_decks_v2';

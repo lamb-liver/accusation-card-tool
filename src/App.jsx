@@ -149,6 +149,12 @@ function App() {
     closeModal,
   } = useCardModal();
 
+  /** 穩定識別：inline 箭頭會在每次 render 打破 CardGallery/Card 的 memo */
+  const handleGalleryCardClick = useCallback(
+    (card) => handleCardClick(card, deferredFilteredCards),
+    [handleCardClick, deferredFilteredCards],
+  );
+
   const backgroundMode =
     currentMode === 'admin' ? 'admin' : currentMode === 'clock' ? 'gallery' : currentMode;
 
@@ -234,7 +240,7 @@ function App() {
                   <CardGallery
                     cards={paginatedCards}
                     layoutMinHeight={galleryMinHeight}
-                    onCardClick={(card) => handleCardClick(card, deferredFilteredCards)}
+                    onCardClick={handleGalleryCardClick}
                   />
 
                   <PaginationControls

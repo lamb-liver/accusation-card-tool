@@ -444,7 +444,8 @@ function AdminItem({
   previewLoading = false,
   onAction,
 }) {
-  const busy = actionId?.startsWith(itemKey);
+  // actionId 格式為 `${kind}-${id}-${status}`；需帶分隔符比對，避免 deck-2 誤匹配 deck-20-*
+  const busy = actionId?.startsWith(`${itemKey}-`);
   return (
     <li className="rounded-lg border border-[#444] bg-[#252525] p-4">
       <div className="mb-2">

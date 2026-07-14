@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import CardGallery from '../CardGallery.jsx';
 
 /** 手機底部 FAB / 安全區留白 */
@@ -25,6 +25,12 @@ export default function DeckPoolSection({
   inDeckIds,
 }) {
   const scrollPaddingBottom = useDeckPoolScrollPadding();
+
+  /** 穩定識別：inline 箭頭會在每次 render 打破 CardGallery/Card 的 memo */
+  const handlePoolCardClick = useCallback(
+    (card) => onCardClick(card, displayCards),
+    [onCardClick, displayCards],
+  );
 
   return (
     <div className="deck-pool-section deck-builder-column-lg flex min-w-0 w-full flex-col overflow-hidden rounded-lg border-2 border-brand-gold bg-[#252525] px-0 py-3 sm:px-4 sm:py-4 lg:min-w-0 lg:flex-1 lg:px-4 lg:py-4 lg:pb-4">
@@ -70,7 +76,7 @@ export default function DeckPoolSection({
       >
         <CardGallery
           cards={displayCards}
-          onCardClick={(card) => onCardClick(card, displayCards)}
+          onCardClick={handlePoolCardClick}
           onCardAdd={onAddCard}
           onCardRemove={onRemoveCard}
           limitedCardIds={limitedCardIds}

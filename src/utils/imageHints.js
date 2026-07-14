@@ -19,7 +19,7 @@ export function preloadImage(src) {
 }
 
 /** 低優先 prefetch（單張） */
-export function prefetchImage(src) {
+function prefetchImage(src) {
   appendLink('prefetch', src);
 }
 

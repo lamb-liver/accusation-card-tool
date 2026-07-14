@@ -8,7 +8,7 @@
 export function cardMatchesFilters(card, searchTerm, filters) {
   const matchesSearch =
     searchTerm === '' ||
-    card.name.includes(searchTerm) ||
+    (card.name && card.name.includes(searchTerm)) ||
     (card.effect && card.effect.includes(searchTerm));
 
   const matchesFaction = !filters.faction || card.faction === filters.faction;

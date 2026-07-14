@@ -1,9 +1,13 @@
-import { useState, useRef } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { X } from 'lucide-react';
 
 export default function DeckCardRow({ card, onRemove, sortMain = false }) {
   const [swiping, setSwiping] = useState(false);
   const startXRef = useRef(0);
+  const removeTimerRef = useRef(null);
+
+  // 滑動刪除的 300ms 動畫計時器；卸載時取消，避免對已移除的卡再次觸發 onRemove
+  useEffect(() => () => clearTimeout(removeTimerRef.current), []);
 
   const onTouchStart = (event) => {
     startXRef.current = event.touches[0].clientX;
@@ -14,7 +18,8 @@ export default function DeckCardRow({ card, onRemove, sortMain = false }) {
     const diff = event.changedTouches[0].clientX - startXRef.current;
     if (diff < -50) {
       setSwiping(true);
-      setTimeout(() => {
+      clearTimeout(removeTimerRef.current);
+      removeTimerRef.current = setTimeout(() => {
         onRemove(card.id);
         setSwiping(false);
       }, 300);

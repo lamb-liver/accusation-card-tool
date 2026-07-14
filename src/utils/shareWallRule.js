@@ -1,3 +1,5 @@
+import { normalizeRuleShape } from '../../shared/deckCompositionCore.js';
+
 /** @typedef {import('../types.js').DeckRule} DeckRule */
 
 /**
@@ -12,15 +14,11 @@ export function ruleToApiPayload(rule) {
 }
 
 /**
+ * API rule_json → DeckRule：分享牆的規則存在即視為啟用。
+ * 形狀處理委派 shared 單一實作。
  * @param {Partial<DeckRule> | null | undefined} ruleJson
  * @returns {DeckRule}
  */
 export function apiRuleToDeckRule(ruleJson) {
-  const type = ruleJson?.type === 'rule2' ? 'rule2' : 'rule1';
-  return {
-    isActive: true,
-    type,
-    primary: typeof ruleJson?.primary === 'string' ? ruleJson.primary : '',
-    secondary: type === 'rule2' && typeof ruleJson?.secondary === 'string' ? ruleJson.secondary : '',
-  };
+  return { ...normalizeRuleShape(ruleJson), isActive: true };
 }
