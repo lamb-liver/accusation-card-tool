@@ -36,6 +36,7 @@ export const FILTER_OPTIONS = {
     { value: '煉金', label: '煉金' },
     { value: '醫藥', label: '醫藥' },
     { value: '禁忌', label: '禁忌' },
+    { value: '灰燼', label: '灰燼' },
   ],
   mechanic: [
     { value: 'all', label: '所有效果關鍵字' },

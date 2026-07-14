@@ -11,17 +11,58 @@ export const CARD_GALLERY_SIZES =
   '(max-width: 640px) 42vw, (max-width: 1024px) 180px, 200px';
 export const CARD_MODAL_SIZES = '(max-width: 768px) min(90vw, 384px), 384px';
 
-/** 有異畫的卡必須同時具備 alternateSource（與主圖 source 可分開） */
-export function cardHasAlternateArt(card) {
-  return Boolean(
-    card?.hasAlternateArt &&
+/**
+ * 取得卡片所有異畫的「取得方式」清單（依序）。
+ * - 單一異畫：沿用舊欄位 hasAlternateArt + alternateSource。
+ * - 多個異畫：使用 alternates 陣列（字串），每個元素為一個異畫的取得方式。
+ */
+export function getCardAltSources(card) {
+  if (!card) return [];
+  if (Array.isArray(card.alternates)) {
+    return card.alternates.filter(
+      (s) => typeof s === 'string' && s.trim() !== '',
+    );
+  }
+  if (
+    card.hasAlternateArt &&
     typeof card.alternateSource === 'string' &&
-    card.alternateSource.trim() !== '',
-  );
+    card.alternateSource.trim() !== ''
+  ) {
+    return [card.alternateSource.trim()];
+  }
+  return [];
+}
+
+/** 有異畫的卡必須至少具備一個異畫取得方式 */
+export function cardHasAlternateArt(card) {
+  return getCardAltSources(card).length > 0;
+}
+
+/** 依序回傳可切換的圖片版本：['main', 'alt', 'alt2', ...]（'alt' 即第一個異畫） */
+export function getCardArtVariants(card) {
+  return [
+    'main',
+    ...getCardAltSources(card).map((_, i) => (i === 0 ? 'alt' : `alt${i + 1}`)),
+  ];
+}
+
+/** 某個版本對應的「取得方式」；main 回主圖 source，異畫回對應的 alternates */
+export function getVariantSource(card, variant) {
+  if (variant === 'main') return card?.source;
+  const sources = getCardAltSources(card);
+  const idx = variant === 'alt' ? 0 : Number(variant.replace('alt', '')) - 1;
+  return sources[idx] ?? card?.source;
+}
+
+/** 版本的顯示標籤：'alt' → 「異畫」、'alt2' → 「異畫2」… */
+export function variantBadgeLabel(variant) {
+  if (variant === 'main') return '';
+  const n = variant === 'alt' ? '' : variant.replace('alt', '');
+  return `異畫${n}`;
 }
 
 function cardBaseName(cardId, variant) {
-  return variant === 'alt' ? `${cardId}alt` : cardId;
+  return variant === 'main' ? cardId : `${cardId}${variant}`;
 }
 
 /** 單一寬度 URL；無響應式檔時 fallback 原圖 */
@@ -58,11 +99,14 @@ export function getCardPictureSources(cardId, variant) {
   };
 }
 
-export function getStoredArtVariant(cardId) {
+export function getStoredArtVariant(cardId, validVariants) {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
     const map = raw ? JSON.parse(raw) : {};
-    return map[cardId] === 'alt' ? 'alt' : 'main';
+    const v = map[cardId];
+    if (!v || v === 'main') return 'main';
+    if (Array.isArray(validVariants) && !validVariants.includes(v)) return 'main';
+    return v;
   } catch {
     return 'main';
   }
@@ -73,7 +117,7 @@ export function setStoredArtVariant(cardId, variant) {
     const raw = localStorage.getItem(STORAGE_KEY);
     const map = raw ? JSON.parse(raw) : {};
     if (variant === 'main') delete map[cardId];
-    else map[cardId] = 'alt';
+    else map[cardId] = variant;
     localStorage.setItem(STORAGE_KEY, JSON.stringify(map));
   } catch {
     /* ignore quota / private mode */

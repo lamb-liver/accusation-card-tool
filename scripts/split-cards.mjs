@@ -6,7 +6,7 @@ const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const SRC = resolve(ROOT, 'public/cards.json');
 const OUT_DIR = resolve(ROOT, 'public/cards');
 
-const SHARD_KEYS = ['cro', 'fox', 'dor', 'asy', 'exi'];
+const SHARD_KEYS = ['cro', 'fox', 'dor', 'asy', 'exi', 'mot', 'kit'];
 
 function shardKey(id) {
   const match = /^[a-z]+/i.exec(id);
@@ -34,7 +34,7 @@ const shards = SHARD_KEYS.filter((k) => groups[k]?.length).map((key) => {
 
 writeFileSync(
   resolve(OUT_DIR, 'index.json'),
-  JSON.stringify({ version: 1, total: all.length, shards }, null, 2),
+  JSON.stringify({ version: 4, total: all.length, shards }, null, 2),
 );
 
 console.log('split cards:', shards.map((s) => `${s.key}=${s.count}`).join(', '));

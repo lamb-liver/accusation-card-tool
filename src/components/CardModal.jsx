@@ -13,10 +13,13 @@ import {
   CARD_ART_CHANGED_EVENT,
   CARD_MODAL_SIZES,
   cardHasAlternateArt,
+  getCardArtVariants,
   getCardImageFullSrc,
   getCardPictureSources,
   getStoredArtVariant,
+  getVariantSource,
   setStoredArtVariant,
+  variantBadgeLabel,
 } from '../utils/cardAlternateArt.js';
 import { cancelScheduledPrefetch, schedulePrefetch } from '../utils/imageHints.js';
 
@@ -37,13 +40,14 @@ export default function CardModal({
   const titleId = 'card-modal-title';
 
   const hasAlt = card ? cardHasAlternateArt(card) : false;
-  const artVariant = hasAlt ? getStoredArtVariant(card.id) : 'main';
+  const artVariants = useMemo(() => (card ? getCardArtVariants(card) : ['main']), [card]);
+  const artVariant = hasAlt ? getStoredArtVariant(card.id, artVariants) : 'main';
+  const variantIdx = artVariants.indexOf(artVariant);
   const picture = useMemo(
     () => (card ? getCardPictureSources(card.id, artVariant) : null),
     [card, artVariant],
   );
-  const displaySource =
-    hasAlt && artVariant === 'alt' ? card.alternateSource : card?.source;
+  const displaySource = getVariantSource(card, artVariant);
 
   useEffect(() => {
     const onArtChange = () => setArtRev((n) => n + 1);
@@ -97,7 +101,7 @@ export default function CardModal({
   const prefetchNeighbor = useCallback((neighbor) => {
     if (!neighbor) return;
     const variant = cardHasAlternateArt(neighbor)
-      ? getStoredArtVariant(neighbor.id)
+      ? getStoredArtVariant(neighbor.id, getCardArtVariants(neighbor))
       : 'main';
     schedulePrefetch(getCardImageFullSrc(neighbor.id, variant));
   }, []);
@@ -112,14 +116,14 @@ export default function CardModal({
 
   const handleArtPrev = (e) => {
     e.stopPropagation();
-    if (!hasAlt || artVariant === 'main') return;
-    setStoredArtVariant(card.id, 'main');
+    if (variantIdx <= 0) return;
+    setStoredArtVariant(card.id, artVariants[variantIdx - 1]);
   };
 
   const handleArtNext = (e) => {
     e.stopPropagation();
-    if (!hasAlt || artVariant === 'alt') return;
-    setStoredArtVariant(card.id, 'alt');
+    if (variantIdx < 0 || variantIdx >= artVariants.length - 1) return;
+    setStoredArtVariant(card.id, artVariants[variantIdx + 1]);
   };
 
   // 鍵盤左右鍵切換 + 焦點陷阱 (Tab)
@@ -177,19 +181,19 @@ export default function CardModal({
           <div className="relative mb-2">
             {hasAlt && (
               <div className="absolute left-2 top-2 z-10 flex items-center gap-1">
-                {artVariant === 'alt' && (
+                {artVariant !== 'main' && (
                   <span
                     className="pointer-events-none rounded border border-amber-600/80 bg-black/55 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-amber-200"
                     aria-hidden
                   >
-                    異畫
+                    {variantBadgeLabel(artVariant)}
                   </span>
                 )}
                 <button
                   type="button"
                   onClick={handleArtPrev}
-                  disabled={artVariant === 'main'}
-                  aria-label="切換為主圖"
+                  disabled={variantIdx <= 0}
+                  aria-label="切換上一個圖版"
                   className="flex h-9 w-9 items-center justify-center rounded-full border-2 border-neutral-500 bg-black/70 text-amber-200 shadow-md transition hover:border-brand-gold hover:text-brand-gold disabled:pointer-events-none disabled:opacity-35"
                 >
                   <ChevronLeft className="h-5 w-5 shrink-0" aria-hidden strokeWidth={2.75} />
@@ -197,8 +201,8 @@ export default function CardModal({
                 <button
                   type="button"
                   onClick={handleArtNext}
-                  disabled={artVariant === 'alt'}
-                  aria-label="切換為異畫"
+                  disabled={variantIdx >= artVariants.length - 1}
+                  aria-label="切換下一個圖版"
                   className="flex h-9 w-9 items-center justify-center rounded-full border-2 border-neutral-500 bg-black/70 text-amber-200 shadow-md transition hover:border-brand-gold hover:text-brand-gold disabled:pointer-events-none disabled:opacity-35"
                 >
                   <ChevronRight className="h-5 w-5 shrink-0" aria-hidden strokeWidth={2.75} />
@@ -222,7 +226,7 @@ export default function CardModal({
                   priority
                   awaitDecode
                   alt={
-                    artVariant === 'alt' && hasAlt
+                    artVariant !== 'main' && hasAlt
                       ? `卡牌「${card.name}」異畫（WebP，${card.faction}，${card.type}）`
                       : `卡牌「${card.name}」大圖（WebP，${card.faction}，${card.type}）`
                   }

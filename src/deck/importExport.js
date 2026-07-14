@@ -2,6 +2,7 @@ import { VALID_RULE_TYPES } from './constants.js';
 import { normalizeImportedRule } from './normalizeImportedRule.js';
 import {
   cardHasAlternateArt,
+  getCardArtVariants,
   getCardImageFullSrc,
   getStoredArtVariant,
 } from '../utils/cardAlternateArt.js';
@@ -179,7 +180,9 @@ export async function exportDeckAsImage(deck, _currentRule, showToast) {
           'aspect-ratio:3/4;overflow:hidden;border-radius:6px;background:#333;position:relative;';
 
         const img = document.createElement('img');
-        const variant = cardHasAlternateArt(card) ? getStoredArtVariant(card.id) : 'main';
+        const variant = cardHasAlternateArt(card)
+          ? getStoredArtVariant(card.id, getCardArtVariants(card))
+          : 'main';
         img.src = getCardImageFullSrc(card.id, variant);
         img.crossOrigin = 'anonymous';
         img.style.cssText = 'width:100%;height:100%;object-fit:cover;display:block;';

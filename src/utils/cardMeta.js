@@ -3,6 +3,8 @@ const FACTION_COLORS = {
   '鴉教團': 'border-purple-400 bg-purple-950/45 text-purple-100',
   '瘋人院': 'border-pink-400 bg-pink-950/45 text-pink-100',
   '門教團': 'border-blue-400 bg-blue-950/45 text-blue-100',
+  '逐光者': 'border-amber-400 bg-amber-950/45 text-amber-100',
+  '禁忌廚房': 'border-rose-400 bg-rose-950/45 text-rose-100',
   '放逐者': 'border-neutral-400 bg-neutral-800/90 text-neutral-100',
 };
 

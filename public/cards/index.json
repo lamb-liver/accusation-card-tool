@@ -1,6 +1,6 @@
 {
-  "version": 3,
-  "total": 102,
+  "version": 4,
+  "total": 156,
   "shards": [
     {
       "key": "cro",
@@ -25,7 +25,17 @@
     {
       "key": "exi",
       "path": "/cards/exi.json",
-      "count": 6
+      "count": 12
+    },
+    {
+      "key": "mot",
+      "path": "/cards/mot.json",
+      "count": 24
+    },
+    {
+      "key": "kit",
+      "path": "/cards/kit.json",
+      "count": 24
     }
   ]
 }

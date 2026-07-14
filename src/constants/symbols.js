@@ -8,4 +8,5 @@ export const SYMBOL_ICONS = {
   '自然': 'images/icons/自然.webp',
   '醫藥': 'images/icons/醫藥.webp',
   '野性': 'images/icons/野性.webp',
+  '灰燼': 'images/icons/灰燼.webp',
 };

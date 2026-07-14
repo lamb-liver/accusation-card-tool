@@ -2,7 +2,7 @@ import { existsSync, readFileSync, statSync } from 'node:fs';
 import { resolve } from 'node:path';
 
 import {
-  cardHasAlternateArt,
+  getCardArtVariants,
   getCardImageAvifSrc,
   getCardPictureSources,
 } from '../../src/utils/cardAlternateArt.js';
@@ -118,8 +118,7 @@ function collectCatalogCards(projectRoot, required, failures) {
 
 function collectCardArt(required, cards) {
   for (const card of cards) {
-    const variants = ['main'];
-    if (cardHasAlternateArt(card)) variants.push('alt');
+    const variants = getCardArtVariants(card);
 
     for (const variant of variants) {
       const picture = getCardPictureSources(card.id, variant);

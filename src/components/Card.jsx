@@ -7,10 +7,13 @@ import {
   CARD_GALLERY_SIZES,
   CARD_IMAGE_DEFAULT_WIDTH,
   cardHasAlternateArt,
+  getCardArtVariants,
   getCardImageAvifSrc,
   getCardPictureSources,
   getStoredArtVariant,
+  getVariantSource,
   setStoredArtVariant,
+  variantBadgeLabel,
 } from '../utils/cardAlternateArt.js';
 import { getCardMetaCells, getCardStats, CARD_STAT_COLORS } from '../utils/cardMeta.js';
 
@@ -28,7 +31,9 @@ function Card({
   const imageRootRef = useRef(null);
 
   const hasAlt = cardHasAlternateArt(card);
-  const artVariant = hasAlt ? getStoredArtVariant(card.id) : 'main';
+  const artVariants = useMemo(() => getCardArtVariants(card), [card]);
+  const artVariant = hasAlt ? getStoredArtVariant(card.id, artVariants) : 'main';
+  const variantIdx = artVariants.indexOf(artVariant);
   const picture = useMemo(
     () => getCardPictureSources(card.id, artVariant),
     [card.id, artVariant],
@@ -36,8 +41,7 @@ function Card({
   const imageSrc = imagePriority
     ? getCardImageAvifSrc(card.id, artVariant, CARD_IMAGE_DEFAULT_WIDTH)
     : picture.fallbackSrc;
-  const displaySource =
-    hasAlt && artVariant === 'alt' ? card.alternateSource : card.source;
+  const displaySource = getVariantSource(card, artVariant);
 
   useEffect(() => {
     const onArtChange = () => setArtRev((n) => n + 1);
@@ -70,26 +74,26 @@ function Card({
   const showActionButton = onAdd !== undefined || isInDeck;
 
   const cardImageAlt =
-    artVariant === 'alt' && hasAlt
+    artVariant !== 'main' && hasAlt
       ? `卡牌「${card.name}」異畫（WebP，${card.faction}，${card.type}）`
       : `卡牌「${card.name}」封面圖（WebP，${card.faction}，${card.type}）`;
 
   const handleArtPrev = useCallback(
     (e) => {
       e.stopPropagation();
-      if (!hasAlt || artVariant === 'main') return;
-      setStoredArtVariant(card.id, 'main');
+      if (variantIdx <= 0) return;
+      setStoredArtVariant(card.id, artVariants[variantIdx - 1]);
     },
-    [hasAlt, artVariant, card.id],
+    [variantIdx, artVariants, card.id],
   );
 
   const handleArtNext = useCallback(
     (e) => {
       e.stopPropagation();
-      if (!hasAlt || artVariant === 'alt') return;
-      setStoredArtVariant(card.id, 'alt');
+      if (variantIdx < 0 || variantIdx >= artVariants.length - 1) return;
+      setStoredArtVariant(card.id, artVariants[variantIdx + 1]);
     },
-    [hasAlt, artVariant, card.id],
+    [variantIdx, artVariants, card.id],
   );
 
   const alignActionBar = compact && showActionButton;
@@ -244,12 +248,12 @@ function Card({
 
       {hasAlt && (
         <>
-          {artVariant === 'alt' && (
+          {artVariant !== 'main' && (
             <div
               className="pointer-events-none absolute right-1.5 top-1.5 z-20 rounded border border-amber-600/80 bg-black/55 px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wide text-amber-200"
               aria-hidden
             >
-              異畫
+              {variantBadgeLabel(artVariant)}
             </div>
           )}
           <div
@@ -260,8 +264,8 @@ function Card({
             <button
               type="button"
               onClick={handleArtPrev}
-              disabled={artVariant === 'main'}
-              aria-label="切換為主圖"
+              disabled={variantIdx <= 0}
+              aria-label="切換上一個圖版"
               className={`flex items-center justify-center rounded-md border border-neutral-500 bg-black/90 text-amber-200 shadow-md transition hover:border-brand-gold hover:text-brand-gold disabled:pointer-events-none disabled:opacity-35 ${
                 compact ? 'h-6 w-6' : 'h-7 w-7'
               }`}
@@ -275,8 +279,8 @@ function Card({
             <button
               type="button"
               onClick={handleArtNext}
-              disabled={artVariant === 'alt'}
-              aria-label="切換為異畫"
+              disabled={variantIdx >= artVariants.length - 1}
+              aria-label="切換下一個圖版"
               className={`flex items-center justify-center rounded-md border border-neutral-500 bg-black/90 text-amber-200 shadow-md transition hover:border-brand-gold hover:text-brand-gold disabled:pointer-events-none disabled:opacity-35 ${
                 compact ? 'h-6 w-6' : 'h-7 w-7'
               }`}
