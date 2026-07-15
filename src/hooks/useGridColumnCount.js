@@ -1,10 +1,11 @@
 import { useEffect, useState } from 'react';
 
+/** 與 CardGallery 預設 gridClass、App 載入骨架的欄數斷點一致 */
 const BREAKPOINTS = [
-  [1536, 6],
-  [1280, 5],
-  [1024, 4],
-  [768, 3],
+  [1280, 6],
+  [1024, 5],
+  [768, 4],
+  [640, 3],
   [0, 2],
 ];
 

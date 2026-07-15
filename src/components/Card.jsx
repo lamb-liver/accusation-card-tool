@@ -258,41 +258,44 @@ function Card({
               {variantBadgeLabel(artVariant)}
             </div>
           )}
+          {/* 半透明膠囊、只渲染可用方向：減少對卡框左上裝飾的遮擋 */}
           <div
-            className={`absolute z-20 flex items-center gap-0.5 ${
-              compact ? '-left-2 top-0.5' : 'left-1 top-1'
+            className={`absolute z-20 flex items-center overflow-hidden rounded-full border border-neutral-600/60 bg-black/60 backdrop-blur-[2px] ${
+              compact ? '-left-1 top-0.5' : 'left-1 top-1'
             }`}
           >
-            <button
-              type="button"
-              onClick={handleArtPrev}
-              disabled={variantIdx <= 0}
-              aria-label="切換上一個圖版"
-              className={`flex items-center justify-center rounded-md border border-neutral-500 bg-black/90 text-amber-200 shadow-md transition hover:border-brand-gold hover:text-brand-gold disabled:pointer-events-none disabled:opacity-35 ${
-                compact ? 'h-6 w-6' : 'h-7 w-7'
-              }`}
-            >
-              <ChevronLeft
-                className={`shrink-0 ${compact ? 'h-3.5 w-3.5' : 'h-4 w-4'}`}
-                aria-hidden
-                strokeWidth={2.75}
-              />
-            </button>
-            <button
-              type="button"
-              onClick={handleArtNext}
-              disabled={variantIdx >= artVariants.length - 1}
-              aria-label="切換下一個圖版"
-              className={`flex items-center justify-center rounded-md border border-neutral-500 bg-black/90 text-amber-200 shadow-md transition hover:border-brand-gold hover:text-brand-gold disabled:pointer-events-none disabled:opacity-35 ${
-                compact ? 'h-6 w-6' : 'h-7 w-7'
-              }`}
-            >
-              <ChevronRight
-                className={`shrink-0 ${compact ? 'h-3.5 w-3.5' : 'h-4 w-4'}`}
-                aria-hidden
-                strokeWidth={2.75}
-              />
-            </button>
+            {variantIdx > 0 && (
+              <button
+                type="button"
+                onClick={handleArtPrev}
+                aria-label="切換上一個圖版"
+                className={`flex items-center justify-center text-amber-200 transition hover:bg-black/60 hover:text-brand-gold ${
+                  compact ? 'h-5 w-5' : 'h-6 w-6'
+                }`}
+              >
+                <ChevronLeft
+                  className={`shrink-0 ${compact ? 'h-3.5 w-3.5' : 'h-4 w-4'}`}
+                  aria-hidden
+                  strokeWidth={2.75}
+                />
+              </button>
+            )}
+            {variantIdx < artVariants.length - 1 && (
+              <button
+                type="button"
+                onClick={handleArtNext}
+                aria-label="切換下一個圖版"
+                className={`flex items-center justify-center text-amber-200 transition hover:bg-black/60 hover:text-brand-gold ${
+                  compact ? 'h-5 w-5' : 'h-6 w-6'
+                }`}
+              >
+                <ChevronRight
+                  className={`shrink-0 ${compact ? 'h-3.5 w-3.5' : 'h-4 w-4'}`}
+                  aria-hidden
+                  strokeWidth={2.75}
+                />
+              </button>
+            )}
           </div>
         </>
       )}

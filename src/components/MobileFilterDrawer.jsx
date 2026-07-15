@@ -17,6 +17,7 @@ export default function MobileFilterDrawer({
   onApply = () => {},
   fabVisible = true,
   fabZIndex = 900,
+  activeFilterCount = 0,
 }) {
   const [open, setOpen] = useState(false);
   const [draftSearch, setDraftSearch] = useState('');
@@ -60,6 +61,20 @@ export default function MobileFilterDrawer({
     closeDrawer();
   };
 
+  /** 一鍵重設：清空草稿並立即套用，關閉抽屜 */
+  const clearDrawerFilters = () => {
+    setDraftSearch('');
+    setDraftFaction('all');
+    setDraftType('all');
+    setDraftSymbol('all');
+    setDraftMechanic('all');
+    onApply({
+      searchTerm: '',
+      filters: { faction: '', type: '', symbol: '', mechanic: '' },
+    });
+    closeDrawer();
+  };
+
   const openDrawer = (event) => {
     event.stopPropagation();
     syncDrawerFilters();
@@ -78,6 +93,14 @@ export default function MobileFilterDrawer({
           onClick={openDrawer}
         >
           <Funnel className="h-6 w-6" aria-hidden strokeWidth={2} />
+          {activeFilterCount > 0 && (
+            <span
+              className="absolute -right-1 -top-1 flex h-5 min-w-5 items-center justify-center rounded-full border-2 border-neutral-900 bg-red-600 px-1 text-[11px] font-bold text-white"
+              aria-label={`已套用 ${activeFilterCount} 個篩選`}
+            >
+              {activeFilterCount}
+            </span>
+          )}
         </button>
       )}
 
@@ -190,14 +213,24 @@ export default function MobileFilterDrawer({
           </select>
         </div>
 
-        <button
-          type="button"
-          id="applyDrawerFilters"
-          className="btn-apply-rule w-full rounded bg-brand-gold py-3 font-bold text-neutral-900 hover:bg-amber-500 transition"
-          onClick={applyDrawerFilters}
-        >
-          套用篩選
-        </button>
+        <div className="flex gap-2">
+          <button
+            type="button"
+            id="clearDrawerFilters"
+            className="w-1/3 rounded border border-[#555] py-3 text-sm font-bold text-gray-300 transition hover:border-brand-gold hover:text-brand-gold"
+            onClick={clearDrawerFilters}
+          >
+            清除篩選
+          </button>
+          <button
+            type="button"
+            id="applyDrawerFilters"
+            className="btn-apply-rule flex-1 rounded bg-brand-gold py-3 font-bold text-neutral-900 hover:bg-amber-500 transition"
+            onClick={applyDrawerFilters}
+          >
+            套用篩選
+          </button>
+        </div>
       </div>
     </>
   );

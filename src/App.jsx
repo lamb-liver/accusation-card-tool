@@ -155,6 +155,32 @@ function App() {
     [handleCardClick, deferredFilteredCards],
   );
 
+  /** 換頁／改每頁張數後回到頁首，避免使用者停留在新頁面的底部 */
+  const handlePageChange = useCallback(
+    (page) => {
+      setCurrentPage(page);
+      window.scrollTo({ top: 0, behavior: 'auto' });
+    },
+    [setCurrentPage],
+  );
+  const handlePerPageChangeAndScroll = useCallback(
+    (value) => {
+      handlePerPageChange(value);
+      window.scrollTo({ top: 0, behavior: 'auto' });
+    },
+    [handlePerPageChange],
+  );
+
+  // ── 篩選啟用狀態（清除鈕與手機 FAB 徽章共用）────────────────────────────
+  const activeFilterCount =
+    (searchTerm.trim() ? 1 : 0) +
+    ['faction', 'type', 'symbol', 'mechanic'].filter((key) => filters[key]).length;
+
+  const handleClearFilters = useCallback(() => {
+    setSearchTerm('');
+    setFilters({ faction: '', type: '', symbol: '', mechanic: '' });
+  }, [setSearchTerm, setFilters]);
+
   const backgroundMode =
     currentMode === 'admin' ? 'admin' : currentMode === 'clock' ? 'gallery' : currentMode;
 
@@ -173,6 +199,8 @@ function App() {
             filters={filters}
             onFilterChange={handleFilterChange}
             resultCount={deckFilteredCount}
+            activeFilterCount={activeFilterCount}
+            onClearFilters={handleClearFilters}
           />
         </div>
       )}
@@ -182,6 +210,7 @@ function App() {
         filters={filters}
         fabVisible={currentMode === 'gallery' || currentMode === 'deck'}
         fabZIndex={currentMode === 'deck' ? 350 : 900}
+        activeFilterCount={activeFilterCount}
         onApply={({ searchTerm: nextSearch, filters: nextFilters }) => {
           setSearchTerm(nextSearch);
           setFilters(nextFilters);
@@ -249,8 +278,8 @@ function App() {
                     totalCards={deferredFilteredCards.length}
                     perPage={perPage}
                     isPaginationMode={isPaginationMode}
-                    onPageChange={setCurrentPage}
-                    onPerPageChange={handlePerPageChange}
+                    onPageChange={handlePageChange}
+                    onPerPageChange={handlePerPageChangeAndScroll}
                   />
                 </>
               )}

@@ -1,8 +1,8 @@
-import { BarChart3, Hammer, HelpCircle, MessageSquare, Search, Timer, X } from 'lucide-react';
+import { BarChart3, FilterX, Hammer, HelpCircle, MessageSquare, Search, Timer, X } from 'lucide-react';
 import { FILTER_OPTIONS } from '../constants/filterOptions.js';
 
 const toolbarSelectClass =
-  'native-select w-full rounded-md border bg-[#2a2a2a] py-3 pl-3 pr-3 text-base leading-snug text-white outline-none transition focus:outline focus:outline-2 focus:outline-brand-gold';
+  'native-select w-full rounded-md border bg-[#2a2a2a] py-3 pl-3 pr-3 text-base leading-snug outline-none transition focus:outline focus:outline-2 focus:outline-brand-gold';
 
 export default function FilterToolbar({
   currentMode = 'gallery',
@@ -17,6 +17,8 @@ export default function FilterToolbar({
   },
   onFilterChange = () => {},
   resultCount = 0,
+  activeFilterCount = 0,
+  onClearFilters = () => {},
 }) {
   const showCardFilters = currentMode === 'gallery' || currentMode === 'deck';
 
@@ -52,7 +54,7 @@ export default function FilterToolbar({
                 type="button"
                 onClick={() => onModeChange(id)}
                 aria-pressed={currentMode === id}
-                className={`mode-btn flex min-w-[4.5rem] flex-1 items-center justify-center gap-1 rounded-md border px-1 py-2 text-xs font-bold transition sm:min-w-[5rem] sm:gap-1.5 sm:px-2 sm:text-sm ${
+                className={`mode-btn flex min-w-0 flex-1 items-center justify-center gap-1 rounded-md border px-1 py-2 text-xs font-bold transition sm:min-w-[5rem] sm:gap-1.5 sm:px-2 sm:text-sm ${
                   currentMode === id
                     ? 'border-brand-gold bg-brand-gold text-neutral-900 shadow-[0_0_8px_rgba(255,215,0,0.3)]'
                     : 'border-[#444] bg-[#2a2a2a] text-[#e0e0e0] hover:border-brand-gold hover:bg-[#333]'
@@ -96,30 +98,47 @@ export default function FilterToolbar({
       {showCardFilters && (
         <div
           id="galleryControls"
-          className="controls mx-auto mb-6 mt-2 hidden w-full max-w-[500px] flex-col gap-2.5 px-4 pb-2 md:flex"
+          className="controls mx-auto mb-6 mt-2 hidden w-full max-w-[1000px] grid-cols-2 gap-2.5 px-4 pb-2 md:grid xl:grid-cols-4"
         >
-          {dropdowns.map(({ key, fallbackLabel }) => (
-            <select
-              key={key}
-              id={`desktop-${key}`}
-              value={filters[key] || 'all'}
-              onChange={(event) => onFilterChange(key, event.target.value)}
-              aria-label={fallbackLabel}
-              className={toolbarSelectClass}
-            >
-              {FILTER_OPTIONS[key].map((option) => (
-                <option key={option.value} value={option.value}>
-                  {option.label}
-                </option>
-              ))}
-            </select>
-          ))}
+          {dropdowns.map(({ key, fallbackLabel }) => {
+            const isActive = Boolean(filters[key] && filters[key] !== 'all');
+            return (
+              <select
+                key={key}
+                id={`desktop-${key}`}
+                value={filters[key] || 'all'}
+                onChange={(event) => onFilterChange(key, event.target.value)}
+                aria-label={fallbackLabel}
+                className={`${toolbarSelectClass} ${
+                  isActive ? 'border-brand-gold text-brand-gold' : 'border-[#444] text-white'
+                }`}
+              >
+                {FILTER_OPTIONS[key].map((option) => (
+                  <option key={option.value} value={option.value}>
+                    {option.label}
+                  </option>
+                ))}
+              </select>
+            );
+          })}
 
-          <div className="filter-stats mt-2 flex items-center justify-center gap-1 text-center text-[13px] font-medium text-brand-gold">
-            <BarChart3 aria-hidden className="h-[13px] w-[13px] shrink-0" strokeWidth={2.25} />
-            <span>
-              共 <span className="font-bold">{resultCount}</span> 張卡牌
+          <div className="filter-stats col-span-full mt-2 flex items-center justify-center gap-3 text-center text-[13px] font-medium text-brand-gold">
+            <span className="flex items-center gap-1">
+              <BarChart3 aria-hidden className="h-[13px] w-[13px] shrink-0" strokeWidth={2.25} />
+              <span>
+                共 <span className="font-bold">{resultCount}</span> 張卡牌
+              </span>
             </span>
+            {activeFilterCount > 0 && (
+              <button
+                type="button"
+                onClick={onClearFilters}
+                className="flex items-center gap-1 rounded border border-[#555] px-2 py-1 text-xs text-gray-300 transition hover:border-brand-gold hover:text-brand-gold"
+              >
+                <FilterX aria-hidden className="h-3.5 w-3.5 shrink-0" strokeWidth={2.25} />
+                清除篩選（{activeFilterCount}）
+              </button>
+            )}
           </div>
         </div>
       )}
