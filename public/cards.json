@@ -1297,82 +1297,6 @@
     "symbols": []
   },
   {
-    "id": "exi01",
-    "name": "斷翅的鴉",
-    "faction": "放逐者",
-    "type": "信徒",
-    "source": "比賽積分兌換",
-    "volume": 2,
-    "calamity": 3,
-    "stardust": 1,
-    "effect": "詠頌：抽1張牌，然後棄置你1張手牌。",
-    "symbols": [
-      "夜幕"
-    ]
-  },
-  {
-    "id": "exi02",
-    "name": "酒鬼傑克",
-    "faction": "放逐者",
-    "type": "信徒",
-    "source": "比賽積分兌換",
-    "volume": 3,
-    "effect": "當這個信徒控訴時，破壞你場上1個信徒。",
-    "symbols": [
-      "凋零"
-    ]
-  },
-  {
-    "id": "exi03",
-    "name": "黑尾",
-    "faction": "放逐者",
-    "type": "信徒",
-    "source": "比賽積分兌換",
-    "volume": 2,
-    "effect": "雙方執行儀式災厄減少1。",
-    "symbols": [
-      "野性"
-    ]
-  },
-  {
-    "id": "exi04",
-    "name": "沼澤女巫",
-    "faction": "放逐者",
-    "type": "信徒",
-    "source": "比賽積分兌換",
-    "volume": 1,
-    "effect": "駐守3。這個信徒無法駐守「荒野」。",
-    "symbols": [
-      "自然"
-    ]
-  },
-  {
-    "id": "exi05",
-    "name": "竊密者",
-    "faction": "放逐者",
-    "type": "信徒",
-    "source": "比賽積分兌換",
-    "volume": 2,
-    "calamity": 3,
-    "stardust": 1,
-    "effect": "詠頌：獻祭你手牌或棄牌區至多1張儀式。",
-    "symbols": [
-      "知識"
-    ]
-  },
-  {
-    "id": "exi06",
-    "name": "說謊的病患",
-    "faction": "放逐者",
-    "type": "信徒",
-    "source": "比賽積分兌換",
-    "volume": 5,
-    "effect": "當這個信徒控訴時，或是這個信徒變為罪惡時，除外這個信徒。",
-    "symbols": [
-      "煉金"
-    ]
-  },
-  {
     "id": "mot01",
     "hasAlternateArt": true,
     "alternateSource": "預購特典",
@@ -1984,6 +1908,82 @@
     "calamity": 4,
     "effect": "破壞雙方場上所有儀式。星塵效果 : 每有1個儀式因上述效果離場，目標敵方棄置1張手牌",
     "symbols": []
+  },
+  {
+    "id": "exi01",
+    "name": "斷翅的鴉",
+    "faction": "放逐者",
+    "type": "信徒",
+    "source": "比賽積分兌換",
+    "volume": 2,
+    "calamity": 3,
+    "stardust": 1,
+    "effect": "詠頌：抽1張牌，然後棄置你1張手牌。",
+    "symbols": [
+      "夜幕"
+    ]
+  },
+  {
+    "id": "exi02",
+    "name": "酒鬼傑克",
+    "faction": "放逐者",
+    "type": "信徒",
+    "source": "比賽積分兌換",
+    "volume": 3,
+    "effect": "當這個信徒控訴時，破壞你場上1個信徒。",
+    "symbols": [
+      "凋零"
+    ]
+  },
+  {
+    "id": "exi03",
+    "name": "黑尾",
+    "faction": "放逐者",
+    "type": "信徒",
+    "source": "比賽積分兌換",
+    "volume": 2,
+    "effect": "雙方執行儀式災厄減少1。",
+    "symbols": [
+      "野性"
+    ]
+  },
+  {
+    "id": "exi04",
+    "name": "沼澤女巫",
+    "faction": "放逐者",
+    "type": "信徒",
+    "source": "比賽積分兌換",
+    "volume": 1,
+    "effect": "駐守3。這個信徒無法駐守「荒野」。",
+    "symbols": [
+      "自然"
+    ]
+  },
+  {
+    "id": "exi05",
+    "name": "竊密者",
+    "faction": "放逐者",
+    "type": "信徒",
+    "source": "比賽積分兌換",
+    "volume": 2,
+    "calamity": 3,
+    "stardust": 1,
+    "effect": "詠頌：獻祭你手牌或棄牌區至多1張儀式。",
+    "symbols": [
+      "知識"
+    ]
+  },
+  {
+    "id": "exi06",
+    "name": "說謊的病患",
+    "faction": "放逐者",
+    "type": "信徒",
+    "source": "比賽積分兌換",
+    "volume": 5,
+    "effect": "當這個信徒控訴時，或是這個信徒變為罪惡時，除外這個信徒。",
+    "symbols": [
+      "煉金"
+    ]
   },
   {
     "id": "exi07",
