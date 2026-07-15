@@ -7,8 +7,12 @@ const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const SRC = resolve(ROOT, 'public/cards.json');
 const OUT_DIR = resolve(ROOT, 'public/cards');
 
-/** 分片順序即載入順序：cro 必須是第一分片（index.html 的 LCP 預載指向 cro01） */
-const SHARD_KEYS = ['cro', 'fox', 'dor', 'asy', 'exi', 'mot', 'kit'];
+/**
+ * 分片順序即卡片牆顯示順序：
+ * - cro 必須是第一分片（index.html 的 LCP 預載指向 cro01）
+ * - exi（放逐者／中立）固定排最後；新增教團時插在 exi 之前
+ */
+const SHARD_KEYS = ['cro', 'fox', 'dor', 'asy', 'mot', 'kit', 'exi'];
 /** index.json 結構版本；僅在分片格式變更時遞增 */
 const INDEX_VERSION = 4;
 

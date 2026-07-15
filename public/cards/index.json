@@ -23,11 +23,6 @@
       "count": 24
     },
     {
-      "key": "exi",
-      "path": "/cards/exi.json",
-      "count": 12
-    },
-    {
       "key": "mot",
       "path": "/cards/mot.json",
       "count": 24
@@ -36,6 +31,11 @@
       "key": "kit",
       "path": "/cards/kit.json",
       "count": 24
+    },
+    {
+      "key": "exi",
+      "path": "/cards/exi.json",
+      "count": 12
     }
   ]
 }
