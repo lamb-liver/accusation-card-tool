@@ -112,7 +112,8 @@ function createPwaPlugins(viteMode) {
         options: {
           cacheName: 'accusation-card-data',
           expiration: {
-            maxEntries: 8,
+            // index.json + 每教團一個分片；目前 8 個條目，保留擴充空間避免新增教團時 LRU 互逐
+            maxEntries: 32,
             maxAgeSeconds: 60 * 60 * 24,
           },
           cacheableResponse: { statuses: [0, 200] },
@@ -149,6 +150,14 @@ export default defineConfig(({ mode }) => {
     rollupOptions: {
       treeshake: true,
       output: {
+        // react 生態獨立 chunk：內容跨部署穩定 → hash 不變 → SW/瀏覽器快取直接命中，
+        // app code 更新時使用者不必重新下載 react
+        manualChunks(id) {
+          if (/node_modules\/(?:react|react-dom|scheduler)\//.test(id)) {
+            return 'vendor-react'
+          }
+          return undefined
+        },
         chunkFileNames: 'assets/[name]-[hash].js',
         entryFileNames: 'assets/[name]-[hash].js',
         assetFileNames: 'assets/[name]-[hash][extname]',
