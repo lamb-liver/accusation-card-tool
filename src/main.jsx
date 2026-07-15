@@ -4,6 +4,7 @@ import { createRoot } from 'react-dom/client'
 import { registerSW } from 'virtual:pwa-register'
 import './index.css';
 import App from './App.jsx'
+import AppErrorBoundary from './components/AppErrorBoundary.jsx'
 
 /** 舊 chunk / 動態 import 失敗時強制重載（避免一般視窗卡在快取、無痕卻正常） */
 window.addEventListener('vite:preloadError', () => {
@@ -20,6 +21,8 @@ window.addEventListener(
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
-    <App />
+    <AppErrorBoundary>
+      <App />
+    </AppErrorBoundary>
   </StrictMode>,
 )
