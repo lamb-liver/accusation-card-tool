@@ -18,6 +18,8 @@ export const STATIC_PUBLIC_ASSETS = [
   'public/manifest.webmanifest',
   'public/robots.txt',
   'public/sitemap.xml',
+  // footer「下載規則書」的目標檔；曾在部署整理時被誤刪導致下載到 SPA fallback 的 HTML
+  'public/rules.pdf',
 ];
 
 export function normalizePublicPath(path) {
