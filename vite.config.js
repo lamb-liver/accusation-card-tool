@@ -67,7 +67,8 @@ function createPwaPlugins(viteMode) {
     mode: viteMode === 'production' ? 'production' : 'development',
     globPatterns: ['**/*.{js,css,html,ico,svg,wasm}'],
     navigateFallback: 'index.html',
-    navigateFallbackDenylist: [/^\/api\//],
+    // PDF 直接導航（如新分頁開啟規則書）不可落入 SPA fallback，否則會拿到 index.html
+    navigateFallbackDenylist: [/^\/api\//, /\.pdf$/i],
     runtimeCaching: [
       {
         urlPattern: ({ url }) => /\.(?:webp|avif)$/i.test(url.pathname),
