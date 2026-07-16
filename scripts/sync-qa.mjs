@@ -10,9 +10,8 @@ const SHEETS = [
   { label: '鴉教團', url: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSPgmF_9uiGkG5t_1GxEnEBD3GSVFvj1MYTaXtKjLjIEa_XqIQcwrWpY9DHELim8zOhVkKcKCxIpSh8/pub?gid=1253175233&single=true&output=csv' },
   { label: '瘋人院', url: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSPgmF_9uiGkG5t_1GxEnEBD3GSVFvj1MYTaXtKjLjIEa_XqIQcwrWpY9DHELim8zOhVkKcKCxIpSh8/pub?gid=332236121&single=true&output=csv' },
   { label: '門教團', url: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSPgmF_9uiGkG5t_1GxEnEBD3GSVFvj1MYTaXtKjLjIEa_XqIQcwrWpY9DHELim8zOhVkKcKCxIpSh8/pub?gid=2076037145&single=true&output=csv' },
-  // TODO: 試算表建立「逐光者」「禁忌廚房」QA 分頁後，將發布 CSV 的 gid URL 填入 url
-  { label: '逐光者', url: null },
-  { label: '禁忌廚房', url: null },
+  { label: '逐光者', url: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSPgmF_9uiGkG5t_1GxEnEBD3GSVFvj1MYTaXtKjLjIEa_XqIQcwrWpY9DHELim8zOhVkKcKCxIpSh8/pub?gid=719906907&single=true&output=csv' },
+  { label: '禁忌廚房', url: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSPgmF_9uiGkG5t_1GxEnEBD3GSVFvj1MYTaXtKjLjIEa_XqIQcwrWpY9DHELim8zOhVkKcKCxIpSh8/pub?gid=1316542157&single=true&output=csv' },
   { label: '放逐者', url: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSPgmF_9uiGkG5t_1GxEnEBD3GSVFvj1MYTaXtKjLjIEa_XqIQcwrWpY9DHELim8zOhVkKcKCxIpSh8/pub?gid=333010439&single=true&output=csv' },
 ];
 
