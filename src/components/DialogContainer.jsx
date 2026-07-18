@@ -37,6 +37,8 @@ export default function DialogContainer({ dialogState, resolve }) {
   };
 
   const handleKey = (e) => {
+    // 輸入法組字中的 Enter/Escape（選字、取消組字）不應觸發確認或關閉
+    if (e.nativeEvent?.isComposing || e.keyCode === 229) return;
     if (e.key === 'Enter' && (!multiline || e.metaKey || e.ctrlKey)) handleConfirm();
     if (e.key === 'Escape') handleCancel();
   };
