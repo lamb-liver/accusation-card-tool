@@ -6,10 +6,14 @@
  * @param {CardFilters} filters
  */
 export function cardMatchesFilters(card, searchTerm, filters) {
+  // 卡面編號如「CRO-01」，資料 id 為「cro01」：去除連字號/空白並轉小寫後比對，
+  // 讓玩家拿實體卡輸入編號（含或不含連字號、大小寫皆可）也能搜到
+  const normalizedIdQuery = searchTerm.replace(/[\s-]/g, '').toLowerCase();
   const matchesSearch =
     searchTerm === '' ||
     (card.name && card.name.includes(searchTerm)) ||
-    (card.effect && card.effect.includes(searchTerm));
+    (card.effect && card.effect.includes(searchTerm)) ||
+    (normalizedIdQuery !== '' && card.id && card.id.toLowerCase().includes(normalizedIdQuery));
 
   const matchesFaction = !filters.faction || card.faction === filters.faction;
   const matchesType = !filters.type || card.type === filters.type;
