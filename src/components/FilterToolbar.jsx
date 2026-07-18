@@ -23,7 +23,7 @@ export default function FilterToolbar({
   const showCardFilters = currentMode === 'gallery' || currentMode === 'deck';
 
   const modes = [
-    { id: 'gallery', label: '查牌', Icon: Search },
+    { id: 'gallery', label: '查卡', Icon: Search },
     { id: 'deck', label: '組牌', Icon: Hammer },
     { id: 'community', label: '交流', Icon: MessageSquare },
     { id: 'qa', label: 'QA', Icon: HelpCircle },
