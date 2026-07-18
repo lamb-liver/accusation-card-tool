@@ -17,6 +17,7 @@ function CardGallery({
   layoutMinHeight,
   contained = false,
   footer = null,
+  hideImage = false,
 }) {
   const handleClick = useCallback(
     (card) => onCardClick(card),
@@ -59,6 +60,7 @@ function CardGallery({
           isInDeck={inDeckIds ? inDeckIds.has(card.id) : false}
           isAtLimit={limitedCardIds ? limitedCardIds.has(card.id) : false}
           imagePriority={index < FIRST_SCREEN_PRIORITY_COUNT}
+          hideImage={hideImage}
         />
       ))}
     </div>

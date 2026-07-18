@@ -1,6 +1,39 @@
 import { useCallback, useEffect, useState } from 'react';
 import CardGallery from '../CardGallery.jsx';
 
+/** 卡池的金色滑軌開關（隱藏已選／隱藏圖片共用） */
+function PoolToggle({ checked, onChange, label }) {
+  return (
+    <label className="flex cursor-pointer select-none items-center gap-2">
+      <input
+        type="checkbox"
+        checked={checked}
+        onChange={(event) => onChange(event.target.checked)}
+        className="sr-only"
+      />
+      <div className="relative h-6 w-10">
+        <div
+          className={`absolute inset-0 rounded-full transition-colors duration-300 ${
+            checked ? 'bg-brand-gold' : 'bg-[#444]'
+          }`}
+        />
+        <div
+          className={`absolute top-1 h-4 w-4 rounded-full shadow transition-all duration-300 ${
+            checked ? 'left-5 bg-black' : 'left-1 bg-white'
+          }`}
+        />
+      </div>
+      <span
+        className={`text-sm transition-colors duration-300 ${
+          checked ? 'font-bold text-brand-gold' : 'text-gray-300'
+        }`}
+      >
+        {label}
+      </span>
+    </label>
+  );
+}
+
 /** 手機底部 FAB / 安全區留白 */
 function useDeckPoolScrollPadding() {
   const [padding, setPadding] = useState(64);
@@ -17,6 +50,8 @@ function useDeckPoolScrollPadding() {
 export default function DeckPoolSection({
   hideSelected,
   onHideSelectedChange,
+  hideImages,
+  onHideImagesChange,
   displayCards,
   onCardClick,
   onAddCard,
@@ -36,33 +71,10 @@ export default function DeckPoolSection({
     <div className="deck-pool-section deck-builder-column-lg flex min-w-0 w-full flex-col overflow-hidden rounded-lg border-2 border-brand-gold bg-[#252525] px-0 py-3 sm:px-4 sm:py-4 lg:min-w-0 lg:flex-1 lg:px-4 lg:py-4 lg:pb-4">
       <div className="deck-pool-header mb-3 flex shrink-0 flex-col items-center gap-2 px-2 sm:px-0">
         <h2 className="text-lg font-bold text-brand-gold">可選卡牌池</h2>
-        <label className="flex cursor-pointer select-none items-center gap-2">
-          <input
-            type="checkbox"
-            checked={hideSelected}
-            onChange={(event) => onHideSelectedChange(event.target.checked)}
-            className="sr-only"
-          />
-          <div className="relative h-6 w-10">
-            <div
-              className={`absolute inset-0 rounded-full transition-colors duration-300 ${
-                hideSelected ? 'bg-brand-gold' : 'bg-[#444]'
-              }`}
-            />
-            <div
-              className={`absolute top-1 h-4 w-4 rounded-full shadow transition-all duration-300 ${
-                hideSelected ? 'left-5 bg-black' : 'left-1 bg-white'
-              }`}
-            />
-          </div>
-          <span
-            className={`text-sm transition-colors duration-300 ${
-              hideSelected ? 'font-bold text-brand-gold' : 'text-gray-300'
-            }`}
-          >
-            隱藏已選
-          </span>
-        </label>
+        <div className="flex flex-wrap items-center justify-center gap-x-5 gap-y-2">
+          <PoolToggle checked={hideSelected} onChange={onHideSelectedChange} label="隱藏已選" />
+          <PoolToggle checked={hideImages} onChange={onHideImagesChange} label="隱藏圖片" />
+        </div>
         {displayCards.length > 0 && (
           <p className="text-xs text-gray-400">
             共 {displayCards.length} 張可選 · 在列表內捲動瀏覽
@@ -83,6 +95,7 @@ export default function DeckPoolSection({
           inDeckIds={inDeckIds}
           gridClass="grid w-full min-w-0 grid-cols-2 gap-2 *:min-w-0 lg:grid-cols-3 lg:gap-4"
           contained
+          hideImage={hideImages}
         />
       </div>
     </div>

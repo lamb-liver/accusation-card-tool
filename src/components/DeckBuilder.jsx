@@ -4,6 +4,8 @@ import { sortMainDeck } from '../deck/sortMainDeck.js';
 import DeckListPanel from './deckBuilder/DeckListPanel.jsx';
 import DeckPoolSection from './deckBuilder/DeckPoolSection.jsx';
 
+const HIDE_IMAGES_KEY = 'accusation-deck-hide-images';
+
 function DeckBuilder({
   deck,
   filteredCards,
@@ -34,12 +36,28 @@ function DeckBuilder({
   getPoolBlockedCardIds,
 }) {
   const [hideSelected, setHideSelected] = useState(false);
+  // 隱藏卡圖偏好持久化：組牌習慣穩定，跨次記住
+  const [hideImages, setHideImages] = useState(() => {
+    try {
+      return localStorage.getItem(HIDE_IMAGES_KEY) === '1';
+    } catch {
+      return false;
+    }
+  });
   const [ruleSelect, setRuleSelect] = useState(currentRule.type || 'rule1');
   const [bottomSheetOpen, setBottomSheetOpen] = useState(false);
 
   useEffect(() => {
     setRuleSelect(currentRule.type || 'rule1');
   }, [currentRule.type]);
+
+  useEffect(() => {
+    try {
+      localStorage.setItem(HIDE_IMAGES_KEY, hideImages ? '1' : '0');
+    } catch {
+      /* ignore quota / private mode */
+    }
+  }, [hideImages]);
 
   const mainListRef = useRef(null);
   const deckMainRef = useRef(deck.main);
@@ -232,6 +250,8 @@ function DeckBuilder({
       <DeckPoolSection
         hideSelected={hideSelected}
         onHideSelectedChange={setHideSelected}
+        hideImages={hideImages}
+        onHideImagesChange={setHideImages}
         displayCards={displayCards}
         onCardClick={onCardClick}
         onAddCard={onAddCard}
