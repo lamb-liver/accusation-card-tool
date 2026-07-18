@@ -16,7 +16,7 @@ import {
   setStoredArtVariant,
 } from '../src/utils/cardAlternateArt.js';
 import { cardMatchesFilters, filterCardIndices } from '../src/utils/cardFilterLogic.js';
-import { getCardMetaCells, getCardStats } from '../src/utils/cardMeta.js';
+import { getCardMetaCells, getCardStats, formatCardNumber } from '../src/utils/cardMeta.js';
 import { formatApiDate } from '../src/utils/formatApiDate.js';
 import { formatShareWallError } from '../src/utils/formatShareWallError.js';
 import { ruleToApiPayload, apiRuleToDeckRule } from '../src/utils/shareWallRule.js';
@@ -99,6 +99,17 @@ assert(
   !cardMatchesFilters(cards[2], '', { faction: '', type: '', symbol: '知識', mechanic: '' }),
   'symbol filter should fail when symbols are missing',
 );
+// 卡面編號搜尋：CRO-01 / cro01 / CRO01 皆應命中 id 'cro01'
+const noFilters = { faction: '', type: '', symbol: '', mechanic: '' };
+assert(cardMatchesFilters(cards[0], 'CRO-01', noFilters), 'search matches printed number CRO-01');
+assert(cardMatchesFilters(cards[0], 'cro01', noFilters), 'search matches raw id cro01');
+assert(cardMatchesFilters(cards[0], 'CRO01', noFilters), 'search matches CRO01 without hyphen');
+assert(!cardMatchesFilters(cards[1], 'CRO-01', noFilters), 'id search should not match other cards');
+
+// formatCardNumber：cro01 → CRO-01、mot12 → MOT-12
+assert(formatCardNumber('cro01') === 'CRO-01', 'formatCardNumber cro01');
+assert(formatCardNumber('mot12') === 'MOT-12', 'formatCardNumber mot12');
+assert(formatCardNumber('kit24') === 'KIT-24', 'formatCardNumber kit24');
 assertDeepEqual(
   filterCardIndices(cards, '', { faction: '', type: '信徒', symbol: '', mechanic: '' }),
   [1],

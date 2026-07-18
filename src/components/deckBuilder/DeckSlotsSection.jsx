@@ -6,6 +6,7 @@ export default function DeckSlotsSection({
   onRemoveCard,
   onClearCategory,
   onSortMain,
+  onCardClick,
   mainListRef,
 }) {
   return (
@@ -27,7 +28,7 @@ export default function DeckSlotsSection({
             <li className="text-[#888] text-xs italic py-2">無卡片</li>
           ) : (
             deck.leader.map((card) => (
-              <DeckCardRow key={card.id} card={card} onRemove={onRemoveCard} />
+              <DeckCardRow key={card.id} card={card} onRemove={onRemoveCard} onCardClick={onCardClick} />
             ))
           )}
         </ul>
@@ -50,7 +51,7 @@ export default function DeckSlotsSection({
             <li className="text-[#888] text-xs italic py-2">無卡片</li>
           ) : (
             deck.rituals.map((card) => (
-              <DeckCardRow key={card.id} card={card} onRemove={onRemoveCard} />
+              <DeckCardRow key={card.id} card={card} onRemove={onRemoveCard} onCardClick={onCardClick} />
             ))
           )}
         </ul>
@@ -103,7 +104,7 @@ export default function DeckSlotsSection({
               <li className="text-[#888] text-xs italic py-2">無卡片</li>
             ) : (
               deck.main.map((card) => (
-                <DeckCardRow key={card.id} card={card} onRemove={onRemoveCard} sortMain />
+                <DeckCardRow key={card.id} card={card} onRemove={onRemoveCard} onCardClick={onCardClick} sortMain />
               ))
             )}
           </ul>

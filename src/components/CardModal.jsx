@@ -9,6 +9,7 @@ import {
 } from 'lucide-react';
 import OptimizedImage from './common/OptimizedImage.jsx';
 import { SYMBOL_ICONS } from '../constants/symbols.js';
+import { formatCardNumber } from '../utils/cardMeta.js';
 import {
   CARD_ART_CHANGED_EVENT,
   CARD_MODAL_SIZES,
@@ -238,8 +239,13 @@ export default function CardModal({
             </div>
           </div>
 
-          {/* 卡名 */}
-          <h2 id={titleId} className="mb-2 text-2xl font-bold text-brand-gold">{card.name}</h2>
+          {/* 卡名＋卡面編號 */}
+          <div className="mb-3 flex items-baseline gap-2 flex-wrap">
+            <h2 id={titleId} className="text-2xl font-bold text-brand-gold">{card.name}</h2>
+            <span className="font-mono text-sm text-gray-400" aria-label={`卡牌編號 ${formatCardNumber(card.id)}`}>
+              {formatCardNumber(card.id)}
+            </span>
+          </div>
 
           {/* 基本屬性 */}
           <div className="grid grid-cols-2 gap-4 mb-6">

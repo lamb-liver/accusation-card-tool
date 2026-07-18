@@ -130,6 +130,16 @@ function DeckBuilder({
     [onApplyRule],
   );
 
+  /** 牌組列點開詳情：以整副牌（教主→儀式→主牌組）為導航清單 */
+  const deckCardList = useMemo(
+    () => [...deck.leader, ...deck.rituals, ...deck.main],
+    [deck.leader, deck.rituals, deck.main],
+  );
+  const handleDeckCardClick = useCallback(
+    (card) => onCardClick(card, deckCardList),
+    [onCardClick, deckCardList],
+  );
+
   const handleSortMain = useCallback(() => {
     const sorted = sortMainDeck(deck.main, currentRule);
     // 已是排序後結果就不必寫入（避免無意義的 state 更新）
@@ -202,6 +212,7 @@ function DeckBuilder({
         onResetRuleAndClear={onResetRuleAndClear}
         onClearCategory={clearCategory}
         onSortMain={handleSortMain}
+        onCardClick={handleDeckCardClick}
         onRemoveCard={onRemoveCard}
         mainListRef={mainListRef}
         primaryCount={primaryCount}

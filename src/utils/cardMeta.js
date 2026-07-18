@@ -25,6 +25,12 @@ const LOCATION_TYPE_COLORS = {
   '庭院': 'border-teal-400 bg-teal-950/45 text-teal-100',
 };
 
+/** 卡牌 id → 實體卡面編號顯示（cro01 → CRO-01；mot12 → MOT-12） */
+export function formatCardNumber(id) {
+  const match = /^([a-z]+)(\d+)$/i.exec(id ?? '');
+  return match ? `${match[1].toUpperCase()}-${match[2]}` : String(id ?? '').toUpperCase();
+}
+
 export function getCardStats(card) {
   const stats = [];
   if (card.type === '儀式') {

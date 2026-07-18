@@ -1,9 +1,10 @@
 import { useEffect, useState, useRef } from 'react';
 import { X } from 'lucide-react';
 
-export default function DeckCardRow({ card, onRemove, sortMain = false }) {
+export default function DeckCardRow({ card, onRemove, onCardClick, sortMain = false }) {
   const [swiping, setSwiping] = useState(false);
   const startXRef = useRef(0);
+  const movedRef = useRef(false);
   const removeTimerRef = useRef(null);
 
   // 滑動刪除的 300ms 動畫計時器；卸載時取消，避免對已移除的卡再次觸發 onRemove
@@ -11,7 +12,14 @@ export default function DeckCardRow({ card, onRemove, sortMain = false }) {
 
   const onTouchStart = (event) => {
     startXRef.current = event.touches[0].clientX;
+    movedRef.current = false;
     setSwiping(false);
+  };
+
+  const onTouchMove = (event) => {
+    if (Math.abs(event.touches[0].clientX - startXRef.current) > 8) {
+      movedRef.current = true;
+    }
   };
 
   const onTouchEnd = (event) => {
@@ -28,12 +36,29 @@ export default function DeckCardRow({ card, onRemove, sortMain = false }) {
     setSwiping(false);
   };
 
+  // 滑動或拖曳（主牌組排序）後不應觸發開啟詳情
+  const handleOpen = () => {
+    if (movedRef.current) {
+      movedRef.current = false;
+      return;
+    }
+    onCardClick?.(card);
+  };
+
+  const handleKeyDown = (event) => {
+    if (event.key === 'Enter' || event.key === ' ') {
+      event.preventDefault();
+      onCardClick?.(card);
+    }
+  };
+
   return (
     <li
       className={`slot-list-item relative overflow-hidden flex items-center justify-between bg-[#3a3a3a] hover:bg-[#4a4a4a] p-2 rounded text-sm transition border-l-2 border-brand-gold ${
         swiping ? 'swiping' : ''
       }`}
       onTouchStart={onTouchStart}
+      onTouchMove={onTouchMove}
       onTouchEnd={onTouchEnd}
       {...(sortMain ? { 'data-sort-main': 'true', 'data-card-id': card.id } : {})}
     >
@@ -45,7 +70,15 @@ export default function DeckCardRow({ card, onRemove, sortMain = false }) {
         刪除
       </div>
       <div className="relative z-[1] flex min-w-0 flex-1 items-center justify-between gap-2">
-        <div className="min-w-0 flex-1">
+        {/* 用 div 而非 button：主牌組以 sortablejs 拖曳排序，其 filter:'button' 會排除 button 不可拖 */}
+        <div
+          role="button"
+          tabIndex={0}
+          onClick={handleOpen}
+          onKeyDown={handleKeyDown}
+          className="min-w-0 flex-1 cursor-pointer text-left focus-visible:outline-2 focus-visible:outline-brand-gold rounded"
+          aria-label={`查看 ${card.name} 詳情`}
+        >
           <p className="deck-card-name text-[#e0e0e0] font-medium truncate">{card.name}</p>
           <p className="text-xs text-[#888]">
             {card.faction} / {card.type}
