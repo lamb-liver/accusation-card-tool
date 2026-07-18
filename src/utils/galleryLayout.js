@@ -1,7 +1,7 @@
 /** 查卡 grid 預留高度的單列估算值 */
 export const CARD_ROW_HEIGHT = 320;
 
-/** 查牌預設每頁張數（與 usePagination 預設一致） */
+/** 查卡預設每頁張數（與 usePagination 預設一致） */
 export const GALLERY_DEFAULT_PAGE_SIZE = 24;
 
 /** 首屏 LCP 卡圖（catalog 第一分片 cro 的第一張） */

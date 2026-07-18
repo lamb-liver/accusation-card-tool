@@ -10,6 +10,7 @@ import {
 import OptimizedImage from './common/OptimizedImage.jsx';
 import { SYMBOL_ICONS } from '../constants/symbols.js';
 import { formatCardNumber } from '../utils/cardMeta.js';
+import { getMechanicNotes } from '../constants/mechanicGlossary.js';
 import {
   CARD_ART_CHANGED_EVENT,
   CARD_MODAL_SIZES,
@@ -313,6 +314,16 @@ export default function CardModal({
               <div className="bg-neutral-700/50 p-4 rounded border border-gray-600">
                 <p className="text-gray-200 whitespace-pre-wrap leading-relaxed">{card.effect}</p>
               </div>
+              {/* 關鍵字說明 — 補充卡面未展開的規則（聖戰／供品…）*/}
+              {getMechanicNotes(card.effect).map(({ term, description }) => (
+                <div
+                  key={term}
+                  className="mt-2 flex gap-2 rounded border border-brand-gold/30 bg-brand-gold/10 px-3 py-2 text-xs leading-relaxed text-amber-100"
+                >
+                  <span className="shrink-0 font-bold text-brand-gold">{term}</span>
+                  <span>{description}</span>
+                </div>
+              ))}
               {/* 取得方式 — 效果框右下角 */}
               {displaySource && (
                 <div className="flex items-center justify-end gap-1.5 mt-2 text-xs text-gray-400">
