@@ -1,0 +1,45 @@
+import { normalizeRule } from '../rules/normalizeRule.js';
+import { FACTION_ORDER } from '../constants/factionOrder.js';
+
+/** @import { Card, DeckRule } from '../types.js' */
+
+/** 主牌組種類排序權重：信徒 → 地點 → 魔法（教主／儀式不在主牌組） */
+const TYPE_ORDER = { 信徒: 0, 地點: 1, 魔法: 2 };
+
+/**
+ * 主牌組排序：種類（信徒→地點→魔法）→ 教團（主→副→放逐者→其餘）→ 編號。
+ * 不改動輸入陣列。
+ * @param {Card[]} main
+ * @param {DeckRule} rule
+ * @returns {Card[]}
+ */
+export function sortMainDeck(main, rule) {
+  if (!Array.isArray(main) || main.length <= 1) return main;
+  const { primary, secondary } = normalizeRule(rule);
+
+  const factionRankMap = new Map();
+  let next = 0;
+  if (primary) factionRankMap.set(primary, next++);
+  if (secondary && secondary !== primary) factionRankMap.set(secondary, next++);
+  // 放逐者緊接主／副之後；無規則時 next===0，讓它退回 FACTION_ORDER（本就殿後）
+  if (next > 0) factionRankMap.set('放逐者', next++);
+
+  /** 主/副/放逐者依上面順序；其餘（無規則時）退回 FACTION_ORDER 保持穩定 */
+  const factionRank = (faction) => {
+    if (factionRankMap.has(faction)) return factionRankMap.get(faction);
+    const idx = FACTION_ORDER.indexOf(faction);
+    return 100 + (idx === -1 ? FACTION_ORDER.length : idx);
+  };
+
+  return [...main].sort((a, b) => {
+    const ta = TYPE_ORDER[a.type] ?? 99;
+    const tb = TYPE_ORDER[b.type] ?? 99;
+    if (ta !== tb) return ta - tb;
+
+    const fa = factionRank(a.faction);
+    const fb = factionRank(b.faction);
+    if (fa !== fb) return fa - fb;
+
+    return String(a.id).localeCompare(String(b.id), undefined, { numeric: true });
+  });
+}

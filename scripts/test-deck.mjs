@@ -18,6 +18,7 @@ import { collectDeckStructureViolations } from '../src/deck/deckCompositionRules
 import { STORAGE_KEY, SAVED_DECKS_KEY, RULE_STATE_KEY } from '../src/deck/constants.js';
 import { createDeckController } from '../src/deck/createDeckController.js';
 import { loadShareWallDeckIntoBuilder } from '../src/deck/shareWallHandlers.js';
+import { sortMainDeck } from '../src/deck/sortMainDeck.js';
 
 let failed = 0;
 
@@ -494,6 +495,35 @@ if (!savedWithRule?.rule || savedWithRule.rule.type !== 'rule1') {
   }
   if (!shareToasts.some((t) => t.message === '已載入分享牌組')) {
     fail('loadShareWallDeckIntoBuilder should toast success');
+  }
+}
+
+// ── sortMainDeck：種類（信徒→地點→魔法）→ 教團（主→副→放逐者）→ 編號 ──
+{
+  const c = (id, type, faction) => ({ id, type, faction });
+  const rule = { isActive: true, type: 'rule2', primary: '鴉教團', secondary: '白狐神社' };
+  const unsorted = [
+    c('fox20', '魔法', '白狐神社'),
+    c('exi09', '信徒', '放逐者'),
+    c('cro10', '信徒', '鴉教團'),
+    c('fox05', '信徒', '白狐神社'),
+    c('cro02', '信徒', '鴉教團'),
+    c('cro16', '地點', '鴉教團'),
+    c('cro21', '魔法', '鴉教團'),
+  ];
+  const sorted = sortMainDeck(unsorted, rule).map((x) => x.id);
+  const expected = ['cro02', 'cro10', 'fox05', 'exi09', 'cro16', 'cro21', 'fox20'];
+  if (sorted.join(',') !== expected.join(',')) {
+    fail(`sortMainDeck order: expected ${expected.join(',')}, got ${sorted.join(',')}`);
+  }
+  // 不改動輸入陣列
+  if (unsorted[0].id !== 'fox20') fail('sortMainDeck should not mutate input');
+  // 無規則時退回 FACTION_ORDER（放逐者殿後），不應丟例外
+  const noRule = sortMainDeck(unsorted, { isActive: false }).map((x) => x.id);
+  // 信徒 block：白狐(fox05) → 鴉(cro02,cro10) → 放逐者(exi09)；再地點、魔法
+  const noRuleExpected = ['fox05', 'cro02', 'cro10', 'exi09', 'cro16', 'fox20', 'cro21'];
+  if (noRule.join(',') !== noRuleExpected.join(',')) {
+    fail(`sortMainDeck no-rule order: expected ${noRuleExpected.join(',')}, got ${noRule.join(',')}`);
   }
 }
 

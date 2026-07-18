@@ -1,5 +1,6 @@
 import { useState, useMemo, useRef, useEffect, useLayoutEffect, useCallback } from 'react';
 import { filterCardsByRule, sortCardsForRuleDisplay } from '../rules/index.js';
+import { sortMainDeck } from '../deck/sortMainDeck.js';
 import DeckListPanel from './deckBuilder/DeckListPanel.jsx';
 import DeckPoolSection from './deckBuilder/DeckPoolSection.jsx';
 
@@ -129,6 +130,14 @@ function DeckBuilder({
     [onApplyRule],
   );
 
+  const handleSortMain = useCallback(() => {
+    const sorted = sortMainDeck(deck.main, currentRule);
+    // 已是排序後結果就不必寫入（避免無意義的 state 更新）
+    if (sorted.some((card, i) => card.id !== deck.main[i].id)) {
+      onReorderMain(sorted);
+    }
+  }, [deck.main, currentRule, onReorderMain]);
+
   const primaryCount = useMemo(
     () => deck.main.filter((card) => card.faction === primaryFaction).length,
     [deck.main, primaryFaction]
@@ -192,6 +201,7 @@ function DeckBuilder({
         onClearDeckOnly={onClearDeckOnly}
         onResetRuleAndClear={onResetRuleAndClear}
         onClearCategory={clearCategory}
+        onSortMain={handleSortMain}
         onRemoveCard={onRemoveCard}
         mainListRef={mainListRef}
         primaryCount={primaryCount}
