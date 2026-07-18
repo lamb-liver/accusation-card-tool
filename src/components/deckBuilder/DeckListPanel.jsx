@@ -21,6 +21,7 @@ export default function DeckListPanel({
   onClearDeckOnly,
   onResetRuleAndClear,
   onClearCategory,
+  onSortMain,
   onRemoveCard,
   mainListRef,
   primaryCount,
@@ -120,6 +121,7 @@ export default function DeckListPanel({
           deck={deck}
           onRemoveCard={onRemoveCard}
           onClearCategory={onClearCategory}
+          onSortMain={onSortMain}
           mainListRef={mainListRef}
         />
 
