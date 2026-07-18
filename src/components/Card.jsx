@@ -25,6 +25,7 @@ function Card({
   isInDeck = false,
   isAtLimit = false,
   imagePriority = false,
+  hideImage = false,
   compact = false,
 }) {
   const [artRev, setArtRev] = useState(0);
@@ -119,23 +120,25 @@ function Card({
             alignActionBar ? 'h-full min-h-0' : compact ? 'shrink-0' : 'h-full min-h-0'
           } ${showActionButton ? 'rounded-t-lg border-b-0' : 'rounded-lg'}`}
         >
-          <div
-            ref={imageRootRef}
-            className="card-image-slot card-image-slot--contain relative w-full shrink-0 overflow-hidden bg-black"
-          >
-            <OptimizedImage
-              src={imageSrc}
-              webpSrcSet={picture.webpSrcSet}
-              avifSrcSet={picture.avifSrcSet}
-              sizes={CARD_GALLERY_SIZES}
-              alt={cardImageAlt}
-              imgKey={`${card.id}-${artVariant}-${artRev}`}
-              priority={imagePriority}
-              rootRef={imageRootRef}
-              className="card-image-media touch-manipulation select-none"
-              placeholderClassName="absolute inset-0 animate-pulse bg-black"
-            />
-          </div>
+          {!hideImage && (
+            <div
+              ref={imageRootRef}
+              className="card-image-slot card-image-slot--contain relative w-full shrink-0 overflow-hidden bg-black"
+            >
+              <OptimizedImage
+                src={imageSrc}
+                webpSrcSet={picture.webpSrcSet}
+                avifSrcSet={picture.avifSrcSet}
+                sizes={CARD_GALLERY_SIZES}
+                alt={cardImageAlt}
+                imgKey={`${card.id}-${artVariant}-${artRev}`}
+                priority={imagePriority}
+                rootRef={imageRootRef}
+                className="card-image-media touch-manipulation select-none"
+                placeholderClassName="absolute inset-0 animate-pulse bg-black"
+              />
+            </div>
+          )}
 
           <div
             className={
@@ -248,7 +251,7 @@ function Card({
         </div>
       </button>
 
-      {hasAlt && (
+      {hasAlt && !hideImage && (
         <>
           {artVariant !== 'main' && (
             <div
