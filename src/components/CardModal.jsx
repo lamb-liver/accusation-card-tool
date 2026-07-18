@@ -38,6 +38,7 @@ export default function CardModal({
   const [imgLoaded, setImgLoaded] = useState(false);
   const [artRev, setArtRev] = useState(0);
   const dialogRef = useRef(null);
+  const touchStartRef = useRef({ x: 0, y: 0 });
   const titleId = 'card-modal-title';
 
   const hasAlt = card ? cardHasAlternateArt(card) : false;
@@ -127,6 +128,20 @@ export default function CardModal({
     setStoredArtVariant(card.id, artVariants[variantIdx + 1]);
   };
 
+  // 手機左右滑動切換上/下一張；只攔水平位移明顯大於垂直的手勢，避免干擾內容捲動
+  const handleTouchStart = (e) => {
+    const t = e.touches[0];
+    touchStartRef.current = { x: t.clientX, y: t.clientY };
+  };
+  const handleTouchEnd = (e) => {
+    const t = e.changedTouches[0];
+    const dx = t.clientX - touchStartRef.current.x;
+    const dy = t.clientY - touchStartRef.current.y;
+    if (Math.abs(dx) < 60 || Math.abs(dx) < Math.abs(dy) * 1.5) return;
+    if (dx < 0 && hasNext) onNext();
+    else if (dx > 0 && hasPrev) onPrev();
+  };
+
   // 鍵盤左右鍵切換 + 焦點陷阱 (Tab)
   const handleKeyDown = (e) => {
     if (e.key === 'ArrowLeft' && hasPrev) { onPrev(); return; }
@@ -164,6 +179,8 @@ export default function CardModal({
         aria-labelledby={titleId}
         tabIndex={-1}
         onKeyDown={handleKeyDown}
+        onTouchStart={handleTouchStart}
+        onTouchEnd={handleTouchEnd}
         className="relative bg-neutral-800 border-2 border-brand-gold rounded-lg max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto shadow-2xl"
       >
         {/* 關閉按鈕 */}

@@ -21,6 +21,7 @@ import FilterToolbar       from './components/FilterToolbar.jsx';
 import CardGallery         from './components/CardGallery.jsx';
 import PaginationControls  from './components/PaginationControls.jsx';
 import MobileFilterDrawer  from './components/MobileFilterDrawer.jsx';
+import BackToTopButton     from './components/BackToTopButton.jsx';
 import AppFooter           from './components/AppFooter.jsx';
 import ToastList           from './components/ToastList.jsx';
 import DialogContainer    from './components/DialogContainer.jsx';
@@ -239,6 +240,7 @@ function App() {
 
         {currentMode === 'gallery' && (
           <>
+            <BackToTopButton />
             <div className="text-center mb-8">
               {isLoading ? (
                 <p className="text-gray-400 text-lg">載入卡牌資料中…</p>
