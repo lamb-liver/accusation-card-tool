@@ -8,13 +8,18 @@ export const MECHANIC_GLOSSARY = {
 };
 
 /**
- * 回傳卡片效果中出現、且有說明的關鍵字（依 glossary 定義順序）。
+ * 回傳卡片效果中「以能力形式出現」且有說明的關鍵字（依 glossary 定義順序）。
+ *
+ * 比對能力標記「<關鍵字>。」而非全文子字串：卡面能力一律寫成「聖戰。…」，
+ * 賦予類效果寫成「…獲得聖戰。」，兩者都該顯示說明；而未來若出現
+ * 「破壞1個供品信徒」這類描述性提及，則不應誤掛說明。
+ *
  * @param {string | undefined} effect
  * @returns {{ term: string, description: string }[]}
  */
 export function getMechanicNotes(effect) {
   if (!effect) return [];
   return Object.entries(MECHANIC_GLOSSARY)
-    .filter(([term]) => effect.includes(term))
+    .filter(([term]) => effect.includes(`${term}。`))
     .map(([term, description]) => ({ term, description }));
 }

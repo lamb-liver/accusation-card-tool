@@ -16,8 +16,10 @@ export default function DeckCardRow({ card, onRemove, onCardClick, sortMain = fa
     setSwiping(false);
   };
 
+  // 門檻需高於一般點按抖動（tap slop 約 10px），又遠低於滑動刪除的 50px，
+  // 否則手指微幅飄移的點按會被當成滑動而無聲吞掉「開啟詳情」
   const onTouchMove = (event) => {
-    if (Math.abs(event.touches[0].clientX - startXRef.current) > 8) {
+    if (Math.abs(event.touches[0].clientX - startXRef.current) > 24) {
       movedRef.current = true;
     }
   };

@@ -22,6 +22,7 @@ import CardGallery         from './components/CardGallery.jsx';
 import PaginationControls  from './components/PaginationControls.jsx';
 import MobileFilterDrawer  from './components/MobileFilterDrawer.jsx';
 import BackToTopButton     from './components/BackToTopButton.jsx';
+import { scrollToTop }     from './utils/scrollToTop.js';
 import AppFooter           from './components/AppFooter.jsx';
 import ToastList           from './components/ToastList.jsx';
 import DialogContainer    from './components/DialogContainer.jsx';
@@ -160,14 +161,14 @@ function App() {
   const handlePageChange = useCallback(
     (page) => {
       setCurrentPage(page);
-      window.scrollTo({ top: 0, behavior: 'auto' });
+      scrollToTop();
     },
     [setCurrentPage],
   );
   const handlePerPageChangeAndScroll = useCallback(
     (value) => {
       handlePerPageChange(value);
-      window.scrollTo({ top: 0, behavior: 'auto' });
+      scrollToTop();
     },
     [handlePerPageChange],
   );
@@ -177,10 +178,38 @@ function App() {
     (searchTerm.trim() ? 1 : 0) +
     ['faction', 'type', 'symbol', 'mechanic'].filter((key) => filters[key]).length;
 
+  /** 卡片彈窗用：判斷該卡是否已在牌組，避免顯示按下無效的「加入牌組」 */
+  const deckCardIds = useMemo(
+    () => new Set([...deck.leader, ...deck.rituals, ...deck.main].map((card) => card.id)),
+    [deck],
+  );
+
+  /**
+   * 篩選變更同樣重置頁碼，需比照換頁回到頁首，否則會停在短結果集的空白區。
+   * 搜尋輸入不在此列：輸入框在頂端置頂列，逐字回捲反而干擾打字。
+   */
+  const handleFilterChangeAndScroll = useCallback(
+    (key, value) => {
+      handleFilterChange(key, value);
+      scrollToTop();
+    },
+    [handleFilterChange],
+  );
+
   const handleClearFilters = useCallback(() => {
     setSearchTerm('');
     setFilters({ faction: '', type: '', symbol: '', mechanic: '' });
+    scrollToTop();
   }, [setSearchTerm, setFilters]);
+
+  const handleDrawerApply = useCallback(
+    ({ searchTerm: nextSearch, filters: nextFilters }) => {
+      setSearchTerm(nextSearch);
+      setFilters(nextFilters);
+      scrollToTop();
+    },
+    [setSearchTerm, setFilters],
+  );
 
   const backgroundMode =
     currentMode === 'admin' ? 'admin' : currentMode === 'clock' ? 'gallery' : currentMode;
@@ -198,7 +227,7 @@ function App() {
             searchTerm={searchTerm}
             onSearchChange={setSearchTerm}
             filters={filters}
-            onFilterChange={handleFilterChange}
+            onFilterChange={handleFilterChangeAndScroll}
             resultCount={deckFilteredCount}
             activeFilterCount={activeFilterCount}
             onClearFilters={handleClearFilters}
@@ -212,10 +241,7 @@ function App() {
         fabVisible={currentMode === 'gallery' || currentMode === 'deck'}
         fabZIndex={currentMode === 'deck' ? 350 : 900}
         activeFilterCount={activeFilterCount}
-        onApply={({ searchTerm: nextSearch, filters: nextFilters }) => {
-          setSearchTerm(nextSearch);
-          setFilters(nextFilters);
-        }}
+        onApply={handleDrawerApply}
       />
 
       <main
@@ -370,6 +396,7 @@ function App() {
             onAdd={addToDeck}
             onPrev={handleModalPrev}
             onNext={handleModalNext}
+            isInDeck={deckCardIds.has(selectedCard.id)}
           />
         </Suspense>
       )}

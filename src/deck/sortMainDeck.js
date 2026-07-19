@@ -1,4 +1,4 @@
-import { normalizeRule } from '../rules/normalizeRule.js';
+import { factionRankForRule } from '../rules/deckPoolDisplay.js';
 import { FACTION_ORDER } from '../constants/factionOrder.js';
 
 /** @import { Card, DeckRule } from '../types.js' */
@@ -15,18 +15,13 @@ const TYPE_ORDER = { 信徒: 0, 地點: 1, 魔法: 2 };
  */
 export function sortMainDeck(main, rule) {
   if (!Array.isArray(main) || main.length <= 1) return main;
-  const { primary, secondary } = normalizeRule(rule);
 
-  const factionRankMap = new Map();
-  let next = 0;
-  if (primary) factionRankMap.set(primary, next++);
-  if (secondary && secondary !== primary) factionRankMap.set(secondary, next++);
-  // 放逐者緊接主／副之後；無規則時 next===0，讓它退回 FACTION_ORDER（本就殿後）
-  if (next > 0) factionRankMap.set('放逐者', next++);
-
-  /** 主/副/放逐者依上面順序；其餘（無規則時）退回 FACTION_ORDER 保持穩定 */
+  // 主／副／放逐者的階層由 factionRankForRule 統一定義（與組牌池顯示同源）；
+  // 其餘教團（未套用規則時）退回 FACTION_ORDER，放逐者於其中本就殿後
+  const rankByRule = factionRankForRule(rule, -1);
   const factionRank = (faction) => {
-    if (factionRankMap.has(faction)) return factionRankMap.get(faction);
+    const ranked = rankByRule(faction);
+    if (ranked !== -1) return ranked;
     const idx = FACTION_ORDER.indexOf(faction);
     return 100 + (idx === -1 ? FACTION_ORDER.length : idx);
   };
