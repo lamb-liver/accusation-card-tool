@@ -37,6 +37,26 @@ export function filterCardsByRule(cards, rule) {
 }
 
 /**
+ * 教團排序階層的單一定義：主教團 → 次要教團 → 放逐者（中立）。
+ * 組牌池顯示與主牌組排序共用，避免兩處各自維護而失同步。
+ *
+ * @param {DeckRule} rule 已正規化或未正規化皆可
+ * @param {number} [fallbackRank] 不在上述階層中的教團的名次
+ * @returns {(faction: string) => number}
+ */
+export function factionRankForRule(rule, fallbackRank = Number.MAX_SAFE_INTEGER) {
+  const { primary, secondary } = normalizeRule(rule);
+  const order = new Map();
+  let next = 0;
+  if (primary) order.set(primary, next++);
+  if (secondary && secondary !== primary) order.set(secondary, next++);
+  // 放逐者緊接主／副之後；未設定主副時不佔位，交由呼叫端的 fallback 決定
+  if (next > 0) order.set('放逐者', next++);
+
+  return (faction) => (order.has(faction) ? order.get(faction) : fallbackRank);
+}
+
+/**
  * rule2 組牌池排序：主教團 → 次要教團（無教主／儀式）→ 放逐者。
  * @param {Card[]} cards
  * @param {DeckRule} rule
@@ -47,12 +67,6 @@ export function sortCardsForRuleDisplay(cards, rule) {
   const normalizedRule = normalizeRule(rule);
   if (!normalizedRule.isActive || normalizedRule.type !== 'rule2') return cards;
 
-  const { primary, secondary } = normalizedRule;
-  const order = {
-    [primary]: 0,
-    ...(secondary ? { [secondary]: 1 } : {}),
-    放逐者: secondary ? 2 : 1,
-  };
-
-  return [...cards].sort((a, b) => (order[a.faction] ?? 3) - (order[b.faction] ?? 3));
+  const rank = factionRankForRule(normalizedRule, 3);
+  return [...cards].sort((a, b) => rank(a.faction) - rank(b.faction));
 }

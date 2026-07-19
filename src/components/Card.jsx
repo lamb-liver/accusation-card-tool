@@ -261,44 +261,50 @@ function Card({
               {variantBadgeLabel(artVariant)}
             </div>
           )}
-          {/* 半透明膠囊、只渲染可用方向：減少對卡框左上裝飾的遮擋 */}
+          {/*
+            半透明膠囊，減少對卡框左上裝飾的遮擋。
+            兩側一律佔位、不可用方向以 invisible 隱藏：膠囊寬度固定，
+            連續切換時箭頭不會橫向位移到手指／游標之外。
+          */}
           <div
             className={`absolute z-20 flex items-center overflow-hidden rounded-full border border-neutral-600/60 bg-black/60 backdrop-blur-[2px] ${
               compact ? '-left-1 top-0.5' : 'left-1 top-1'
             }`}
           >
-            {variantIdx > 0 && (
+            {[
+              {
+                key: 'prev',
+                usable: variantIdx > 0,
+                onClick: handleArtPrev,
+                label: '切換上一個圖版',
+                Icon: ChevronLeft,
+              },
+              {
+                key: 'next',
+                usable: variantIdx < artVariants.length - 1,
+                onClick: handleArtNext,
+                label: '切換下一個圖版',
+                Icon: ChevronRight,
+              },
+            ].map(({ key, usable, onClick, label, Icon }) => (
               <button
+                key={key}
                 type="button"
-                onClick={handleArtPrev}
-                aria-label="切換上一個圖版"
+                onClick={onClick}
+                aria-label={label}
+                aria-hidden={!usable}
+                tabIndex={usable ? 0 : -1}
                 className={`flex items-center justify-center text-amber-200 transition hover:bg-black/60 hover:text-brand-gold ${
-                  compact ? 'h-5 w-5' : 'h-6 w-6'
-                }`}
+                  usable ? '' : 'invisible pointer-events-none'
+                } ${compact ? 'h-5 w-5' : 'h-6 w-6'}`}
               >
-                <ChevronLeft
+                <Icon
                   className={`shrink-0 ${compact ? 'h-3.5 w-3.5' : 'h-4 w-4'}`}
                   aria-hidden
                   strokeWidth={2.75}
                 />
               </button>
-            )}
-            {variantIdx < artVariants.length - 1 && (
-              <button
-                type="button"
-                onClick={handleArtNext}
-                aria-label="切換下一個圖版"
-                className={`flex items-center justify-center text-amber-200 transition hover:bg-black/60 hover:text-brand-gold ${
-                  compact ? 'h-5 w-5' : 'h-6 w-6'
-                }`}
-              >
-                <ChevronRight
-                  className={`shrink-0 ${compact ? 'h-3.5 w-3.5' : 'h-4 w-4'}`}
-                  aria-hidden
-                  strokeWidth={2.75}
-                />
-              </button>
-            )}
+            ))}
           </div>
         </>
       )}

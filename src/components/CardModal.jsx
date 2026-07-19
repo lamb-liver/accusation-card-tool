@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
+  Check,
   ChevronLeft,
   ChevronRight,
   Image as ImageIcon,
@@ -35,11 +36,12 @@ export default function CardModal({
   onAdd = () => {},
   onPrev = () => {},
   onNext = () => {},
+  isInDeck = false,
 }) {
   const [imgLoaded, setImgLoaded] = useState(false);
   const [artRev, setArtRev] = useState(0);
   const dialogRef = useRef(null);
-  const touchStartRef = useRef({ x: 0, y: 0 });
+  const touchStartRef = useRef({ x: 0, y: 0, ignore: false });
   const titleId = 'card-modal-title';
 
   const hasAlt = card ? cardHasAlternateArt(card) : false;
@@ -129,12 +131,15 @@ export default function CardModal({
     setStoredArtVariant(card.id, artVariants[variantIdx + 1]);
   };
 
-  // 手機左右滑動切換上/下一張；只攔水平位移明顯大於垂直的手勢，避免干擾內容捲動
+  // 手機左右滑動切換上/下一張；只攔水平位移明顯大於垂直的手勢，避免干擾內容捲動。
+  // 起點落在按鈕等互動元件時忽略手勢，否則按著「加入牌組」橫移會誤換卡。
   const handleTouchStart = (e) => {
     const t = e.touches[0];
-    touchStartRef.current = { x: t.clientX, y: t.clientY };
+    const fromControl = Boolean(e.target?.closest?.('button, a, input, select, textarea'));
+    touchStartRef.current = { x: t.clientX, y: t.clientY, ignore: fromControl };
   };
   const handleTouchEnd = (e) => {
+    if (touchStartRef.current.ignore) return;
     const t = e.changedTouches[0];
     const dx = t.clientX - touchStartRef.current.x;
     const dy = t.clientY - touchStartRef.current.y;
@@ -378,12 +383,28 @@ export default function CardModal({
               </button>
             ) : null}
 
+            {/* 從牌組列開啟時卡片已在牌組，按下只會被阻擋；直接呈現已加入狀態 */}
             <button
+              type="button"
               onClick={() => onAdd(card)}
-              className="inline-flex items-center justify-center gap-2 bg-brand-gold hover:bg-amber-500 text-neutral-900 font-bold py-3 px-10 rounded-full transition text-base"
+              disabled={isInDeck}
+              className={`inline-flex items-center justify-center gap-2 font-bold py-3 px-10 rounded-full transition text-base ${
+                isInDeck
+                  ? 'cursor-not-allowed border-2 border-green-500/60 bg-green-950/40 text-green-300'
+                  : 'bg-brand-gold hover:bg-amber-500 text-neutral-900'
+              }`}
             >
-              <Plus className="h-5 w-5 shrink-0" aria-hidden strokeWidth={2.75} />
-              加入牌組
+              {isInDeck ? (
+                <>
+                  <Check className="h-5 w-5 shrink-0" aria-hidden strokeWidth={2.75} />
+                  已在牌組
+                </>
+              ) : (
+                <>
+                  <Plus className="h-5 w-5 shrink-0" aria-hidden strokeWidth={2.75} />
+                  加入牌組
+                </>
+              )}
             </button>
 
             {cardList.length > 1 ? (

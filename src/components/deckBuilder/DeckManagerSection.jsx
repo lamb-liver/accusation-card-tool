@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { isImeComposing } from '../../utils/imeComposition.js';
 
 export default function DeckManagerSection({
   savedDecks,
@@ -23,8 +24,7 @@ export default function DeckManagerSection({
           value={deckNameInput}
           onChange={(event) => setDeckNameInput(event.target.value)}
           onKeyDown={(event) => {
-            // 輸入法組字中的 Enter（選字確認）不應觸發儲存；keyCode 229 為舊版瀏覽器的組字訊號
-            if (event.nativeEvent.isComposing || event.keyCode === 229) return;
+            if (isImeComposing(event)) return;
             if (event.key === 'Enter') handleSave();
           }}
           placeholder="牌組名稱（最多 20 字）"
