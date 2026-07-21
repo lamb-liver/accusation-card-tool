@@ -90,34 +90,27 @@
 | 6 | 匯出圖片時卡圖只靠 `onload`/`onerror` resolve，兩者皆不觸發則 `Promise.all` 永遠 pending，離屏容器永久留在 DOM | `deck/importExport.js` | 加 10 秒逾時保險 |
 | 7 | `useCardData` 的 `retry` 無 staleness guard，連按時舊請求會覆蓋新結果 | `hooks/useCardData.js` | 加 `requestIdRef`（比照 `useAsyncResource` 既有作法） |
 
-另補上三組回歸測試至 `scripts/test-share-wall.mjs`：`timingSafeEqual`、`createResponder` 的 id 一致性、`runDbQuery` 的錯誤轉換。
+| 8 | `useCardModal` 回傳的四個函式每次 render 重建，使 `App.jsx` 與 `DeckPoolSection` 中「為了讓 CardGallery/Card 的 memo 生效」而寫的 `useCallback` 實際上未生效；`CardModal` 鎖背景捲動的 effect 也因 `onClose` 不穩定而反覆解除重掛 keydown listener | `hooks/useCardModal.js` | 四個函式全部 `useCallback` 化，card 與 list 合併為單一 state 以便 updater 從 `prev` 取值。順帶修正 `next` 在卡片不在列表時會跳到第一張的不一致 |
+| 9 | `usePagination` 以 `filteredCards.length` 判斷結果集是否改變，兩組篩選張數相同時（例如兩個教團各 24 張）不會重置頁碼 | `hooks/usePagination.js` | 改以陣列 identity 判斷 |
+| 10 | admin 審核後呼叫 `reload()`，已按「載入更多」取得的項目全部消失、回到第一頁 | `components/admin/useAdminSubmissions.js`、`AdminSection.jsx` | 抽出純函式 `applyStatusChangeToList` 做就地更新；移除項目時 offset 同步減 1，讓下次載入更多與伺服器端縮小後的結果集對齊 |
+
+回歸測試：
+- `scripts/test-share-wall.mjs` — `timingSafeEqual`、`createResponder` 的 id 一致性、`runDbQuery` 的錯誤轉換
+- `scripts/test-utils.mjs` — `applyStatusChangeToList` 的移除／就地更新／未命中 id 三種路徑，含不可變性檢查
 
 ---
 
 ## 4. 已知但未修
 
-### 4.1 `useCardModal` 未 memo 化，使多處 `useCallback` 失效（建議優先處理）
+### 4.1 OFFSET 分頁在資料變動時會漏項或重複
 
-`hooks/useCardModal.js` 回傳的 `handleCardClick`、`closeModal`、`handleModalPrev`、`handleModalNext` 都是每次 render 重建的普通函式。連鎖影響：
+公開列表、留言板、admin 列表都使用 `LIMIT ? OFFSET ?`。新投稿或他人的審核動作會讓後續頁位移，導致漏項或重複。
 
-- `App.jsx` 的 `handleGalleryCardClick` 掛著註解「穩定識別：inline 箭頭會在每次 render 打破 CardGallery/Card 的 memo」，但它依賴 `handleCardClick`，所以每次 render 仍然變動 —— `CardGallery` / `Card` 的 `memo` 實際上沒有生效。`DeckPoolSection` 有同樣註解與同樣問題。
-- `CardModal` 中鎖定 body 捲動的 effect 依賴 `[card, onClose]`，`onClose` 每次變動會導致 effect 反覆解除／重掛 keydown listener 並重設 `body.style.overflow`。
+**未修的理由**：要根治需改 cursor 分頁（`created_at < ?`），這會變更 API 的請求／回應契約，而 `docs/project-state.md` 明確要求不得在非 share-wall 主題的工作中改動該契約。本次審查不是 share-wall 專案，故保留。
 
-修法：在 `useCardModal` 內以 `useCallback` 包裝四個回傳函式（`handleModalPrev`/`handleModalNext` 需改用 functional state update 以避免依賴 `selectedCard`）。
+註：admin 端因第 3 節第 10 項改為就地更新，自身審核動作造成的偏移已消除（移除項目時同步調整 offset）；此處剩下的是**他人**或**其他來源**變動資料所造成的偏移。
 
-### 4.2 `usePagination` 只在結果「數量」改變時重置頁碼
-
-`hooks/usePagination.js` 的 effect 比較 `filteredCards.length`。若切換篩選後結果數量恰好相同（例如兩個教團各 24 張），使用者會停在舊頁碼而非回到第 1 頁。影響輕微但確實可重現。
-
-### 4.3 OFFSET 分頁在資料變動時會漏項或重複
-
-公開列表、留言板、admin 列表都使用 `LIMIT ? OFFSET ?`。審核動作或新投稿會讓後續頁位移。低流量下可接受；要根治需改 cursor 分頁（`created_at < ?`），但會變更 API 契約 —— `docs/project-state.md` 明確要求不在無關工作中改動 share-wall 契約，故未動。
-
-### 4.4 `AdminSection` 的 `reload()` 會丟棄已載入的分頁
-
-狀態變更後呼叫 `reload()`，列表回到第一頁，先前按「載入更多」取得的項目消失。UX 層面的小問題。
-
-### 4.5 `statusPatch.js` 的表名字串插值
+### 4.2 `statusPatch.js` 的表名字串插值
 
 `SELECT ... FROM ${table}` 無法用 bind 參數化。目前安全：`table` 來自寫死的 `TABLES` 白名單，`kind` 只由本模組呼叫端以字面量傳入。本次已加註解說明此前提，提醒未來新增呼叫端時不可讓 `kind` 來自請求資料。
 

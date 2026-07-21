@@ -77,6 +77,7 @@ export default function AdminSection({ showToast, showConfirm }) {
     isError,
     errorMessage,
     reload,
+    applyStatusChange,
     isLoadingMoreDecks,
     isLoadingMoreMessages,
     loadMoreDecksError,
@@ -128,7 +129,8 @@ export default function AdminSection({ showToast, showConfirm }) {
       if (kind === 'deck') await patchDeckStatus(id, status);
       else await patchMessageStatus(id, status);
       showToast('狀態已更新', 'success');
-      reload();
+      // 就地更新而非 reload：reload 會丟棄已按「載入更多」取得的項目
+      applyStatusChange(kind, id, status);
     } catch (error) {
       showToast(formatShareWallError(error, '操作失敗'), 'error');
     } finally {
