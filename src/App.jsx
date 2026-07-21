@@ -73,8 +73,9 @@ function App() {
 
   // ── 資料層 ────────────────────────────────────────────────────────────────
   const { allCards, isLoading, isError, retry }                         = useCardData();
-  const { searchTerm, setSearchTerm, filters, setFilters,
-          handleFilterChange, deferredFilteredCards, isFilterPending } = useCardFilters(allCards);
+  const { searchTerm, setSearchTerm, filters, setFilters, handleFilterChange,
+          deferredFilteredCards, isFilterPending,
+          activeFilterCount, resetFilters }                            = useCardFilters(allCards);
   const { setCurrentPage, perPage, isPaginationMode,
           totalPages, safePage, paginatedCards, handlePerPageChange }   = usePagination(deferredFilteredCards);
   const galleryColumns = useGridColumnCount();
@@ -173,11 +174,6 @@ function App() {
     [handlePerPageChange],
   );
 
-  // ── 篩選啟用狀態（清除鈕與手機 FAB 徽章共用）────────────────────────────
-  const activeFilterCount =
-    (searchTerm.trim() ? 1 : 0) +
-    ['faction', 'type', 'symbol', 'mechanic'].filter((key) => filters[key]).length;
-
   /** 卡片彈窗 →「查看此教團常見問題」：關閉彈窗並開在該教團分類 */
   const handleViewFactionQA = useCallback(
     (faction) => {
@@ -207,10 +203,9 @@ function App() {
   );
 
   const handleClearFilters = useCallback(() => {
-    setSearchTerm('');
-    setFilters({ faction: '', type: '', symbol: '', mechanic: '' });
+    resetFilters();
     scrollToTop();
-  }, [setSearchTerm, setFilters]);
+  }, [resetFilters]);
 
   const handleDrawerApply = useCallback(
     ({ searchTerm: nextSearch, filters: nextFilters }) => {

@@ -16,24 +16,25 @@ import { readFileSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
+import { parseQaModule } from './lib/qa-module.mjs';
+import { isPlaceholderOnlyCategory } from '../src/constants/qaPlaceholder.js';
+
 const projectRoot = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const QA_PATH = 'src/data/qaData.js';
-const PLACEHOLDER_Q = '目前尚無特定 QA';
 /** 題數允許的最大跌幅（試算表正常編修可能小幅減少，大跌代表出事） */
 const MAX_DROP_RATIO = 0.3;
 
 function parseQaSource(source) {
-  const match = source.match(/export const qaData = ([\s\S]*);\s*$/);
-  if (!match) throw new Error(`無法從 ${QA_PATH} 解析 qaData`);
-  return JSON.parse(match[1]);
-}
-
-function isPlaceholderOnly(category) {
-  return category.questions.every((item) => item.q === PLACEHOLDER_Q);
+  const data = parseQaModule(source);
+  if (!data) throw new Error(`無法從 ${QA_PATH} 解析 qaData`);
+  return data;
 }
 
 function countQuestions(data) {
-  return data.reduce((n, c) => n + (isPlaceholderOnly(c) ? 0 : c.questions.length), 0);
+  return data.reduce(
+    (n, c) => n + (isPlaceholderOnlyCategory(c) ? 0 : c.questions.length),
+    0,
+  );
 }
 
 const next = parseQaSource(readFileSync(resolve(projectRoot, QA_PATH), 'utf-8'));
@@ -54,7 +55,7 @@ const previousByCategory = new Map(previous.map((c) => [c.category, c]));
 for (const category of next) {
   const before = previousByCategory.get(category.category);
   if (!before) continue;
-  if (!isPlaceholderOnly(before) && isPlaceholderOnly(category)) {
+  if (!isPlaceholderOnlyCategory(before) && isPlaceholderOnlyCategory(category)) {
     failures.push(
       `分類「${category.category}」原有 ${before.questions.length} 題，同步後只剩佔位符 — 分頁可能被清空或取消發布`,
     );
