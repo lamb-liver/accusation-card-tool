@@ -3,6 +3,7 @@ import {
   Check,
   ChevronLeft,
   ChevronRight,
+  HelpCircle,
   Image as ImageIcon,
   List,
   Plus,
@@ -12,6 +13,7 @@ import OptimizedImage from './common/OptimizedImage.jsx';
 import { SYMBOL_ICONS } from '../constants/symbols.js';
 import { formatCardNumber } from '../utils/cardMeta.js';
 import { getMechanicNotes } from '../constants/mechanicGlossary.js';
+import { factionHasQA } from '../utils/qaLookup.js';
 import {
   CARD_ART_CHANGED_EVENT,
   CARD_MODAL_SIZES,
@@ -37,6 +39,7 @@ export default function CardModal({
   onPrev = () => {},
   onNext = () => {},
   isInDeck = false,
+  onViewFactionQA = () => {},
 }) {
   const [imgLoaded, setImgLoaded] = useState(false);
   const [artRev, setArtRev] = useState(0);
@@ -365,6 +368,18 @@ export default function CardModal({
                 ))}
               </div>
             </div>
+          )}
+
+          {/* 玩家多半是「這張卡有疑問」才查 QA，直接從卡片導向該教團的問答 */}
+          {factionHasQA(card.faction) && (
+            <button
+              type="button"
+              onClick={() => onViewFactionQA(card.faction)}
+              className="mb-6 flex w-full items-center justify-center gap-2 rounded-lg border border-[#555] px-4 py-2.5 text-sm font-medium text-gray-300 transition hover:border-brand-gold hover:text-brand-gold"
+            >
+              <HelpCircle className="h-4 w-4 shrink-0" aria-hidden strokeWidth={2.25} />
+              查看「{card.faction}」常見問題
+            </button>
           )}
 
           {/* 加入牌組 + 左右切換同一行 */}

@@ -31,9 +31,9 @@ const CATEGORY_DECOR_SVG =
  * 常見問題：搜尋（同時比對問題與答案）＋教團篩選晶片。
  * 關鍵字常跨教團分散（如「控訴」散在 4 個分類），故以搜尋為主、分類為輔。
  */
-export default function QASection() {
+export default function QASection({ initialCategory = '' }) {
   const [searchTerm, setSearchTerm] = useState('');
-  const [activeCategory, setActiveCategory] = useState('');
+  const [activeCategory, setActiveCategory] = useState(initialCategory);
   /** 玩家明確點開／收合的項目；搜尋時預設展開，此 Map 為覆寫 */
   const [openOverrides, setOpenOverrides] = useState(() => new Map());
 
@@ -43,6 +43,11 @@ export default function QASection() {
   useEffect(() => {
     setOpenOverrides(new Map());
   }, [searchTerm]);
+
+  // 由 #/qa/<教團> 進入或切換教團時同步選取（如從別張卡的彈窗再次跳入）
+  useEffect(() => {
+    setActiveCategory(initialCategory);
+  }, [initialCategory]);
 
   const toggle = useCallback((key, currentlyOpen) => {
     setOpenOverrides((prev) => {
@@ -77,7 +82,6 @@ export default function QASection() {
   );
 
   const totalMatches = visibleCategories.reduce((n, c) => n + c.questions.length, 0);
-  const totalQuestions = useMemo(() => qaData.reduce((n, c) => n + c.questions.length, 0), []);
 
   const clearFilters = () => {
     setSearchTerm('');
@@ -113,20 +117,8 @@ export default function QASection() {
         )}
       </div>
 
-      {/* 教團篩選晶片；括號內為目前搜尋下該分類的命中數 */}
+      {/* 教團篩選晶片；再次點擊已選取者即回到全部，故不需另設「全部」標籤 */}
       <div className="mb-4 flex flex-wrap gap-2">
-        <button
-          type="button"
-          onClick={() => setActiveCategory('')}
-          aria-pressed={activeCategory === ''}
-          className={`rounded-full border px-3 py-1.5 text-xs font-bold transition ${
-            activeCategory === ''
-              ? 'border-brand-gold bg-brand-gold text-neutral-900'
-              : 'border-[#444] bg-[#2a2a2a] text-[#e0e0e0] hover:border-brand-gold'
-          }`}
-        >
-          全部（{isSearching ? totalMatches : totalQuestions}）
-        </button>
         {qaData.map((category) => {
           const count = countsByCategory.get(category.category) ?? 0;
           const isActive = activeCategory === category.category;
@@ -143,7 +135,7 @@ export default function QASection() {
                   : 'border-[#444] bg-[#2a2a2a] text-[#e0e0e0] hover:border-brand-gold'
               }`}
             >
-              {category.category}（{count}）
+              {category.category}
             </button>
           );
         })}

@@ -2,7 +2,7 @@ import { useCallback, useEffect, useState } from 'react';
 
 /**
  * @typedef {'home' | 'deck' | 'community' | 'deck-detail' | 'qa' | 'clock' | 'admin'} HashRouteKind
- * @typedef {{ kind: HashRouteKind, shareId?: string, communityScroll?: 'guestbook' | 'decks' }} HashRoute
+ * @typedef {{ kind: HashRouteKind, shareId?: string, communityScroll?: 'guestbook' | 'decks', qaCategory?: string }} HashRoute
  */
 
 /** @param {string} hash @returns {HashRoute} */
@@ -20,6 +20,10 @@ export function parseHashRoute(hash = window.location.hash) {
   // 舊版錨點 #community-decks / #community-guestbook（勿與路由混用，會誤判為查卡）
   if (raw === 'community-decks') return { kind: 'community', communityScroll: 'decks' };
   if (raw === 'community-guestbook') return { kind: 'community', communityScroll: 'guestbook' };
+  // #/qa/<教團> 可直接開在該教團分類（卡片彈窗的「查看此教團 QA」使用）
+  if (parts[0] === 'qa' && parts[1]) {
+    return { kind: 'qa', qaCategory: decodeURIComponent(parts[1]) };
+  }
   if (parts[0] === 'qa') return { kind: 'qa' };
   if (parts[0] === 'clock') return { kind: 'clock' };
   if (parts[0] === 'admin') return { kind: 'admin' };

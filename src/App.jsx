@@ -178,6 +178,16 @@ function App() {
     (searchTerm.trim() ? 1 : 0) +
     ['faction', 'type', 'symbol', 'mechanic'].filter((key) => filters[key]).length;
 
+  /** 卡片彈窗 →「查看此教團常見問題」：關閉彈窗並開在該教團分類 */
+  const handleViewFactionQA = useCallback(
+    (faction) => {
+      closeModal();
+      navigate(`qa/${encodeURIComponent(faction)}`);
+      scrollToTop();
+    },
+    [closeModal, navigate],
+  );
+
   /** 卡片彈窗用：判斷該卡是否已在牌組，避免顯示按下無效的「加入牌組」 */
   const deckCardIds = useMemo(
     () => new Set([...deck.leader, ...deck.rituals, ...deck.main].map((card) => card.id)),
@@ -370,7 +380,7 @@ function App() {
 
         {currentMode === 'qa' && (
           <Suspense fallback={<SectionFallback label="載入常見問題…" />}>
-            <QASection />
+            <QASection initialCategory={route.kind === 'qa' ? (route.qaCategory ?? '') : ''} />
           </Suspense>
         )}
 
@@ -397,6 +407,7 @@ function App() {
             onPrev={handleModalPrev}
             onNext={handleModalNext}
             isInDeck={deckCardIds.has(selectedCard.id)}
+            onViewFactionQA={handleViewFactionQA}
           />
         </Suspense>
       )}
