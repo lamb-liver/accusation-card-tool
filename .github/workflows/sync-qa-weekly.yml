@@ -8,7 +8,6 @@ on:
 
 permissions:
   contents: write
-  pull-requests: write
 
 concurrency:
   group: sync-qa-weekly
@@ -31,26 +30,39 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      # 內容無變化時 sync-qa 不會動檔案，因此 git diff 即可判斷是否需要推送
       - name: Sync QA from Google Sheets
         run: npm run sync:qa
 
-      - name: Create pull request
-        uses: peter-evans/create-pull-request@v8
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          branch: automation/sync-qa
-          delete-branch: true
-          commit-message: 'chore: sync QA from Google Sheets'
-          title: 'chore: 同步 QA（Google 試算表）'
-          body: |
-            ## Summary
-            每週自動從 Google 試算表同步常見問題至 `src/data/qaData.js`。
+      - name: Detect changes
+        id: changes
+        run: |
+          if git diff --quiet -- src/data/qaData.js; then
+            echo 'changed=false' >> "$GITHUB_OUTPUT"
+            echo 'QA 內容無變化，本次不推送。'
+          else
+            echo 'changed=true' >> "$GITHUB_OUTPUT"
+            git --no-pager diff --stat -- src/data/qaData.js
+          fi
 
-            ## 合併後
-            - `main` 上的 [Build Deploy Artifact](.github/workflows/deploy.yml) 會自動建置部署產物
-            - 或依專案流程手動部署 `deploy-output`
+      # 免人工推送沒有合併前的人工把關，改由這兩道自動閘門負責：
+      # 1) 內容流失防護：分頁被清空／取消發布時擋下，避免真 QA 被佔位符覆蓋
+      # 2) 專案完整驗證：資產、生成檔、lint、全部測試套件
+      - name: Guard against QA content loss
+        if: steps.changes.outputs.changed == 'true'
+        run: node scripts/check-qa-sync-safety.mjs
 
-            ---
-            _此 PR 由 [sync-qa-weekly](.github/workflows/sync-qa-weekly.yml) 產生。_
-          add-paths: |
-            src/data/qaData.js
+      - name: Validate repository
+        if: steps.changes.outputs.changed == 'true'
+        run: npm run validate:repo
+
+      # 推送後由 Cloudflare Pages 的 git 整合自動建置部署（非 Actions 工作流，
+      # 不受 GITHUB_TOKEN 的遞迴觸發限制）
+      - name: Commit and push to main
+        if: steps.changes.outputs.changed == 'true'
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add src/data/qaData.js
+          git commit -m 'chore: sync QA from Google Sheets'
+          git push
