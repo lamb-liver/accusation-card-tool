@@ -1,4 +1,4 @@
-import { writeFileSync } from 'fs';
+import { readFileSync, writeFileSync } from 'fs';
 import { resolve, dirname } from 'path';
 import { fileURLToPath } from 'url';
 
@@ -61,6 +61,20 @@ function toJSModule(data) {
 export const qaData = ${JSON.stringify(data, null, 2)};\n`;
 }
 
+/**
+ * 讀取現有檔案中的 qaData（僅比對內容，忽略時間戳註解）。
+ * @returns {unknown | null} 解析失敗或檔案不存在時回傳 null
+ */
+function readExistingQaData() {
+  try {
+    const src = readFileSync(OUTPUT_PATH, 'utf-8');
+    const match = src.match(/export const qaData = ([\s\S]*);\s*$/);
+    return match ? JSON.parse(match[1]) : null;
+  } catch {
+    return null;
+  }
+}
+
 async function main() {
   console.log('🔄 開始同步 QA 資料...\n');
   const qaData = [];
@@ -81,8 +95,16 @@ async function main() {
     console.log(questions.length ? `✅ ${questions.length} 題` : '空白，使用佔位符');
   }
 
-  writeFileSync(OUTPUT_PATH, toJSModule(qaData), 'utf-8');
   const total = qaData.reduce((n, c) => n + c.questions.length, 0);
+
+  // 內容未變就不重寫（含時間戳）：否則每週排程都會產生只有時間戳差異的 PR，
+  // 真正有新 QA 時反而被雜訊淹沒
+  if (JSON.stringify(readExistingQaData()) === JSON.stringify(qaData)) {
+    console.log(`\n✅ QA 內容無變化（${qaData.length} 分類，${total} 題），未更新檔案`);
+    return;
+  }
+
+  writeFileSync(OUTPUT_PATH, toJSModule(qaData), 'utf-8');
   console.log(`\n✅ 已寫入 ${OUTPUT_PATH}，共 ${qaData.length} 分類，${total} 題`);
 }
 
