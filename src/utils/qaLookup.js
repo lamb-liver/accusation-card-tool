@@ -1,7 +1,5 @@
 import { qaData } from '../data/qaData.js';
-
-/** 與 scripts/sync-qa.mjs 的 PLACEHOLDER 一致：分頁尚未建立時的佔位題 */
-const PLACEHOLDER_Q = '目前尚無特定 QA';
+import { isPlaceholderOnlyCategory } from '../constants/qaPlaceholder.js';
 
 /**
  * 該教團是否有真正的 QA 內容（排除佔位題）。
@@ -11,5 +9,5 @@ const PLACEHOLDER_Q = '目前尚無特定 QA';
 export function factionHasQA(faction) {
   if (!faction) return false;
   const category = qaData.find((item) => item.category === faction);
-  return Boolean(category?.questions.some((qa) => qa.q !== PLACEHOLDER_Q));
+  return Boolean(category) && !isPlaceholderOnlyCategory(category);
 }

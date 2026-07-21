@@ -18,13 +18,12 @@ export function sortMainDeck(main, rule) {
 
   // 主／副／放逐者的階層由 factionRankForRule 統一定義（與組牌池顯示同源）；
   // 其餘教團（未套用規則時）退回 FACTION_ORDER，放逐者於其中本就殿後
-  const rankByRule = factionRankForRule(rule, -1);
-  const factionRank = (faction) => {
-    const ranked = rankByRule(faction);
-    if (ranked !== -1) return ranked;
+  const rankByRule = factionRankForRule(rule);
+  const fallbackRank = (faction) => {
     const idx = FACTION_ORDER.indexOf(faction);
     return 100 + (idx === -1 ? FACTION_ORDER.length : idx);
   };
+  const factionRank = (faction) => rankByRule(faction) ?? fallbackRank(faction);
 
   return [...main].sort((a, b) => {
     const ta = TYPE_ORDER[a.type] ?? 99;

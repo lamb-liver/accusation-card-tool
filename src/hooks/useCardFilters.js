@@ -46,6 +46,18 @@ export function useCardFilters(allCards) {
   const deferredFilteredCards = useDeferredValue(filteredCards);
   const isFilterStale = filteredCards !== deferredFilteredCards;
 
+  /** 啟用中的條件數（含搜尋）；鍵源自 INITIAL_FILTERS，新增篩選維度不必改 App */
+  const activeFilterCount =
+    (searchTerm.trim() ? 1 : 0) +
+    Object.keys(INITIAL_FILTERS).filter((key) => filters[key]).length;
+
+  const resetFilters = useCallback(() => {
+    startTransition(() => {
+      setSearchTermState('');
+      setFiltersState(INITIAL_FILTERS);
+    });
+  }, []);
+
   return {
     searchTerm,
     setSearchTerm,
@@ -55,5 +67,7 @@ export function useCardFilters(allCards) {
     filteredCards,
     deferredFilteredCards,
     isFilterPending: isPending || isFilterStale,
+    activeFilterCount,
+    resetFilters,
   };
 }

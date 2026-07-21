@@ -17,6 +17,31 @@ import {
 } from '../utils/cardAlternateArt.js';
 import { getCardMetaCells, getCardStats, CARD_STAT_COLORS } from '../utils/cardMeta.js';
 
+/**
+ * 異畫切換膠囊內的方向鍵。不可用方向仍佔位（invisible）以固定膠囊寬度，
+ * 避免連續切換時箭頭橫向位移到手指／游標之外。
+ */
+function ArtNavButton({ usable, onClick, label, Icon, compact }) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      aria-label={label}
+      aria-hidden={!usable}
+      tabIndex={usable ? 0 : -1}
+      className={`flex items-center justify-center text-amber-200 transition hover:bg-black/60 hover:text-brand-gold ${
+        usable ? '' : 'invisible pointer-events-none'
+      } ${compact ? 'h-5 w-5' : 'h-6 w-6'}`}
+    >
+      <Icon
+        className={`shrink-0 ${compact ? 'h-3.5 w-3.5' : 'h-4 w-4'}`}
+        aria-hidden
+        strokeWidth={2.75}
+      />
+    </button>
+  );
+}
+
 function Card({
   card,
   onClick = () => {},
@@ -271,40 +296,20 @@ function Card({
               compact ? '-left-1 top-0.5' : 'left-1 top-1'
             }`}
           >
-            {[
-              {
-                key: 'prev',
-                usable: variantIdx > 0,
-                onClick: handleArtPrev,
-                label: '切換上一個圖版',
-                Icon: ChevronLeft,
-              },
-              {
-                key: 'next',
-                usable: variantIdx < artVariants.length - 1,
-                onClick: handleArtNext,
-                label: '切換下一個圖版',
-                Icon: ChevronRight,
-              },
-            ].map(({ key, usable, onClick, label, Icon }) => (
-              <button
-                key={key}
-                type="button"
-                onClick={onClick}
-                aria-label={label}
-                aria-hidden={!usable}
-                tabIndex={usable ? 0 : -1}
-                className={`flex items-center justify-center text-amber-200 transition hover:bg-black/60 hover:text-brand-gold ${
-                  usable ? '' : 'invisible pointer-events-none'
-                } ${compact ? 'h-5 w-5' : 'h-6 w-6'}`}
-              >
-                <Icon
-                  className={`shrink-0 ${compact ? 'h-3.5 w-3.5' : 'h-4 w-4'}`}
-                  aria-hidden
-                  strokeWidth={2.75}
-                />
-              </button>
-            ))}
+            <ArtNavButton
+              usable={variantIdx > 0}
+              onClick={handleArtPrev}
+              label="切換上一個圖版"
+              Icon={ChevronLeft}
+              compact={compact}
+            />
+            <ArtNavButton
+              usable={variantIdx < artVariants.length - 1}
+              onClick={handleArtNext}
+              label="切換下一個圖版"
+              Icon={ChevronRight}
+              compact={compact}
+            />
           </div>
         </>
       )}
