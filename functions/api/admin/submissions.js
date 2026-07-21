@@ -6,7 +6,12 @@ import {
 } from '../../_shared/constants.js';
 import { requireAdmin } from '../../_shared/auth.js';
 import { parseLimitParam, parseOffsetParam } from '../../_shared/request.js';
-import { apiResponse, errorResponse, jsonResponse } from '../../_shared/response.js';
+import {
+  createResponder,
+  errorResponse,
+  jsonResponse,
+  runDbQuery,
+} from '../../_shared/response.js';
 
 const TYPE_VALUES = new Set(['deck', 'guestbook', 'all']);
 const STATUS_FILTER_VALUES = new Set([...STATUSES, 'all']);
@@ -18,7 +23,7 @@ function buildStatusClause(status) {
 
 export async function onRequestGet(context) {
   const { request, env } = context;
-  const respond = (response) => apiResponse(response, request);
+  const { requestId, respond } = createResponder(request);
   const auth = await requireAdmin(request, env);
   if (auth.error) return respond(auth.error);
 
@@ -48,31 +53,39 @@ export async function onRequestGet(context) {
   let messagesHasMore = false;
 
   if (type === 'deck' || type === 'all') {
-    const { results } = await env.DB.prepare(
-      `SELECT id, share_id, title, author_name, description, status, created_at, reviewed_at
-       FROM deck_shares
-       WHERE 1 = 1 ${clause}
-       ORDER BY created_at DESC
-       LIMIT ? OFFSET ?`,
-    )
-      .bind(...bind, fetchLimit, offset)
-      .all();
-    const rows = results ?? [];
+    const query = await runDbQuery('admin deck list query failed', requestId, () =>
+      env.DB.prepare(
+        `SELECT id, share_id, title, author_name, description, status, created_at, reviewed_at
+         FROM deck_shares
+         WHERE 1 = 1 ${clause}
+         ORDER BY created_at DESC
+         LIMIT ? OFFSET ?`,
+      )
+        .bind(...bind, fetchLimit, offset)
+        .all(),
+    );
+    if (query.error) return respond(query.error);
+
+    const rows = query.data.results ?? [];
     decksHasMore = rows.length > limit;
     decks = rows.slice(0, limit).map(mapAdminDeckListRow);
   }
 
   if (type === 'guestbook' || type === 'all') {
-    const { results } = await env.DB.prepare(
-      `SELECT id, author_name, message, status, created_at, reviewed_at
-       FROM guestbook_messages
-       WHERE 1 = 1 ${clause}
-       ORDER BY created_at DESC
-       LIMIT ? OFFSET ?`,
-    )
-      .bind(...bind, fetchLimit, offset)
-      .all();
-    const rows = results ?? [];
+    const query = await runDbQuery('admin message list query failed', requestId, () =>
+      env.DB.prepare(
+        `SELECT id, author_name, message, status, created_at, reviewed_at
+         FROM guestbook_messages
+         WHERE 1 = 1 ${clause}
+         ORDER BY created_at DESC
+         LIMIT ? OFFSET ?`,
+      )
+        .bind(...bind, fetchLimit, offset)
+        .all(),
+    );
+    if (query.error) return respond(query.error);
+
+    const rows = query.data.results ?? [];
     messagesHasMore = rows.length > limit;
     messages = rows.slice(0, limit).map(mapAdminMessageRow);
   }

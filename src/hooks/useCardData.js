@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { loadCardCatalog } from '../utils/cardCatalog.js';
 
 /**
@@ -9,30 +9,36 @@ export function useCardData() {
   const [allCards, setAllCards] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isError, setIsError] = useState(false);
+  /** 連按重試時，較早發出的請求不得覆蓋較新請求的結果 */
+  const requestIdRef = useRef(0);
 
   const load = useCallback(async () => {
+    const requestId = ++requestIdRef.current;
+    const isStale = () => requestId !== requestIdRef.current;
+
     setIsError(false);
     let showedCache = false;
 
     try {
       await loadCardCatalog({
         onUpdate: (cards) => {
+          if (isStale()) return;
           setAllCards(cards);
           setIsLoading(false);
           showedCache = true;
         },
         onCacheMiss: () => {
-          if (!showedCache) setIsLoading(true);
+          if (!showedCache && !isStale()) setIsLoading(true);
         },
       });
     } catch (err) {
       console.error('讀取卡片失敗:', err);
-      if (!showedCache) {
+      if (!showedCache && !isStale()) {
         setIsError(true);
         setAllCards([]);
       }
     } finally {
-      setIsLoading(false);
+      if (!isStale()) setIsLoading(false);
     }
   }, []);
 

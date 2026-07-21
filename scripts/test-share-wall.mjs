@@ -20,8 +20,10 @@ import { stripTurnstileToken } from '../functions/_shared/submissionBody.js';
 import {
   createAdminToken,
   shouldSetSecureCookie,
+  timingSafeEqual,
   verifyAdminToken,
 } from '../functions/_shared/auth.js';
+import { createResponder, jsonResponse, runDbQuery } from '../functions/_shared/response.js';
 import { isUniqueConstraintError } from '../functions/_shared/shareId.js';
 import { canTransition } from '../functions/_shared/statusMachine.js';
 import {
@@ -219,6 +221,47 @@ const env = { ADMIN_SESSION_SECRET: 'test-secret-for-unit-tests' };
 const token = await createAdminToken(env);
 const session = await verifyAdminToken(token, env);
 assert(session?.role === 'admin', 'admin token should verify');
+
+// 常數時間密碼比對
+assert(await timingSafeEqual('correct-horse', 'correct-horse'), 'identical strings should match');
+assert(!(await timingSafeEqual('correct-horse', 'correct-hors')), 'prefix should not match');
+assert(!(await timingSafeEqual('correct-horse', '')), 'empty candidate should not match');
+assert(!(await timingSafeEqual(undefined, 'x')), 'non-string candidate should not match');
+assert(await timingSafeEqual('多位元組密碼', '多位元組密碼'), 'multibyte strings should match');
+
+// requestId：日誌與回應標頭必須是同一個值
+{
+  const requestWithoutId = { headers: { get: () => null } };
+  const { requestId, respond } = createResponder(requestWithoutId);
+  const response = respond(jsonResponse({ ok: true }));
+  assert(
+    response.headers.get('X-Request-Id') === requestId,
+    'createResponder should reuse one requestId for logs and response header',
+  );
+
+  const requestWithId = { headers: { get: (name) => (name === 'X-Request-Id' ? 'abcd1234' : null) } };
+  assert(
+    createResponder(requestWithId).requestId === 'abcd1234',
+    'client-supplied X-Request-Id should be honoured',
+  );
+}
+
+// D1 失敗要轉成結構化 500，而非裸 throw
+{
+  const ok = await runDbQuery('scope', 'req-1', async () => 'value');
+  assert(ok.data === 'value' && !ok.error, 'runDbQuery should pass through success');
+
+  const failure = await withMutedConsole('error', () =>
+    runDbQuery('scope', 'req-1', async () => {
+      throw new Error('D1 unavailable');
+    }),
+  );
+  assert(failure.error?.status === 500, 'runDbQuery should convert a throw into a 500 response');
+  assert(
+    (await failure.error.json())?.error === 'Internal server error',
+    'runDbQuery 500 should keep the { error } envelope',
+  );
+}
 
 assert(validateApiDeckJson({ leader: ['a'], rituals: [], main: [] }) === null, 'valid api deck json');
 assert(validateApiDeckJson({ leader: 'bad', rituals: [], main: [] }) !== null, 'invalid leader type');

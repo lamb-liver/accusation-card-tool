@@ -5,11 +5,11 @@ import { publicListJsonResponse } from '../_shared/publicListCache.js';
 import { checkRateLimit } from '../_shared/rateLimit.js';
 import { parseLimitParam, parseOffsetParam, readJsonBody } from '../_shared/request.js';
 import {
-  apiResponse,
+  createResponder,
   errorResponse,
   jsonResponse,
   logApiError,
-  resolveRequestId,
+  runDbQuery,
 } from '../_shared/response.js';
 import { generateShareId, isUniqueConstraintError } from '../_shared/shareId.js';
 import { stripTurnstileToken } from '../_shared/submissionBody.js';
@@ -24,8 +24,7 @@ const INSERT_SQL = `
 
 export async function onRequestPost(context) {
   const { request, env } = context;
-  const requestId = resolveRequestId(request);
-  const respond = (response) => apiResponse(response, request);
+  const { requestId, respond } = createResponder(request);
 
   const originError = checkMutatingOrigin(request, env);
   if (originError) return respond(originError);
@@ -87,8 +86,7 @@ export async function onRequestPost(context) {
 export async function onRequestGet(context) {
   const { request, env } = context;
   const url = new URL(request.url);
-  const requestId = resolveRequestId(request);
-  const respond = (response) => apiResponse(response, request);
+  const { requestId, respond } = createResponder(request);
 
   const limit = parseLimitParam(url, {
     defaultValue: PUBLIC_LIST_DEFAULT,
@@ -100,17 +98,20 @@ export async function onRequestGet(context) {
   if (offset === null) return respond(errorResponse('Invalid offset parameter', 400));
 
   const fetchLimit = limit + 1;
-  const { results } = await env.DB.prepare(
-    `SELECT share_id, title, author_name, description, reviewed_at, created_at
-     FROM deck_shares
-     WHERE status = 'approved'
-     ORDER BY reviewed_at DESC, created_at DESC
-     LIMIT ? OFFSET ?`,
-  )
-    .bind(fetchLimit, offset)
-    .all();
+  const query = await runDbQuery('public deck list query failed', requestId, () =>
+    env.DB.prepare(
+      `SELECT share_id, title, author_name, description, reviewed_at, created_at
+       FROM deck_shares
+       WHERE status = 'approved'
+       ORDER BY reviewed_at DESC, created_at DESC
+       LIMIT ? OFFSET ?`,
+    )
+      .bind(fetchLimit, offset)
+      .all(),
+  );
+  if (query.error) return respond(query.error);
 
-  const rows = results ?? [];
+  const rows = query.data.results ?? [];
   const hasMore = rows.length > limit;
 
   return publicListJsonResponse(

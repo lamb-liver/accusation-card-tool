@@ -4,7 +4,12 @@ import { checkMutatingOrigin } from '../_shared/origin.js';
 import { publicListJsonResponse } from '../_shared/publicListCache.js';
 import { checkRateLimit } from '../_shared/rateLimit.js';
 import { parseLimitParam, parseOffsetParam, readJsonBody } from '../_shared/request.js';
-import { apiResponse, errorResponse, jsonResponse, resolveRequestId } from '../_shared/response.js';
+import {
+  createResponder,
+  errorResponse,
+  jsonResponse,
+  runDbQuery,
+} from '../_shared/response.js';
 import { stripTurnstileToken } from '../_shared/submissionBody.js';
 import { verifyTurnstileToken } from '../_shared/turnstile.js';
 import { validateGuestbookSubmission } from '../_shared/validation.js';
@@ -16,7 +21,7 @@ const INSERT_SQL = `
 
 export async function onRequestPost(context) {
   const { request, env } = context;
-  const respond = (response) => apiResponse(response, request);
+  const { requestId, respond } = createResponder(request);
 
   const originError = checkMutatingOrigin(request, env);
   if (originError) return respond(originError);
@@ -34,15 +39,18 @@ export async function onRequestPost(context) {
   const validationError = validateGuestbookSubmission(payload);
   if (validationError) return respond(errorResponse(validationError, 400));
 
-  await env.DB.prepare(INSERT_SQL).bind(payload.author_name, payload.message).run();
+  const insert = await runDbQuery('guestbook insert failed', requestId, () =>
+    env.DB.prepare(INSERT_SQL).bind(payload.author_name, payload.message).run(),
+  );
+  if (insert.error) return respond(insert.error);
+
   return respond(jsonResponse({ status: 'pending' }, 201));
 }
 
 export async function onRequestGet(context) {
   const { request, env } = context;
   const url = new URL(request.url);
-  const requestId = resolveRequestId(request);
-  const respond = (response) => apiResponse(response, request);
+  const { requestId, respond } = createResponder(request);
 
   const limit = parseLimitParam(url, {
     defaultValue: PUBLIC_LIST_DEFAULT,
@@ -54,17 +62,20 @@ export async function onRequestGet(context) {
   if (offset === null) return respond(errorResponse('Invalid offset parameter', 400));
 
   const fetchLimit = limit + 1;
-  const { results } = await env.DB.prepare(
-    `SELECT author_name, message, reviewed_at, created_at
-     FROM guestbook_messages
-     WHERE status = 'approved'
-     ORDER BY reviewed_at DESC, created_at DESC
-     LIMIT ? OFFSET ?`,
-  )
-    .bind(fetchLimit, offset)
-    .all();
+  const query = await runDbQuery('guestbook list query failed', requestId, () =>
+    env.DB.prepare(
+      `SELECT author_name, message, reviewed_at, created_at
+       FROM guestbook_messages
+       WHERE status = 'approved'
+       ORDER BY reviewed_at DESC, created_at DESC
+       LIMIT ? OFFSET ?`,
+    )
+      .bind(fetchLimit, offset)
+      .all(),
+  );
+  if (query.error) return respond(query.error);
 
-  const rows = results ?? [];
+  const rows = query.data.results ?? [];
   const hasMore = rows.length > limit;
 
   return publicListJsonResponse(

@@ -19,12 +19,16 @@ const UPSERT_SQL = `
   RETURNING hit_count
 `;
 
+/**
+ * 只信任 Cloudflare 注入的 CF-Connecting-IP。
+ *
+ * X-Forwarded-For 完全由客戶端控制：拿它當 bucket key 等於讓攻擊者每次請求
+ * 換一個桶，rate limit 形同虛設（含 admin login 的暴力破解上限）。取不到時
+ * 回傳 null，由 checkRateLimit 決定如何處置，而非退回共用的 'unknown' 桶
+ * ——共用桶會讓任何人用少量請求就把該端點對所有人鎖死。
+ */
 function getClientIp(request) {
-  return (
-    request.headers.get('CF-Connecting-IP') ??
-    request.headers.get('X-Forwarded-For')?.split(',')[0]?.trim() ??
-    'unknown'
-  );
+  return request.headers.get('CF-Connecting-IP');
 }
 
 function buildBucketKey(endpointKey, ip, windowSec) {
@@ -43,10 +47,20 @@ export async function checkRateLimit(request, env, endpointKey) {
   if (!config) return null;
   if (env.RATE_LIMIT_DISABLED === 'true') return null;
 
+  const ip = getClientIp(request);
+  if (!ip) {
+    // 正式環境必定在 Cloudflare 後方，缺這個標頭代表請求走了非預期路徑 → 拒絕，
+    // 不要退回可共用／可偽造的桶。本機 wrangler dev 沒有此標頭，走固定 key；
+    // 要完全關閉請設 RATE_LIMIT_DISABLED=true。
+    if (env.ENVIRONMENT === 'production') {
+      console.warn('rate limit: CF-Connecting-IP missing in production', { endpointKey });
+      return errorResponse('Unable to identify client', 403);
+    }
+  }
+
   await maybeCleanupStaleBuckets(env);
 
-  const ip = getClientIp(request);
-  const bucketKey = buildBucketKey(endpointKey, ip, config.windowSec);
+  const bucketKey = buildBucketKey(endpointKey, ip ?? 'local-dev', config.windowSec);
   const row = await env.DB.prepare(UPSERT_SQL).bind(bucketKey).first();
   const hitCount = Number(row?.hit_count ?? 0);
 

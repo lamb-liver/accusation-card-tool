@@ -2,15 +2,16 @@ import {
   buildAdminCookie,
   createAdminToken,
   shouldSetSecureCookie,
+  timingSafeEqual,
 } from '../../_shared/auth.js';
 import { checkMutatingOrigin } from '../../_shared/origin.js';
 import { checkRateLimit } from '../../_shared/rateLimit.js';
 import { readJsonBody } from '../../_shared/request.js';
-import { apiResponse, errorResponse, jsonResponse } from '../../_shared/response.js';
+import { createResponder, errorResponse, jsonResponse } from '../../_shared/response.js';
 
 export async function onRequestPost(context) {
   const { request, env } = context;
-  const respond = (response) => apiResponse(response, request);
+  const { respond } = createResponder(request);
 
   const originError = checkMutatingOrigin(request, env);
   if (originError) return respond(originError);
@@ -29,7 +30,7 @@ export async function onRequestPost(context) {
     return respond(errorResponse('password is required', 400));
   }
 
-  if (data.password !== env.ADMIN_PASSWORD) {
+  if (!(await timingSafeEqual(data.password, env.ADMIN_PASSWORD))) {
     return respond(errorResponse('Invalid credentials', 401));
   }
 
