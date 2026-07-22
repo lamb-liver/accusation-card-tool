@@ -113,7 +113,10 @@ export function useHashRoute() {
   const setQuery = useCallback((nextQuery) => {
     const path = splitHash(window.location.hash).path;
     const nextHash = buildHash(path, nextQuery);
-    if (window.location.hash !== nextHash) {
+    // '' 與 '#/' 都是首頁：首次載入裸網址時空 query 會組出 '#/'，
+    // 若不視為相等就會無故 replaceState、把乾淨的網址改寫成「site/#/」
+    const currentHash = window.location.hash || '#/';
+    if (currentHash !== nextHash) {
       window.history.replaceState(null, '', nextHash);
     }
     setQueryState(parseHashQuery(nextHash));

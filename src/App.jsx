@@ -183,8 +183,16 @@ function App() {
     [handleCardClick, deferredFilteredCards],
   );
 
-  /** 篩選與卡片彈窗只在查卡／組牌有意義，其餘頁面不把它們寫進網址 */
-  const syncsQueryToUrl = currentMode === 'gallery' || currentMode === 'deck';
+  /**
+   * 篩選與卡片彈窗只在查卡／組牌有意義，其餘頁面不把它們寫進網址。
+   *
+   * 存「模式名或 null」而非布林：gallery↔deck 互切時 navigate 會清掉網址
+   * query，若依賴布林（兩模式下都是 true、值不變），同步 effect 不會重跑，
+   * 篩選仍在 state 裡生效、網址上卻消失了——此時重新整理就會丟失篩選。
+   * 模式名在互切時必然變化，能觸發 effect 把 query 補寫回新路徑。
+   */
+  const querySyncMode =
+    currentMode === 'gallery' || currentMode === 'deck' ? currentMode : null;
 
   /**
    * 還原網址帶進來的卡片彈窗。只執行一次：之後彈窗的開關由使用者操作決定，
@@ -212,11 +220,11 @@ function App() {
    * 因此不需要反向監看 query，也就不會有兩邊互相覆寫的迴圈。
    */
   useEffect(() => {
-    if (!syncsQueryToUrl) return;
+    if (!querySyncMode) return;
     const nextQuery = filtersToQuery(searchTerm, filters);
     if (selectedCard) nextQuery.card = selectedCard.id;
     setQuery(nextQuery);
-  }, [syncsQueryToUrl, searchTerm, filters, selectedCard, setQuery]);
+  }, [querySyncMode, searchTerm, filters, selectedCard, setQuery]);
 
   /** 換頁／改每頁張數後回到頁首，避免使用者停留在新頁面的底部 */
   const handlePageChange = useCallback(
