@@ -351,6 +351,8 @@ assert(formatShareWallError(null, 'fallback') === 'fallback', 'format unknown er
 
   // 稻原的實際資料是 ['自然','自然','夜幕']——單張卡提供 2 個自然。
   // 效果的 (N*符號) 算的是符號總數，故重複必須累加，不能當成「含此符號的卡數」。
+  // 教主／儀式／主牌組三個欄位都要計入：已確認教主、儀式、信徒、地點在場上
+  // 都提供自身符號（魔法卡無符號）。
   const deck = {
     leader: [{ id: 'cro01', symbols: ['夜幕', '知識'] }],
     rituals: [{ id: 'cro02', symbols: ['凋零'] }],
