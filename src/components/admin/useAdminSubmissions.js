@@ -17,8 +17,11 @@ const EMPTY_SUBMISSIONS = {
  * 第一頁，審核多筆時每按一次就得重新往下捲。
  *
  * - statusFilter 為 'all'：項目仍屬於結果集，只換 status。
- * - 篩選特定狀態：項目已不符條件而移除。伺服器端的結果集同樣少一筆，
- *   故呼叫端需把 offset 減 1，下次「載入更多」的 OFFSET 才會對齊。
+ * - 篩選特定狀態：項目已不符條件而移除。
+ *
+ * 游標不需要跟著調整：keyset 以「上一頁最後一筆的排序鍵」定位，不受前面
+ * 筆數變動影響——這正是改用 cursor 分頁要解決的問題。（OFFSET 時期則必須
+ * 把 offset 減 1 才能對齊。）
  *
  * 取捨：不會順帶刷新其他項目的狀態（單人後台場景可接受，必要時仍可手動
  * 重新載入）。
@@ -44,8 +47,8 @@ export function useAdminSubmissions({ authState, typeFilter, statusFilter }) {
   const [messages, setMessages] = useState([]);
   const [decksHasMore, setDecksHasMore] = useState(false);
   const [messagesHasMore, setMessagesHasMore] = useState(false);
-  const [deckOffset, setDeckOffset] = useState(0);
-  const [messageOffset, setMessageOffset] = useState(0);
+  const [deckCursor, setDeckCursor] = useState(null);
+  const [messageCursor, setMessageCursor] = useState(null);
   const [isLoadingMoreDecks, setIsLoadingMoreDecks] = useState(false);
   const [isLoadingMoreMessages, setIsLoadingMoreMessages] = useState(false);
   const [loadMoreDecksError, setLoadMoreDecksError] = useState('');
@@ -57,7 +60,6 @@ export function useAdminSubmissions({ authState, typeFilter, statusFilter }) {
       type: typeFilter,
       status: statusFilter,
       limit: ADMIN_PAGE_SIZE,
-      offset: 0,
     });
   }, [authState, typeFilter, statusFilter]);
 
@@ -72,8 +74,8 @@ export function useAdminSubmissions({ authState, typeFilter, statusFilter }) {
     setMessages(nextMessages);
     setDecksHasMore(data.decksHasMore ?? false);
     setMessagesHasMore(data.messagesHasMore ?? false);
-    setDeckOffset(nextDecks.length);
-    setMessageOffset(nextMessages.length);
+    setDeckCursor(data.decksNextCursor ?? null);
+    setMessageCursor(data.messagesNextCursor ?? null);
     setLoadMoreDecksError('');
     setLoadMoreMessagesError('');
   }, [data]);
@@ -82,16 +84,18 @@ export function useAdminSubmissions({ authState, typeFilter, statusFilter }) {
     const isDeck = kind === 'deck';
     const isLoadingMore = isDeck ? isLoadingMoreDecks : isLoadingMoreMessages;
     const hasMore = isDeck ? decksHasMore : messagesHasMore;
-    if (isLoadingMore || !hasMore) return;
+    const cursor = isDeck ? deckCursor : messageCursor;
+    // 沒有游標就沒有下一頁；缺少它時不可退回第一頁，否則會重複附加既有項目
+    if (isLoadingMore || !hasMore || !cursor) return;
 
-    const offset = isDeck ? deckOffset : messageOffset;
     const setItems = isDeck ? setDecks : setMessages;
     const setHasMore = isDeck ? setDecksHasMore : setMessagesHasMore;
-    const setOffset = isDeck ? setDeckOffset : setMessageOffset;
+    const setCursor = isDeck ? setDeckCursor : setMessageCursor;
     const setLoadingMore = isDeck ? setIsLoadingMoreDecks : setIsLoadingMoreMessages;
     const setLoadMoreError = isDeck ? setLoadMoreDecksError : setLoadMoreMessagesError;
     const itemsKey = isDeck ? 'decks' : 'messages';
     const hasMoreKey = isDeck ? 'decksHasMore' : 'messagesHasMore';
+    const cursorKey = isDeck ? 'decksNextCursor' : 'messagesNextCursor';
 
     setLoadingMore(true);
     setLoadMoreError('');
@@ -100,23 +104,23 @@ export function useAdminSubmissions({ authState, typeFilter, statusFilter }) {
         type: kind,
         status: statusFilter,
         limit: ADMIN_PAGE_SIZE,
-        offset,
+        ...(isDeck ? { deckCursor: cursor } : { messageCursor: cursor }),
       });
       const nextItems = next[itemsKey] ?? [];
       setItems((prev) => [...prev, ...nextItems]);
       setHasMore(next[hasMoreKey] ?? false);
-      setOffset((prev) => prev + nextItems.length);
+      setCursor(next[cursorKey] ?? null);
     } catch (error) {
       setLoadMoreError(formatShareWallError(error, '載入更多失敗'));
     } finally {
       setLoadingMore(false);
     }
   }, [
-    deckOffset,
+    deckCursor,
     decksHasMore,
     isLoadingMoreDecks,
     isLoadingMoreMessages,
-    messageOffset,
+    messageCursor,
     messagesHasMore,
     statusFilter,
   ]);
@@ -130,16 +134,15 @@ export function useAdminSubmissions({ authState, typeFilter, statusFilter }) {
       const isDeck = kind === 'deck';
       const items = isDeck ? decks : messages;
       const setItems = isDeck ? setDecks : setMessages;
-      const setOffset = isDeck ? setDeckOffset : setMessageOffset;
 
-      const { items: nextItems, removed } = applyStatusChangeToList(items, {
+      // 游標不必調整（見 applyStatusChangeToList 的說明）
+      const { items: nextItems } = applyStatusChangeToList(items, {
         id,
         nextStatus,
         statusFilter,
       });
 
       setItems(nextItems);
-      if (removed) setOffset((prev) => Math.max(0, prev - 1));
     },
     [decks, messages, statusFilter],
   );

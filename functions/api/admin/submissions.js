@@ -5,7 +5,8 @@ import {
   STATUSES,
 } from '../../_shared/constants.js';
 import { requireAdmin } from '../../_shared/auth.js';
-import { parseLimitParam, parseOffsetParam } from '../../_shared/request.js';
+import { parseLimitParam, resolvePageQuery } from '../../_shared/request.js';
+import { nextCursorFrom } from '../../_shared/cursor.js';
 import {
   createResponder,
   errorResponse,
@@ -19,6 +20,21 @@ const STATUS_FILTER_VALUES = new Set([...STATUSES, 'all']);
 function buildStatusClause(status) {
   if (status === 'all') return { clause: '', bind: [] };
   return { clause: 'AND status = ?', bind: [status] };
+}
+
+/**
+ * resolvePageQuery 只認 `cursor` 參數，但本端點有兩份獨立列表、各自一個游標。
+ * 複製一份 URL 並把指定參數改名為 `cursor`，讓兩份列表共用同一套解析邏輯。
+ *
+ * @param {URL} url
+ * @param {'deckCursor' | 'messageCursor'} paramName
+ */
+function withCursorParam(url, paramName) {
+  const copy = new URL(url);
+  const value = copy.searchParams.get(paramName);
+  copy.searchParams.delete('cursor');
+  if (value) copy.searchParams.set('cursor', value);
+  return copy;
 }
 
 export async function onRequestGet(context) {
@@ -42,8 +58,13 @@ export async function onRequestGet(context) {
   });
   if (limit === null) return respond(errorResponse('Invalid limit parameter', 400));
 
-  const offset = parseOffsetParam(url);
-  if (offset === null) return respond(errorResponse('Invalid offset parameter', 400));
+  // 兩份列表各自分頁，故各有一個游標參數。共用一個 cursor 會在 type='all'
+  // 時把牌組的位置套到留言上（兩者的 created_at 完全無關）。
+  const deckPage = resolvePageQuery(withCursorParam(url, 'deckCursor'), 'created_at');
+  if (deckPage.error) return respond(errorResponse(`deck ${deckPage.error}`, 400));
+
+  const messagePage = resolvePageQuery(withCursorParam(url, 'messageCursor'), 'created_at');
+  if (messagePage.error) return respond(errorResponse(`message ${messagePage.error}`, 400));
 
   const { clause, bind } = buildStatusClause(status);
   const fetchLimit = limit + 1;
@@ -51,24 +72,30 @@ export async function onRequestGet(context) {
   let messages = [];
   let decksHasMore = false;
   let messagesHasMore = false;
+  let decksNextCursor = null;
+  let messagesNextCursor = null;
 
   if (type === 'deck' || type === 'all') {
     const query = await runDbQuery('admin deck list query failed', requestId, () =>
       env.DB.prepare(
         `SELECT id, share_id, title, author_name, description, status, created_at, reviewed_at
          FROM deck_shares
-         WHERE 1 = 1 ${clause}
-         ORDER BY created_at DESC
-         LIMIT ? OFFSET ?`,
+         WHERE 1 = 1 ${clause} ${deckPage.clause}
+         ORDER BY created_at DESC, id DESC
+         ${deckPage.limitClause}`,
       )
-        .bind(...bind, fetchLimit, offset)
+        .bind(...bind, ...deckPage.bind, fetchLimit, ...deckPage.tailBind)
         .all(),
     );
     if (query.error) return respond(query.error);
 
     const rows = query.data.results ?? [];
     decksHasMore = rows.length > limit;
-    decks = rows.slice(0, limit).map(mapAdminDeckListRow);
+    const pageRows = rows.slice(0, limit);
+    decks = pageRows.map(mapAdminDeckListRow);
+    decksNextCursor = decksHasMore
+      ? nextCursorFrom(pageRows[pageRows.length - 1], 'created_at')
+      : null;
   }
 
   if (type === 'guestbook' || type === 'all') {
@@ -76,19 +103,32 @@ export async function onRequestGet(context) {
       env.DB.prepare(
         `SELECT id, author_name, message, status, created_at, reviewed_at
          FROM guestbook_messages
-         WHERE 1 = 1 ${clause}
-         ORDER BY created_at DESC
-         LIMIT ? OFFSET ?`,
+         WHERE 1 = 1 ${clause} ${messagePage.clause}
+         ORDER BY created_at DESC, id DESC
+         ${messagePage.limitClause}`,
       )
-        .bind(...bind, fetchLimit, offset)
+        .bind(...bind, ...messagePage.bind, fetchLimit, ...messagePage.tailBind)
         .all(),
     );
     if (query.error) return respond(query.error);
 
     const rows = query.data.results ?? [];
     messagesHasMore = rows.length > limit;
-    messages = rows.slice(0, limit).map(mapAdminMessageRow);
+    const pageRows = rows.slice(0, limit);
+    messages = pageRows.map(mapAdminMessageRow);
+    messagesNextCursor = messagesHasMore
+      ? nextCursorFrom(pageRows[pageRows.length - 1], 'created_at')
+      : null;
   }
 
-  return respond(jsonResponse({ decks, messages, decksHasMore, messagesHasMore }));
+  return respond(
+    jsonResponse({
+      decks,
+      messages,
+      decksHasMore,
+      messagesHasMore,
+      decksNextCursor,
+      messagesNextCursor,
+    }),
+  );
 }

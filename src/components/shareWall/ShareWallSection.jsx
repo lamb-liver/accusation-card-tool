@@ -11,7 +11,7 @@ export default function ShareWallSection({
   embedded = false,
   loadEnabled = true,
 }) {
-  const loadDecks = useCallback(() => fetchPublicDecks({ limit: PUBLIC_PAGE_SIZE, offset: 0 }), []);
+  const loadDecks = useCallback(() => fetchPublicDecks({ limit: PUBLIC_PAGE_SIZE }), []);
   const { data, isLoading, isRetrying, isError, errorMessage, reload } = useAsyncResource(
     loadDecks,
     { enabled: loadEnabled },
@@ -19,7 +19,7 @@ export default function ShareWallSection({
 
   const [decks, setDecks] = useState([]);
   const [hasMore, setHasMore] = useState(false);
-  const [offset, setOffset] = useState(0);
+  const [cursor, setCursor] = useState(null);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
   const [loadMoreError, setLoadMoreError] = useState('');
 
@@ -27,19 +27,20 @@ export default function ShareWallSection({
     if (!data) return;
     setDecks(data.decks ?? []);
     setHasMore(data.hasMore ?? false);
-    setOffset((data.decks ?? []).length);
+    setCursor(data.nextCursor ?? null);
     setLoadMoreError('');
   }, [data]);
 
   async function handleLoadMore() {
-    if (isLoadingMore || !hasMore) return;
+    // 沒有游標就沒有下一頁；缺少它時不可退回第一頁，否則會重複附加既有項目
+    if (isLoadingMore || !hasMore || !cursor) return;
     setIsLoadingMore(true);
     setLoadMoreError('');
     try {
-      const next = await fetchPublicDecks({ limit: PUBLIC_PAGE_SIZE, offset });
+      const next = await fetchPublicDecks({ limit: PUBLIC_PAGE_SIZE, cursor });
       setDecks((prev) => [...prev, ...(next.decks ?? [])]);
       setHasMore(next.hasMore ?? false);
-      setOffset((prev) => prev + (next.decks ?? []).length);
+      setCursor(next.nextCursor ?? null);
     } catch (error) {
       setLoadMoreError(formatShareWallError(error, '載入更多失敗'));
     } finally {

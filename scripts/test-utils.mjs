@@ -213,12 +213,26 @@ assert(factionIconPath('鴉教團', '右') === 'images/icons/鴉教團右.webp',
     return { ok: true, status: 200, text: async () => '{"ok":true}' };
   };
 
-  await fetchPublicDecks({ limit: 10, offset: 5 });
+  await fetchPublicDecks({ limit: 10, cursor: 'CUR50R' });
   await fetchPublicDeck('share/id');
   await submitPublicDeck({ title: '測試牌組' });
-  await fetchAdminSubmissions({ type: 'deck', status: 'approved', limit: 1, offset: 2 });
+  await fetchAdminSubmissions({
+    type: 'deck',
+    status: 'approved',
+    limit: 1,
+    deckCursor: 'DECKCUR',
+  });
+  await fetchPublicDecks({ limit: 10 });
 
-  assert(calls[0].path === '/api/decks?limit=10&offset=5', 'public deck list query path');
+  assert(calls[0].path === '/api/decks?limit=10&cursor=CUR50R', 'public deck list query path');
+  assert(
+    calls[3].path.includes('deckCursor=DECKCUR'),
+    'admin list sends its own deck cursor parameter',
+  );
+  assert(
+    calls[4].path === '/api/decks?limit=10',
+    'first page omits the cursor parameter entirely',
+  );
   assert(calls[1].path === '/api/decks/share%2Fid', 'public deck detail encodes share id');
   assert(calls[2].options.method === 'POST', 'submit deck uses POST');
   assert(calls[2].options.headers['Content-Type'] === 'application/json', 'submit deck sends JSON content type');
