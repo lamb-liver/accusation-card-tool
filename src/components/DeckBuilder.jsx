@@ -1,6 +1,7 @@
 import { useState, useMemo, useRef, useEffect, useLayoutEffect, useCallback } from 'react';
 import { filterCardsByRule, sortCardsForRuleDisplay } from '../rules/index.js';
 import { sortMainDeck } from '../deck/sortMainDeck.js';
+import { collectDeckSymbolCounts } from '../deck/deckSymbolStats.js';
 import DeckListPanel from './deckBuilder/DeckListPanel.jsx';
 import DeckPoolSection from './deckBuilder/DeckPoolSection.jsx';
 
@@ -179,6 +180,8 @@ function DeckBuilder({
     [deck.main]
   );
 
+  const symbolEntries = useMemo(() => collectDeckSymbolCounts(deck), [deck]);
+
   const clearCategory = useCallback(
     async (category) => {
       const label = category === 'leader' ? '教主' : category === 'rituals' ? '儀式' : '主牌組';
@@ -236,6 +239,7 @@ function DeckBuilder({
         primaryCount={primaryCount}
         secondaryCount={secondaryCount}
         exileCount={exileCount}
+        symbolEntries={symbolEntries}
         savedDecks={savedDecks}
         onSaveDeck={onSaveDeck}
         onLoadDeck={onLoadDeck}
