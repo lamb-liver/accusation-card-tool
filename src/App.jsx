@@ -1,4 +1,4 @@
-import { lazy, Suspense, useCallback, useMemo } from 'react';
+import { lazy, Suspense, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useGridColumnCount } from './hooks/useGridColumnCount.js';
 import {
   estimateGalleryMinHeight,
@@ -6,7 +6,7 @@ import {
 } from './utils/galleryLayout.js';
 import { TriangleAlert } from 'lucide-react';
 import { useCardData }    from './hooks/useCardData.js';
-import { useCardFilters } from './hooks/useCardFilters.js';
+import { useCardFilters, FILTER_KEYS } from './hooks/useCardFilters.js';
 import { usePagination }  from './hooks/usePagination.js';
 import { useDeck }        from './hooks/useDeck.js';
 import { useCardModal }   from './hooks/useCardModal.js';
@@ -53,9 +53,31 @@ function resolveModeFromRoute(route) {
   return 'gallery';
 }
 
+/**
+ * 網址 query ←→ 篩選狀態的對應。
+ * 搜尋詞用 `q`（比 searchTerm 短且是慣例），其餘篩選維度同名。
+ */
+function filtersToQuery(searchTerm, filters) {
+  const query = {};
+  if (searchTerm.trim()) query.q = searchTerm;
+  for (const key of FILTER_KEYS) {
+    if (filters[key]) query[key] = filters[key];
+  }
+  return query;
+}
+
 function App() {
-  const { route, navigate } = useHashRoute();
+  const { route, query, navigate, setQuery } = useHashRoute();
   const currentMode = resolveModeFromRoute(route);
+
+  /**
+   * 首次 mount 時的網址狀態。
+   *
+   * 用 useState 凍結而非每次讀 `query`：篩選的真相源是 React state，網址只是
+   * 它的投影；若每次 render 都拿當下的 query 當初始值，同步回寫時兩邊會互相
+   * 覆蓋。（不用 ref 是因為 render 期間不得讀取 ref。）
+   */
+  const [initialQuery] = useState(query);
 
   const handleModeChange = useCallback((mode) => {
     if (mode === 'community') navigate('community');
@@ -75,7 +97,10 @@ function App() {
   const { allCards, isLoading, isError, retry }                         = useCardData();
   const { searchTerm, setSearchTerm, filters, setFilters, handleFilterChange,
           deferredFilteredCards, isFilterPending,
-          activeFilterCount, resetFilters }                            = useCardFilters(allCards);
+          activeFilterCount, resetFilters }                            = useCardFilters(allCards, {
+            searchTerm: initialQuery.q,
+            filters: initialQuery,
+          });
   const { setCurrentPage, perPage, isPaginationMode,
           totalPages, safePage, paginatedCards, handlePerPageChange }   = usePagination(deferredFilteredCards);
   const galleryColumns = useGridColumnCount();
@@ -157,6 +182,41 @@ function App() {
     (card) => handleCardClick(card, deferredFilteredCards),
     [handleCardClick, deferredFilteredCards],
   );
+
+  /** 篩選與卡片彈窗只在查卡／組牌有意義，其餘頁面不把它們寫進網址 */
+  const syncsQueryToUrl = currentMode === 'gallery' || currentMode === 'deck';
+
+  /**
+   * 還原網址帶進來的卡片彈窗。只執行一次：之後彈窗的開關由使用者操作決定，
+   * 再次比對網址會在關閉當下又把它重新打開。
+   * 需等卡牌資料載入才找得到卡，故以 allCards 為觸發條件。
+   */
+  const restoredCardRef = useRef(false);
+  useEffect(() => {
+    if (restoredCardRef.current) return;
+    const cardId = initialQuery.card;
+    if (!cardId) {
+      restoredCardRef.current = true;
+      return;
+    }
+    if (allCards.length === 0) return;
+
+    restoredCardRef.current = true;
+    const card = allCards.find((item) => item.id === cardId);
+    // 找不到（網址帶了不存在的 id）就當作沒有彈窗，不打擾使用者
+    if (card) handleCardClick(card, deferredFilteredCards);
+  }, [allCards, deferredFilteredCards, handleCardClick, initialQuery]);
+
+  /**
+   * 篩選／彈窗 → 網址。單向投影：state 是真相源，網址只反映它，
+   * 因此不需要反向監看 query，也就不會有兩邊互相覆寫的迴圈。
+   */
+  useEffect(() => {
+    if (!syncsQueryToUrl) return;
+    const nextQuery = filtersToQuery(searchTerm, filters);
+    if (selectedCard) nextQuery.card = selectedCard.id;
+    setQuery(nextQuery);
+  }, [syncsQueryToUrl, searchTerm, filters, selectedCard, setQuery]);
 
   /** 換頁／改每頁張數後回到頁首，避免使用者停留在新頁面的底部 */
   const handlePageChange = useCallback(

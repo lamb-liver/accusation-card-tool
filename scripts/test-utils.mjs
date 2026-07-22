@@ -21,8 +21,14 @@ import { formatApiDate } from '../src/utils/formatApiDate.js';
 import { formatShareWallError } from '../src/utils/formatShareWallError.js';
 import { ruleToApiPayload, apiRuleToDeckRule } from '../src/utils/shareWallRule.js';
 import { factionIconPath } from '../src/constants/factionOrder.js';
-import { parseHashRoute } from '../src/hooks/useHashRoute.js';
+import { parseHashRoute, parseHashQuery, buildHash } from '../src/hooks/useHashRoute.js';
+import { pickFilters, FILTER_KEYS } from '../src/hooks/useCardFilters.js';
 import { applyStatusChangeToList } from '../src/components/admin/useAdminSubmissions.js';
+import {
+  collectDeckSymbolCounts,
+  getTotalSymbolCount,
+  SYMBOL_ORDER,
+} from '../src/deck/deckSymbolStats.js';
 
 let failed = 0;
 
@@ -63,6 +69,53 @@ assertDeepEqual(
 );
 assertDeepEqual(parseHashRoute('#/admin'), { kind: 'admin' }, 'admin hash route');
 assertDeepEqual(parseHashRoute('#/unknown'), { kind: 'home' }, 'unknown hash routes home');
+
+// query 不可污染 path 判定：'#/deck?q=x' 若整串當 path 會誤判成 home
+assertDeepEqual(parseHashRoute('#/deck?q=夜'), { kind: 'deck' }, 'route ignores the query string');
+assertDeepEqual(
+  parseHashRoute('#/qa/鴉教團?card=cro01'),
+  { kind: 'qa', qaCategory: '鴉教團' },
+  'route with both a path segment and a query',
+);
+assertDeepEqual(parseHashRoute('#/?q=夜'), { kind: 'home' }, 'home route with query only');
+
+// ── hash query 解析與組裝 ──────────────────────────────────────────────────
+assertDeepEqual(parseHashQuery('#/'), {}, 'no query yields an empty object');
+assertDeepEqual(
+  parseHashQuery('#/?q=夜幕&faction=鴉教團&card=cro01'),
+  { q: '夜幕', faction: '鴉教團', card: 'cro01' },
+  'query params are decoded into an object',
+);
+// 空值等同未設定，否則會在網址留下 `?q=` 這種無意義殘留
+assertDeepEqual(parseHashQuery('#/?q=&faction=鴉教團'), { faction: '鴉教團' }, 'blank values are dropped');
+
+assert(buildHash('deck', {}) === '#/deck', 'empty query leaves no trailing question mark');
+assert(buildHash('', {}) === '#/', 'empty path builds the root hash');
+assert(buildHash('deck', { q: '夜', faction: '' }) === '#/deck?q=%E5%A4%9C', 'blank values are omitted');
+assertDeepEqual(
+  parseHashQuery(buildHash('', { q: '夜 幕', card: 'cro01' })),
+  { q: '夜 幕', card: 'cro01' },
+  'build/parse round-trips values needing escaping',
+);
+
+// ── 篩選白名單 ─────────────────────────────────────────────────────────────
+// 網址由使用者任意編輯，不可整包展開進 state
+assertDeepEqual(
+  pickFilters({ faction: '鴉教團', evil: 'x', q: '夜' }),
+  { faction: '鴉教團', type: '', symbol: '', mechanic: '' },
+  'only whitelisted filter keys are picked',
+);
+assertDeepEqual(
+  pickFilters({ faction: 123, type: null }),
+  { faction: '', type: '', symbol: '', mechanic: '' },
+  'non-string filter values fall back to empty',
+);
+assertDeepEqual(
+  pickFilters(undefined),
+  { faction: '', type: '', symbol: '', mechanic: '' },
+  'missing source yields all-empty filters',
+);
+assert(FILTER_KEYS.length === 4, 'filter key list covers the four dimensions');
 
 // ── card filter pure logic ─────────────────────────────────────────────────
 const cards = [
@@ -288,6 +341,58 @@ assert(formatShareWallError(null, 'fallback') === 'fallback', 'format unknown er
   });
   assert(missing.removed === false, 'unknown id reports nothing removed (offset must not shift)');
   assert(missing.items.length === 3, 'unknown id leaves the list unchanged');
+}
+
+// ── 牌組符號統計 ───────────────────────────────────────────────────────────
+{
+  const emptyDeck = { leader: [], rituals: [], main: [] };
+  assertDeepEqual(collectDeckSymbolCounts(emptyDeck), [], 'empty deck has no symbol entries');
+  assert(getTotalSymbolCount(emptyDeck) === 0, 'empty deck totals zero symbols');
+
+  // 稻原的實際資料是 ['自然','自然','夜幕']——單張卡提供 2 個自然。
+  // 效果的 (N*符號) 算的是符號總數，故重複必須累加，不能當成「含此符號的卡數」。
+  const deck = {
+    leader: [{ id: 'cro01', symbols: ['夜幕', '知識'] }],
+    rituals: [{ id: 'cro02', symbols: ['凋零'] }],
+    main: [
+      { id: 'fox18', symbols: ['自然', '自然', '夜幕'] },
+      { id: 'kit06', symbols: ['凋零', '凋零', '自然'] },
+      { id: 'mag01', symbols: [] },
+      { id: 'mag02' },
+    ],
+  };
+  const entries = collectDeckSymbolCounts(deck);
+  const bySymbol = Object.fromEntries(entries.map((e) => [e.symbol, e.count]));
+
+  assert(bySymbol['自然'] === 3, 'duplicate symbols on one card are counted individually');
+  assert(bySymbol['凋零'] === 3, 'symbols are summed across all deck sections');
+  assert(bySymbol['夜幕'] === 2, 'leader and main symbols both counted');
+  assert(bySymbol['知識'] === 1, 'leader-only symbol counted');
+  assert(!('禁忌' in bySymbol), 'symbols with zero count are omitted');
+  assert(getTotalSymbolCount(deck) === 9, 'total symbol count sums every entry');
+
+  // 卡牌可能沒有 symbols 欄位（魔法卡）或為空陣列——不可拋錯
+  assert(entries.every((e) => e.count > 0), 'no zero-count entries leak through');
+
+  // 顯示順序須與篩選下拉一致，否則同一份資料在兩處排列不同
+  const orderedSymbols = entries.map((e) => e.symbol);
+  const expectedOrder = SYMBOL_ORDER.filter((s) => orderedSymbols.includes(s));
+  assertDeepEqual(orderedSymbols, expectedOrder, 'entries follow the shared symbol order');
+
+  // 資料新增了常數未涵蓋的符號時，必須仍然出現（接在最後），不可靜默丟棄
+  const withUnknown = collectDeckSymbolCounts({
+    leader: [],
+    rituals: [],
+    main: [{ id: 'x', symbols: ['未知符號', '夜幕'] }],
+  });
+  assert(
+    withUnknown.some((e) => e.symbol === '未知符號' && e.count === 1),
+    'symbols missing from the order list are still reported',
+  );
+  assert(
+    withUnknown[withUnknown.length - 1].symbol === '未知符號',
+    'unknown symbols are appended after the known ones',
+  );
 }
 
 assert(formatApiDate(null) === '—', 'empty api date placeholder');
