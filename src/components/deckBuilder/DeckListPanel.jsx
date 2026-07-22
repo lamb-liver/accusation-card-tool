@@ -2,6 +2,7 @@ import { AlertTriangle, ChevronUp } from 'lucide-react';
 import DeckRuleConfigurator from './DeckRuleConfigurator.jsx';
 import DeckSlotsSection from './DeckSlotsSection.jsx';
 import DeckManagerSection from './DeckManagerSection.jsx';
+import DeckSymbolStats from './DeckSymbolStats.jsx';
 import DeckTransferActions from './DeckTransferActions.jsx';
 
 export default function DeckListPanel({
@@ -28,6 +29,7 @@ export default function DeckListPanel({
   primaryCount,
   secondaryCount,
   exileCount,
+  symbolEntries,
   savedDecks,
   onSaveDeck,
   onLoadDeck,
@@ -117,6 +119,8 @@ export default function DeckListPanel({
           secondaryCount={secondaryCount}
           exileCount={exileCount}
         />
+
+        <DeckSymbolStats entries={symbolEntries} />
 
         <DeckSlotsSection
           deck={deck}
