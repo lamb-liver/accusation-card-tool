@@ -28,10 +28,38 @@ export function withRequestId(response, requestId) {
   });
 }
 
-export function apiResponse(response, request) {
-  return withRequestId(response, resolveRequestId(request));
+/**
+ * 每個 request 只解析一次 requestId，讓日誌與回應標頭指向同一個值。
+ * （resolveRequestId 在客戶端未帶 X-Request-Id 時每次都產生新 UUID，
+ * 重複呼叫會讓 log 記的 id 對不上客戶端收到的 id。）
+ */
+export function createResponder(request) {
+  const requestId = resolveRequestId(request);
+  return {
+    requestId,
+    respond: (response) => withRequestId(response, requestId),
+  };
 }
 
 export function logApiError(scope, error, context = {}) {
   console.error(scope, context, error);
+}
+
+/**
+ * 包裝 D1 查詢：失敗時記錄並回傳結構化 500，避免裸 throw 讓客戶端收到
+ * 沒有 { error } 形狀、也沒有 X-Request-Id 的平台預設 500。
+ *
+ * @template T
+ * @param {string} scope
+ * @param {string} requestId
+ * @param {() => Promise<T>} operation
+ * @returns {Promise<{ data: T } | { error: Response }>}
+ */
+export async function runDbQuery(scope, requestId, operation) {
+  try {
+    return { data: await operation() };
+  } catch (error) {
+    logApiError(scope, error, { requestId });
+    return { error: errorResponse('Internal server error', 500) };
+  }
 }

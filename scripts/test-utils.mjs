@@ -22,6 +22,7 @@ import { formatShareWallError } from '../src/utils/formatShareWallError.js';
 import { ruleToApiPayload, apiRuleToDeckRule } from '../src/utils/shareWallRule.js';
 import { factionIconPath } from '../src/constants/factionOrder.js';
 import { parseHashRoute } from '../src/hooks/useHashRoute.js';
+import { applyStatusChangeToList } from '../src/components/admin/useAdminSubmissions.js';
 
 let failed = 0;
 
@@ -243,6 +244,51 @@ assert(formatShareWallError(new ShareWallApiError('', 403)) === '請求被拒絕
 assert(formatShareWallError(new ShareWallApiError('offline', 503)) === '服務暫時無法使用，請稍後再試', 'format 503 share-wall error');
 assert(formatShareWallError(new Error('broken')) === 'broken', 'format generic Error message');
 assert(formatShareWallError(null, 'fallback') === 'fallback', 'format unknown error fallback');
+
+// admin 審核後的就地列表更新（取代整份 reload）
+{
+  const pendingItems = [
+    { id: 1, status: 'pending' },
+    { id: 2, status: 'pending' },
+    { id: 3, status: 'pending' },
+  ];
+
+  const approved = applyStatusChangeToList(pendingItems, {
+    id: 2,
+    nextStatus: 'approved',
+    statusFilter: 'pending',
+  });
+  assert(approved.removed === true, 'approving under a pending filter removes the item');
+  assert(
+    approved.items.map((item) => item.id).join(',') === '1,3',
+    'remaining items keep their order after removal',
+  );
+  assert(pendingItems.length === 3, 'applyStatusChangeToList does not mutate its input');
+
+  const underAll = applyStatusChangeToList(pendingItems, {
+    id: 2,
+    nextStatus: 'approved',
+    statusFilter: 'all',
+  });
+  assert(underAll.removed === false, 'status filter "all" keeps the item in the list');
+  assert(underAll.items.length === 3, 'status filter "all" preserves list length');
+  assert(
+    underAll.items.find((item) => item.id === 2)?.status === 'approved',
+    'status filter "all" updates the item status in place',
+  );
+  assert(
+    underAll.items.find((item) => item.id === 1)?.status === 'pending',
+    'status filter "all" leaves other items untouched',
+  );
+
+  const missing = applyStatusChangeToList(pendingItems, {
+    id: 999,
+    nextStatus: 'approved',
+    statusFilter: 'pending',
+  });
+  assert(missing.removed === false, 'unknown id reports nothing removed (offset must not shift)');
+  assert(missing.items.length === 3, 'unknown id leaves the list unchanged');
+}
 
 assert(formatApiDate(null) === '—', 'empty api date placeholder');
 assert(formatApiDate('not a date') === 'not a date', 'invalid api date preserved');

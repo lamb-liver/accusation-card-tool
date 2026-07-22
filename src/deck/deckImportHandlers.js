@@ -52,7 +52,9 @@ export function createDeckImportHandlers({ getState, ctx, commit }) {
       // 非 JSON，改走文字格式解析
     }
 
-    if (json?.deck && json.version) {
+    // 用 typeof 而非 truthiness：version: 0 也是合法版本號，
+    // 若靠 truthy 判斷會靜默掉進文字解析分支並回報「格式錯誤」。
+    if (json?.deck && typeof json.version === 'number') {
       try {
         const schemaErr = validateImportedJson(json);
         if (schemaErr) {

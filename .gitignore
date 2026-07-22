@@ -10,3 +10,6 @@ dist/
 
 # Cloudflare local files
 .wrangler/
+
+# Claude Code 個人本地設定（.claude/launch.json 為共用設定，仍納入版控）
+.claude/settings.local.json

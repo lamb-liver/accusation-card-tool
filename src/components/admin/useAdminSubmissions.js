@@ -10,6 +10,35 @@ const EMPTY_SUBMISSIONS = {
   messagesHasMore: false,
 };
 
+/**
+ * 審核動作後就地更新列表。
+ *
+ * 取代整份 reload：reload 會把已按「載入更多」取得的項目全部丟掉、回到
+ * 第一頁，審核多筆時每按一次就得重新往下捲。
+ *
+ * - statusFilter 為 'all'：項目仍屬於結果集，只換 status。
+ * - 篩選特定狀態：項目已不符條件而移除。伺服器端的結果集同樣少一筆，
+ *   故呼叫端需把 offset 減 1，下次「載入更多」的 OFFSET 才會對齊。
+ *
+ * 取捨：不會順帶刷新其他項目的狀態（單人後台場景可接受，必要時仍可手動
+ * 重新載入）。
+ *
+ * @param {Array<{ id: number, status: string }>} items
+ * @param {{ id: number, nextStatus: string, statusFilter: string }} change
+ * @returns {{ items: Array<object>, removed: boolean }}
+ */
+export function applyStatusChangeToList(items, { id, nextStatus, statusFilter }) {
+  if (statusFilter === 'all') {
+    return {
+      items: items.map((item) => (item.id === id ? { ...item, status: nextStatus } : item)),
+      removed: false,
+    };
+  }
+
+  const nextItems = items.filter((item) => item.id !== id);
+  return { items: nextItems, removed: nextItems.length !== items.length };
+}
+
 export function useAdminSubmissions({ authState, typeFilter, statusFilter }) {
   const [decks, setDecks] = useState([]);
   const [messages, setMessages] = useState([]);
@@ -92,6 +121,29 @@ export function useAdminSubmissions({ authState, typeFilter, statusFilter }) {
     statusFilter,
   ]);
 
+  /**
+   * @param {'deck' | 'message'} kind 與 AdminSection 的 runStatusAction 一致
+   *   （注意：載入更多用的是 API 的 'guestbook'，此處是留言的 'message'）
+   */
+  const applyStatusChange = useCallback(
+    (kind, id, nextStatus) => {
+      const isDeck = kind === 'deck';
+      const items = isDeck ? decks : messages;
+      const setItems = isDeck ? setDecks : setMessages;
+      const setOffset = isDeck ? setDeckOffset : setMessageOffset;
+
+      const { items: nextItems, removed } = applyStatusChangeToList(items, {
+        id,
+        nextStatus,
+        statusFilter,
+      });
+
+      setItems(nextItems);
+      if (removed) setOffset((prev) => Math.max(0, prev - 1));
+    },
+    [decks, messages, statusFilter],
+  );
+
   const handleLoadMoreDecks = useCallback(() => loadMoreSubmissions('deck'), [loadMoreSubmissions]);
   const handleLoadMoreMessages = useCallback(
     () => loadMoreSubmissions('guestbook'),
@@ -108,6 +160,7 @@ export function useAdminSubmissions({ authState, typeFilter, statusFilter }) {
     isError,
     errorMessage,
     reload,
+    applyStatusChange,
     isLoadingMoreDecks,
     isLoadingMoreMessages,
     loadMoreDecksError,

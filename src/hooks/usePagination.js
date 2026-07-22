@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect, useRef } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 
 /**
  * 管理分頁邏輯。perPage = 0 代表顯示全部。
@@ -17,16 +17,18 @@ import { useState, useMemo, useEffect, useRef } from 'react';
 export function usePagination(filteredCards) {
   const [currentPage, setCurrentPage] = useState(1);
   const [perPage, setPerPage] = useState(24);
-  const prevLengthRef = useRef(filteredCards.length);
 
   const isPaginationMode = perPage > 0;
 
+  /**
+   * 以陣列 identity 而非 length 判斷「結果集換了」：兩組不同篩選的結果
+   * 張數可能相同（例如兩個教團各 24 張），比 length 會漏掉那次重置、
+   * 讓使用者停在舊頁碼。上游 filteredCards 是 useMemo 產物，只在
+   * 資料或篩選條件改變時換 identity，不會每次 render 都觸發。
+   */
   useEffect(() => {
-    if (filteredCards.length !== prevLengthRef.current) {
-      prevLengthRef.current = filteredCards.length;
-      setCurrentPage(1);
-    }
-  }, [filteredCards.length]);
+    setCurrentPage(1);
+  }, [filteredCards]);
 
   const totalPages = useMemo(() => {
     if (!isPaginationMode || filteredCards.length === 0) return 1;

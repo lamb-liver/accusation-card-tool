@@ -1,10 +1,10 @@
 import { clearAdminCookie, shouldSetSecureCookie } from '../../_shared/auth.js';
 import { checkMutatingOrigin } from '../../_shared/origin.js';
-import { apiResponse, jsonResponse } from '../../_shared/response.js';
+import { createResponder, jsonResponse } from '../../_shared/response.js';
 
 export async function onRequestPost(context) {
   const { request, env } = context;
-  const respond = (response) => apiResponse(response, request);
+  const { respond } = createResponder(request);
 
   const originError = checkMutatingOrigin(request, env);
   if (originError) return respond(originError);

@@ -12,6 +12,9 @@ export { normalizeImportedRule };
 /** 匯入 JSON 各欄位 ID 數量上限（高於合法牌組上限，用於拒絕惡意超大陣列） */
 const MAX_IMPORT_SECTION_LENGTH = 32;
 
+/** 匯出圖片時單張卡圖的載入逾時 */
+const IMAGE_LOAD_TIMEOUT_MS = 10_000;
+
 export function validateImportedJson(json) {
   if (!json || typeof json !== 'object' || Array.isArray(json)) return '不是有效的 JSON 物件';
   if (typeof json.version !== 'number') return '缺少 version 欄位';
@@ -191,8 +194,16 @@ export async function exportDeckAsImage(deck, _currentRule, showToast) {
         img.crossOrigin = 'anonymous';
         img.style.cssText = 'width:100%;height:100%;object-fit:cover;display:block;';
 
-        img.onload = () => resolve(wrapper);
-        img.onerror = () => resolve(wrapper);
+        // 逾時保險：只靠 onload/onerror 時，任一張圖兩個事件都不觸發就會讓
+        // Promise.all 永遠 pending —— finally 不執行，離屏容器永久留在 DOM。
+        // 逾時後照樣 resolve，該格以底色呈現。
+        const timeoutId = setTimeout(() => resolve(wrapper), IMAGE_LOAD_TIMEOUT_MS);
+        const settle = () => {
+          clearTimeout(timeoutId);
+          resolve(wrapper);
+        };
+        img.onload = settle;
+        img.onerror = settle;
 
         wrapper.appendChild(img);
         grid.appendChild(wrapper);

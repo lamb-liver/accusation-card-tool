@@ -35,6 +35,29 @@ async function verifyBytes(bytes, signature, secret) {
   return crypto.subtle.verify('HMAC', key, signatureBytes, bytes);
 }
 
+/**
+ * 常數時間字串比對：先各自 SHA-256 再逐 byte 累積 XOR，
+ * 避免 `!==` 的短路行為透過回應時間洩漏密碼前綴。
+ *
+ * @param {unknown} a
+ * @param {unknown} b
+ */
+export async function timingSafeEqual(a, b) {
+  if (typeof a !== 'string' || typeof b !== 'string') return false;
+
+  const encoder = new TextEncoder();
+  const [digestA, digestB] = await Promise.all([
+    crypto.subtle.digest('SHA-256', encoder.encode(a)),
+    crypto.subtle.digest('SHA-256', encoder.encode(b)),
+  ]);
+
+  const bytesA = new Uint8Array(digestA);
+  const bytesB = new Uint8Array(digestB);
+  let diff = 0;
+  for (let i = 0; i < bytesA.length; i += 1) diff |= bytesA[i] ^ bytesB[i];
+  return diff === 0;
+}
+
 export async function createAdminToken(env) {
   const now = Math.floor(Date.now() / 1000);
   const payload = {
