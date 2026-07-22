@@ -14,7 +14,7 @@ import { isTurnstileEnabled } from '../../utils/turnstileConfig.js';
 
 export default function GuestbookSection({ showToast, embedded = false }) {
   const loadMessages = useCallback(
-    () => fetchGuestbookMessages({ limit: PUBLIC_PAGE_SIZE, offset: 0 }),
+    () => fetchGuestbookMessages({ limit: PUBLIC_PAGE_SIZE }),
     [],
   );
   const { data, isLoading, isRetrying, isError, errorMessage, reload } =
@@ -29,7 +29,7 @@ export default function GuestbookSection({ showToast, embedded = false }) {
 
   const [messages, setMessages] = useState([]);
   const [hasMore, setHasMore] = useState(false);
-  const [offset, setOffset] = useState(0);
+  const [cursor, setCursor] = useState(null);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
   const [loadMoreError, setLoadMoreError] = useState('');
 
@@ -37,7 +37,7 @@ export default function GuestbookSection({ showToast, embedded = false }) {
     if (!data) return;
     setMessages(data.messages ?? []);
     setHasMore(data.hasMore ?? false);
-    setOffset((data.messages ?? []).length);
+    setCursor(data.nextCursor ?? null);
     setLoadMoreError('');
   }, [data]);
 
@@ -72,14 +72,15 @@ export default function GuestbookSection({ showToast, embedded = false }) {
   }
 
   async function handleLoadMore() {
-    if (isLoadingMore || !hasMore) return;
+    // 沒有游標就沒有下一頁；缺少它時不可退回第一頁，否則會重複附加既有項目
+    if (isLoadingMore || !hasMore || !cursor) return;
     setIsLoadingMore(true);
     setLoadMoreError('');
     try {
-      const next = await fetchGuestbookMessages({ limit: PUBLIC_PAGE_SIZE, offset });
+      const next = await fetchGuestbookMessages({ limit: PUBLIC_PAGE_SIZE, cursor });
       setMessages((prev) => [...prev, ...(next.messages ?? [])]);
       setHasMore(next.hasMore ?? false);
-      setOffset((prev) => prev + (next.messages ?? []).length);
+      setCursor(next.nextCursor ?? null);
     } catch (error) {
       setLoadMoreError(formatShareWallError(error, '載入更多失敗'));
     } finally {

@@ -45,7 +45,7 @@ export default function AdminSection({ showToast, showConfirm }) {
 
   useEffect(() => {
     let cancelled = false;
-    fetchAdminSubmissions({ type: 'all', status: 'pending', limit: 1, offset: 0 })
+    fetchAdminSubmissions({ type: 'all', status: 'pending', limit: 1 })
       .then(() => {
         if (!cancelled) {
           setAuthProbeError('');

@@ -14,7 +14,13 @@ import { CSRF_HEADER_NAME, CSRF_HEADER_VALUE, MAX_BODY_BYTES } from '../function
 import { CSRF_HEADER_VALUE as generatedBackendCsrf } from '../functions/_shared/csrf.generated.js';
 import { CSRF_HEADER_VALUE as generatedFrontendCsrf } from '../src/api/csrfHeader.generated.js';
 import { checkCsrfHeader, normalizeOrigin } from '../functions/_shared/origin.js';
-import { parseOffsetParam, readJsonBody } from '../functions/_shared/request.js';
+import { parseOffsetParam, readJsonBody, resolvePageQuery } from '../functions/_shared/request.js';
+import {
+  buildKeysetClause,
+  decodeCursor,
+  encodeCursor,
+  nextCursorFrom,
+} from '../functions/_shared/cursor.js';
 import { verifyTurnstileToken } from '../functions/_shared/turnstile.js';
 import { stripTurnstileToken } from '../functions/_shared/submissionBody.js';
 import {
@@ -222,6 +228,93 @@ const token = await createAdminToken(env);
 const session = await verifyAdminToken(token, env);
 assert(session?.role === 'admin', 'admin token should verify');
 
+// keyset 游標編解碼
+{
+  const roundTrip = decodeCursor(encodeCursor('2026-07-22 03:04:05', 42));
+  assert(roundTrip?.sortValue === '2026-07-22 03:04:05', 'cursor round-trips sortValue');
+  assert(roundTrip?.id === 42, 'cursor round-trips id');
+  assert(
+    !/[+/=]/.test(encodeCursor('2026-07-22 03:04:05', 42)),
+    'cursor is base64url (safe in a query string without escaping)',
+  );
+
+  assert(decodeCursor('') === null, 'empty cursor rejected');
+  assert(decodeCursor('not-base64!!') === null, 'malformed cursor rejected');
+  assert(decodeCursor(btoa('{"v":1}')) === null, 'cursor missing fields rejected');
+  assert(
+    decodeCursor(btoa(JSON.stringify({ v: 99, s: 'x', i: 1 }))) === null,
+    'cursor with unknown version rejected',
+  );
+  assert(
+    decodeCursor(btoa(JSON.stringify({ v: 1, s: 'x', i: 0 }))) === null,
+    'cursor with non-positive id rejected',
+  );
+  assert(
+    decodeCursor(btoa(JSON.stringify({ v: 1, s: '', i: 1 }))) === null,
+    'cursor with empty sortValue rejected',
+  );
+
+  // keyset 條件必須包含同時間戳的 tiebreaker，否則同秒的列會被整批跳過
+  const keyset = buildKeysetClause('reviewed_at', { sortValue: 'T', id: 7 });
+  assert(
+    keyset.clause.includes('reviewed_at < ?') && keyset.clause.includes('reviewed_at = ?'),
+    'keyset clause covers both the strictly-earlier and same-timestamp cases',
+  );
+  assert(
+    keyset.bind.length === 3 && keyset.bind[2] === 7,
+    'keyset binds sortValue twice then the tiebreaker id',
+  );
+
+  assert(nextCursorFrom(undefined, 'reviewed_at') === null, 'no row yields no cursor');
+  assert(
+    nextCursorFrom({ reviewed_at: null, id: 1 }, 'reviewed_at') === null,
+    'row without a sort value yields no cursor',
+  );
+  assert(
+    decodeCursor(nextCursorFrom({ reviewed_at: 'T1', id: 9 }, 'reviewed_at'))?.id === 9,
+    'nextCursorFrom encodes the last row of the page',
+  );
+}
+
+// 分頁參數解析：cursor 優先，offset 為舊前端的相容路徑
+{
+  const pageUrl = (qs) => new URL(`https://example.test/api/decks${qs}`);
+
+  const firstPage = resolvePageQuery(pageUrl(''), 'reviewed_at');
+  assert(firstPage.clause === '', 'no cursor and no offset means first page (no extra clause)');
+  assert(firstPage.limitClause === 'LIMIT ? OFFSET ?', 'first page still binds an offset of 0');
+  assert(firstPage.tailBind[0] === 0, 'default offset is 0');
+
+  const cursored = resolvePageQuery(
+    pageUrl(`?cursor=${encodeCursor('T', 5)}`),
+    'reviewed_at',
+  );
+  assert(cursored.clause.includes('reviewed_at'), 'cursor produces a keyset clause');
+  assert(cursored.limitClause === 'LIMIT ?', 'keyset paging does not use OFFSET');
+  assert(cursored.tailBind.length === 0, 'keyset paging binds nothing after the limit');
+
+  const legacy = resolvePageQuery(pageUrl('?offset=40'), 'reviewed_at');
+  assert(legacy.clause === '', 'offset path adds no keyset clause');
+  assert(legacy.tailBind[0] === 40, 'offset path still honours the legacy parameter');
+
+  // 不可靜默當成第一頁，否則「載入更多」會無聲重複回傳第一頁
+  assert(
+    resolvePageQuery(pageUrl('?cursor=garbage'), 'reviewed_at').error !== undefined,
+    'invalid cursor is an error, not a silent fallback to page one',
+  );
+  assert(
+    resolvePageQuery(pageUrl('?offset=-1'), 'reviewed_at').error !== undefined,
+    'negative offset is rejected',
+  );
+
+  // 兩者同時出現時以 cursor 為準（只有新前端會送 cursor）
+  const both = resolvePageQuery(
+    pageUrl(`?offset=40&cursor=${encodeCursor('T', 5)}`),
+    'reviewed_at',
+  );
+  assert(both.limitClause === 'LIMIT ?', 'cursor wins when both parameters are present');
+}
+
 // 常數時間密碼比對
 assert(await timingSafeEqual('correct-horse', 'correct-horse'), 'identical strings should match');
 assert(!(await timingSafeEqual('correct-horse', 'correct-hors')), 'prefix should not match');
@@ -347,7 +440,10 @@ async function requestJson(baseUrl, path, { method = 'GET', body, headers = {} }
   const response = await fetch(`${baseUrl}${path}`, {
     method,
     headers: {
-      'X-Requested-With': CSRF_HEADER_VALUE,
+      // 必須用 CSRF_HEADER_NAME。曾經寫死成 'X-Requested-With'，後端讀的卻是
+      // x-accusation-csrf，導致每個 mutating 請求都被 403 擋下、整套整合測試
+      // 全紅——而「錯誤 CSRF header 應回 403」那條斷言反而因此假性通過。
+      [CSRF_HEADER_NAME]: CSRF_HEADER_VALUE,
       ...(body ? { 'Content-Type': 'application/json' } : {}),
       ...headers,
     },
@@ -448,7 +544,8 @@ async function runIntegrationTests() {
 
     const missingCsrf = await requestJson(baseUrl, '/api/decks', {
       method: 'POST',
-      headers: { Origin: origin, 'X-Requested-With': 'wrong' },
+      // 覆寫成正確的 header 名稱、錯誤的值，才真的測到 CSRF 值比對
+      headers: { Origin: origin, [CSRF_HEADER_NAME]: 'wrong' },
       body: {
         title: '惡意',
         author_name: 'x',
@@ -612,7 +709,18 @@ async function runIntegrationTests() {
       publicMsgs.data?.messages?.some((row) => row.message === '整合測試留言'),
       'approved message should appear in public list',
     );
-    assert(publicMsgs.data?.hasMore === false, 'guestbook list should include hasMore');
+    // 不斷言 hasMore === false：那等於假設本地 D1 是空的，跨回合累積資料後會誤紅。
+    // 改成明確驗證兩種狀態——limit=1 且已有多筆時必為 true。
+    assert(typeof publicMsgs.data?.hasMore === 'boolean', 'guestbook list should include hasMore');
+    const cappedMsgs = await requestJson(baseUrl, '/api/guestbook?limit=1');
+    assert(
+      (cappedMsgs.data?.messages ?? []).length === 1,
+      'guestbook list should honour the limit parameter',
+    );
+    assert(
+      cappedMsgs.data?.hasMore === true,
+      'hasMore should be true when more rows remain beyond the limit',
+    );
 
     const deleteDeck = await requestJson(baseUrl, `/api/admin/decks/${deckId}/status`, {
       method: 'PATCH',
@@ -627,6 +735,107 @@ async function runIntegrationTests() {
       body: { status: 'approved' },
     });
     assert(reviveDeck.status === 409, 'deleted deck cannot be revived');
+
+    // ── keyset 分頁 ──────────────────────────────────────────────────────────
+    // 連續核准會落在同一秒，reviewed_at 相同——正好驗證 id tiebreaker：
+    // 若排序不是全序，邊界上的列會被跳過或重複。
+    // 本地 D1 會跨測試回合累積資料。訊息內容須逐回合唯一，否則殘留的同名列
+    // 會讓「無重複」斷言誤判；結束時再把本回合的資料標記為 deleted。
+    const runTag = Date.now().toString(36);
+    const seededIds = [];
+
+    async function submitAndApproveMessage(text) {
+      const posted = await requestJson(baseUrl, '/api/guestbook', {
+        method: 'POST',
+        headers: { Origin: origin },
+        body: { author_name: '分頁測試', message: text },
+      });
+      assert(posted.status === 201, `seed message "${text}" should be created`);
+
+      const pendingList = await requestJson(
+        baseUrl,
+        '/api/admin/submissions?type=guestbook&status=pending&limit=100',
+        { headers: { Origin: origin, Cookie: cookie } },
+      );
+      const row = pendingList.data?.messages?.find((m) => m.message === text);
+      assert(row, `seed message "${text}" should be pending`);
+      seededIds.push(row.id);
+
+      const approved = await requestJson(baseUrl, `/api/admin/messages/${row.id}/status`, {
+        method: 'PATCH',
+        headers: { Origin: origin, Cookie: cookie },
+        body: { status: 'approved' },
+      });
+      assert(approved.status === 200, `seed message "${text}" should be approved`);
+    }
+
+    const seeded = [1, 2, 3, 4, 5].map((n) => `頁測${n}-${runTag}`);
+    for (const text of seeded) {
+      await submitAndApproveMessage(text);
+    }
+
+    // 逐頁走完，確認總數正確且無重複、無遺漏。
+    // guard 需大於整個列表的頁數（含殘留資料），否則會提前中斷而誤判為「遺漏」。
+    const walked = [];
+    let walkCursor = null;
+    for (let guard = 0; guard < 500; guard += 1) {
+      const query = walkCursor
+        ? `/api/guestbook?limit=2&cursor=${encodeURIComponent(walkCursor)}`
+        : '/api/guestbook?limit=2';
+      const page = await requestJson(baseUrl, query);
+      assert(page.status === 200, 'keyset page should return 200');
+      assert((page.data?.messages ?? []).length <= 2, 'page must not exceed the requested limit');
+      walked.push(...(page.data?.messages ?? []).map((m) => m.message));
+      if (!page.data?.hasMore) {
+        assert(page.data?.nextCursor === null, 'last page should not carry a next cursor');
+        break;
+      }
+      assert(typeof page.data?.nextCursor === 'string', 'non-final page must carry a next cursor');
+      walkCursor = page.data.nextCursor;
+    }
+
+    const seededWalked = walked.filter((m) => seeded.includes(m));
+    assert(
+      seededWalked.length === new Set(seededWalked).size,
+      'keyset paging must not repeat rows across pages',
+    );
+    assert(
+      seeded.every((text) => seededWalked.includes(text)),
+      'keyset paging must not skip rows across pages',
+    );
+
+    // 關鍵情境：翻頁途中插入新資料。OFFSET 會因前面多一筆而重複回傳上一頁
+    // 的最後一列；keyset 以排序鍵定位，不受影響。
+    const firstPage = await requestJson(baseUrl, '/api/guestbook?limit=2');
+    assert(firstPage.data?.hasMore === true, 'seeded data should span more than one page');
+    const firstPageMessages = (firstPage.data?.messages ?? []).map((m) => m.message);
+    const cursorAfterFirstPage = firstPage.data.nextCursor;
+
+    const jumpedText = `頁測插隊-${runTag}`;
+    await submitAndApproveMessage(jumpedText);
+
+    const secondPage = await requestJson(
+      baseUrl,
+      `/api/guestbook?limit=2&cursor=${encodeURIComponent(cursorAfterFirstPage)}`,
+    );
+    const secondPageMessages = (secondPage.data?.messages ?? []).map((m) => m.message);
+    assert(
+      !secondPageMessages.some((m) => firstPageMessages.includes(m)),
+      'a row inserted mid-walk must not push page one rows into page two',
+    );
+    assert(
+      !secondPageMessages.includes(jumpedText),
+      'a row inserted after the cursor position must not appear on a later page',
+    );
+
+    // 清掉本回合的 seed，避免本地 D1 無限累積拖慢後續回合
+    for (const id of seededIds) {
+      await requestJson(baseUrl, `/api/admin/messages/${id}/status`, {
+        method: 'PATCH',
+        headers: { Origin: origin, Cookie: cookie },
+        body: { status: 'deleted' },
+      });
+    }
   } finally {
     child.kill('SIGTERM');
     cleanupDevVars();

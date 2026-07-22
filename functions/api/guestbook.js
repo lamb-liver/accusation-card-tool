@@ -3,7 +3,8 @@ import { PUBLIC_LIST_DEFAULT, PUBLIC_LIST_HARD_CAP } from '../_shared/constants.
 import { checkMutatingOrigin } from '../_shared/origin.js';
 import { publicListJsonResponse } from '../_shared/publicListCache.js';
 import { checkRateLimit } from '../_shared/rateLimit.js';
-import { parseLimitParam, parseOffsetParam, readJsonBody } from '../_shared/request.js';
+import { parseLimitParam, readJsonBody, resolvePageQuery } from '../_shared/request.js';
+import { nextCursorFrom } from '../_shared/cursor.js';
 import {
   createResponder,
   errorResponse,
@@ -58,30 +59,33 @@ export async function onRequestGet(context) {
   });
   if (limit === null) return respond(errorResponse('Invalid limit parameter', 400));
 
-  const offset = parseOffsetParam(url);
-  if (offset === null) return respond(errorResponse('Invalid offset parameter', 400));
+  const page = resolvePageQuery(url, 'reviewed_at');
+  if (page.error) return respond(errorResponse(page.error, 400));
 
   const fetchLimit = limit + 1;
   const query = await runDbQuery('guestbook list query failed', requestId, () =>
     env.DB.prepare(
-      `SELECT author_name, message, reviewed_at, created_at
+      `SELECT id, author_name, message, reviewed_at, created_at
        FROM guestbook_messages
-       WHERE status = 'approved'
-       ORDER BY reviewed_at DESC, created_at DESC
-       LIMIT ? OFFSET ?`,
+       WHERE status = 'approved' ${page.clause}
+       ORDER BY reviewed_at DESC, id DESC
+       ${page.limitClause}`,
     )
-      .bind(fetchLimit, offset)
+      .bind(...page.bind, fetchLimit, ...page.tailBind)
       .all(),
   );
   if (query.error) return respond(query.error);
 
   const rows = query.data.results ?? [];
   const hasMore = rows.length > limit;
+  const pageRows = rows.slice(0, limit);
 
   return publicListJsonResponse(
     {
-      messages: rows.slice(0, limit).map(mapPublicMessageRow),
+      // id 僅供產生游標，mapPublicMessageRow 不會把它放進回應
+      messages: pageRows.map(mapPublicMessageRow),
       hasMore,
+      nextCursor: hasMore ? nextCursorFrom(pageRows[pageRows.length - 1], 'reviewed_at') : null,
     },
     request,
     requestId,

@@ -94,23 +94,24 @@
 | 9 | `usePagination` 以 `filteredCards.length` 判斷結果集是否改變，兩組篩選張數相同時（例如兩個教團各 24 張）不會重置頁碼 | `hooks/usePagination.js` | 改以陣列 identity 判斷 |
 | 10 | admin 審核後呼叫 `reload()`，已按「載入更多」取得的項目全部消失、回到第一頁 | `components/admin/useAdminSubmissions.js`、`AdminSection.jsx` | 抽出純函式 `applyStatusChangeToList` 做就地更新；移除項目時 offset 同步減 1，讓下次載入更多與伺服器端縮小後的結果集對齊 |
 
+| 11 | 三支列表端點使用 `LIMIT ? OFFSET ?`，新投稿或審核動作會讓後續頁位移，「載入更多」因而漏項或重複 | `functions/api/decks.js`、`guestbook.js`、`admin/submissions.js` 及三個前端消費端 | 改為 keyset（cursor）分頁，排序加 `id` tiebreaker 取得全序；新增 `_shared/cursor.js` 與 migration `0004`。後端仍接受 `offset`，供 service worker 快取的舊前端過渡（見下方「後續清理」） |
+| 12 | 整合測試的 `requestJson` 送錯 CSRF header 名稱（`X-Requested-With`，後端讀 `x-accusation-csrf`），導致所有 mutating 請求被 403 擋下、整套整合測試全紅，而「錯誤 CSRF header 應回 403」那條斷言反而假性通過 | `scripts/test-share-wall.mjs` | 改用 `CSRF_HEADER_NAME`；該條斷言改成「正確名稱、錯誤值」才真的測到值比對 |
+| 13 | 整合測試假設本地 D1 是空的（`hasMore === false`），跨回合累積資料後會誤紅 | `scripts/test-share-wall.mjs` | 改成明確驗證 `hasMore` 的兩種狀態；seed 資料加上回合唯一標記並於結束時清理 |
+
 回歸測試：
-- `scripts/test-share-wall.mjs` — `timingSafeEqual`、`createResponder` 的 id 一致性、`runDbQuery` 的錯誤轉換
+- `scripts/test-share-wall.mjs` — `timingSafeEqual`、`createResponder` 的 id 一致性、`runDbQuery` 的錯誤轉換、游標編解碼與 `resolvePageQuery` 的 cursor／offset 分支
 - `scripts/test-utils.mjs` — `applyStatusChangeToList` 的移除／就地更新／未命中 id 三種路徑，含不可變性檢查
+- **整合測試**（`--integration`，實際跑 wrangler + D1）— keyset 逐頁走訪的無重複／無遺漏，以及「翻頁途中插入資料」這個 OFFSET 會出錯的關鍵情境
+
+### 後續清理（待舊快取淘汰）
+
+`functions/_shared/request.js` 的 `resolvePageQuery` 仍保留 offset 分支，只為相容 service worker 快取的舊前端。待舊快取自然淘汰後，可移除 offset 路徑與 `parseOffsetParam`。
 
 ---
 
 ## 4. 已知但未修
 
-### 4.1 OFFSET 分頁在資料變動時會漏項或重複
-
-公開列表、留言板、admin 列表都使用 `LIMIT ? OFFSET ?`。新投稿或他人的審核動作會讓後續頁位移，導致漏項或重複。
-
-**未修的理由**：要根治需改 cursor 分頁（`created_at < ?`），這會變更 API 的請求／回應契約，而 `docs/project-state.md` 明確要求不得在非 share-wall 主題的工作中改動該契約。本次審查不是 share-wall 專案，故保留。
-
-註：admin 端因第 3 節第 10 項改為就地更新，自身審核動作造成的偏移已消除（移除項目時同步調整 offset）；此處剩下的是**他人**或**其他來源**變動資料所造成的偏移。
-
-### 4.2 `statusPatch.js` 的表名字串插值
+### 4.1 `statusPatch.js` 的表名字串插值
 
 `SELECT ... FROM ${table}` 無法用 bind 參數化。目前安全：`table` 來自寫死的 `TABLES` 白名單，`kind` 只由本模組呼叫端以字面量傳入。本次已加註解說明此前提，提醒未來新增呼叫端時不可讓 `kind` 來自請求資料。
 

@@ -38,10 +38,15 @@ function errorFromResponse(response, data) {
   return new ShareWallApiError(message, response.status);
 }
 
-function buildListParams({ limit, offset } = {}) {
+/**
+ * 列表查詢參數。分頁一律用 cursor：offset 會在資料變動時漏項或重複
+ * （後端仍接受 offset，只為相容 service worker 快取的舊前端）。
+ * cursor 為 null／undefined 代表第一頁。
+ */
+function buildListParams({ limit, cursor } = {}) {
   const params = new URLSearchParams();
   if (limit != null) params.set('limit', String(limit));
-  if (offset != null) params.set('offset', String(offset));
+  if (cursor) params.set('cursor', cursor);
   const query = params.toString();
   return query ? `?${query}` : '';
 }
@@ -63,8 +68,8 @@ async function apiFetch(path, { method = 'GET', body, admin = false } = {}) {
   return data;
 }
 
-export function fetchPublicDecks({ limit = PUBLIC_PAGE_SIZE, offset = 0 } = {}) {
-  return apiFetch(`/api/decks${buildListParams({ limit, offset })}`);
+export function fetchPublicDecks({ limit = PUBLIC_PAGE_SIZE, cursor = null } = {}) {
+  return apiFetch(`/api/decks${buildListParams({ limit, cursor })}`);
 }
 
 export function fetchPublicDeck(shareId) {
@@ -75,8 +80,8 @@ export function submitPublicDeck(payload) {
   return apiFetch('/api/decks', { method: 'POST', body: payload });
 }
 
-export function fetchGuestbookMessages({ limit = PUBLIC_PAGE_SIZE, offset = 0 } = {}) {
-  return apiFetch(`/api/guestbook${buildListParams({ limit, offset })}`);
+export function fetchGuestbookMessages({ limit = PUBLIC_PAGE_SIZE, cursor = null } = {}) {
+  return apiFetch(`/api/guestbook${buildListParams({ limit, cursor })}`);
 }
 
 export function submitGuestbookMessage(payload) {
@@ -91,18 +96,24 @@ export function adminLogout() {
   return apiFetch('/api/admin/logout', { method: 'POST', admin: true });
 }
 
+/**
+ * 兩份列表各自分頁，故游標分開帶：deckCursor / messageCursor。
+ * 回應含 decksNextCursor / messagesNextCursor。
+ */
 export function fetchAdminSubmissions({
   type = 'all',
   status = 'pending',
   limit = ADMIN_PAGE_SIZE,
-  offset = 0,
+  deckCursor = null,
+  messageCursor = null,
 } = {}) {
   const params = new URLSearchParams({
     type,
     status,
     limit: String(limit),
-    offset: String(offset),
   });
+  if (deckCursor) params.set('deckCursor', deckCursor);
+  if (messageCursor) params.set('messageCursor', messageCursor);
   return apiFetch(`/api/admin/submissions?${params}`, { admin: true });
 }
 
