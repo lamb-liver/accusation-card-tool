@@ -2,7 +2,7 @@ import { BarChart3, FilterX, Hammer, HelpCircle, MessageSquare, Search, Timer, X
 import { FILTER_OPTIONS } from '../constants/filterOptions.js';
 
 const toolbarSelectClass =
-  'native-select w-full rounded-md border bg-[#2a2a2a] py-3 pl-3 pr-3 text-base leading-snug outline-none transition focus:outline focus:outline-2 focus:outline-brand-gold';
+  'native-select w-full rounded-md border bg-[#2a2a2a] py-2.5 pl-3 pr-3 text-base leading-snug outline-none transition focus:outline focus:outline-2 focus:outline-brand-gold';
 
 export default function FilterToolbar({
   currentMode = 'gallery',
@@ -39,14 +39,14 @@ export default function FilterToolbar({
 
   return (
     <>
-      <header className="w-full px-4 pt-3 text-center">
-        <h1 className="app-brand-title m-0 break-words text-lg font-bold text-brand-gold sm:text-xl md:text-2xl">
+      <header className="w-full px-4 pt-2 text-center">
+        <h1 className="app-brand-title m-0 break-words text-lg font-bold text-brand-gold sm:text-xl">
           控訴-查卡＆組牌＆QA
         </h1>
       </header>
 
-      <div className="sticky-toolbar sticky top-0 z-[1100] flex w-full flex-col items-center border-b-2 border-brand-gold bg-neutral-900/95 px-4 py-3 shadow-[0_4px_15px_rgba(0,0,0,0.6)] backdrop-blur-md">
-        <div className="flex w-full max-w-[640px] flex-col items-center gap-3">
+      <div className="sticky-toolbar sticky top-0 z-[1100] flex w-full flex-col items-center border-b border-brand-gold/30 bg-neutral-900/95 px-4 py-2 shadow-[0_4px_15px_rgba(0,0,0,0.6)] backdrop-blur-md">
+        <div className="flex w-full max-w-[640px] flex-col items-center gap-2">
           <div className="mode-switch flex w-full flex-wrap justify-center gap-2">
             {modes.map(({ id, label, Icon }) => (
               <button
@@ -54,9 +54,9 @@ export default function FilterToolbar({
                 type="button"
                 onClick={() => onModeChange(id)}
                 aria-pressed={currentMode === id}
-                className={`mode-btn flex min-w-0 flex-1 items-center justify-center gap-1 rounded-md border px-1 py-2 text-xs font-bold transition sm:min-w-[5rem] sm:gap-1.5 sm:px-2 sm:text-sm ${
+                className={`mode-btn flex min-w-0 flex-1 items-center justify-center gap-1 rounded-md border px-1 py-1.5 text-xs font-bold transition sm:min-w-[5rem] sm:gap-1.5 sm:px-2 sm:py-2 sm:text-sm ${
                   currentMode === id
-                    ? 'border-brand-gold bg-brand-gold text-neutral-900 shadow-[0_0_8px_rgba(255,215,0,0.3)]'
+                    ? 'border-brand-gold-bright bg-brand-gold-bright text-neutral-900 shadow-[0_0_8px_rgba(242,207,74,0.25)]'
                     : 'border-[#444] bg-[#2a2a2a] text-[#e0e0e0] hover:border-brand-gold hover:bg-[#333]'
                 }`}
               >
@@ -78,7 +78,7 @@ export default function FilterToolbar({
                 onChange={(event) => onSearchChange(event.target.value)}
                 placeholder="搜尋卡名或效果..."
                 aria-label="搜尋卡片"
-                className="toolbar-search-input w-full rounded-md border-none bg-[#222] py-3 pl-3 pr-10 text-base text-white placeholder-gray-400 outline-none ring-0"
+                className="toolbar-search-input w-full rounded-md border-none bg-[#222] py-2.5 pl-3 pr-10 text-base text-white placeholder-gray-400 outline-none ring-0"
               />
               {searchTerm && (
                 <button
@@ -98,7 +98,7 @@ export default function FilterToolbar({
       {showCardFilters && (
         <div
           id="galleryControls"
-          className="controls mx-auto mb-6 mt-2 hidden w-full max-w-[1000px] grid-cols-2 gap-2.5 px-4 pb-2 md:grid xl:grid-cols-4"
+          className="controls mx-auto mb-4 mt-2 hidden w-full max-w-[1000px] grid-cols-2 gap-2.5 px-4 pb-1 md:grid xl:grid-cols-4"
         >
           {dropdowns.map(({ key, fallbackLabel }) => {
             const isActive = Boolean(filters[key] && filters[key] !== 'all');
@@ -122,11 +122,11 @@ export default function FilterToolbar({
             );
           })}
 
-          <div className="filter-stats col-span-full mt-2 flex items-center justify-center gap-3 text-center text-[13px] font-medium text-brand-gold">
+          <div className="filter-stats col-span-full mt-1 flex items-center justify-center gap-3 text-center text-[13px] font-medium text-stone-400">
             <span className="flex items-center gap-1">
               <BarChart3 aria-hidden className="h-[13px] w-[13px] shrink-0" strokeWidth={2.25} />
               <span>
-                共 <span className="font-bold">{resultCount}</span> 張卡牌
+                共 <span className="font-bold text-brand-gold">{resultCount}</span> 張卡牌
               </span>
             </span>
             {activeFilterCount > 0 && (

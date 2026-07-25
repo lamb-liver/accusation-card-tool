@@ -13,7 +13,8 @@
 
 /* ===== 設計權杖：由 @tailwindcss/vite 處理；對應 text-brand-gold、bg-bg-card 等工具類 ===== */
 @theme {
-  --color-brand-gold: #ffd700;
+  --color-brand-gold: #d1b35f;
+  --color-brand-gold-bright: #f2cf4a;
 
   /* 展示字體堆疊；對應 font-display 工具類，正文仍走系統無襯線 */
   --font-display: 'Noto Serif TC Subset', 'Noto Serif TC', 'Songti TC',
@@ -33,7 +34,7 @@
   --ritual-ink: #090807;
   --ritual-panel: rgba(28, 25, 22, 0.88);
   --ritual-panel-strong: rgba(35, 31, 27, 0.95);
-  --ritual-line-strong: rgba(255, 215, 0, 0.58);
+  --ritual-line-strong: rgba(209, 179, 95, 0.28);
 }
 
 /* 卡圖槽位：固定比例避免 lazy / responsive 造成 CLS */
@@ -179,7 +180,7 @@
   font-family: var(--font-display);
   letter-spacing: 0.02em;
   text-shadow:
-    0 0 16px rgba(255, 215, 0, 0.22),
+    0 0 16px rgba(209, 179, 95, 0.16),
     0 1px 0 rgba(0, 0, 0, 0.9);
 }
 
@@ -217,10 +218,10 @@
 }
 
 .mode-btn[aria-pressed="true"] {
-  background-image: linear-gradient(180deg, #ffdf58, #d9ad2f);
+  background-image: linear-gradient(180deg, #f6dc79, var(--color-brand-gold-bright));
   box-shadow:
     0 0 0 1px rgba(255, 244, 184, 0.28) inset,
-    0 0 18px rgba(255, 215, 0, 0.24);
+    0 0 18px rgba(242, 207, 74, 0.2);
 }
 
 .toolbar-search-input,
@@ -248,7 +249,7 @@
 }
 
 .filter-stats {
-  text-shadow: 0 0 10px rgba(255, 215, 0, 0.18);
+  text-shadow: none;
 }
 
 /* ===== 組牌區相關樣式 ===== */
@@ -261,7 +262,7 @@
   background:
     linear-gradient(180deg, var(--ritual-panel-strong), var(--ritual-panel)),
     linear-gradient(135deg, rgba(255, 215, 0, 0.08), transparent 45%);
-  border-color: rgba(255, 215, 0, 0.56);
+  border-color: rgba(209, 179, 95, 0.24);
   box-shadow:
     0 18px 46px rgba(0, 0, 0, 0.38),
     0 0 0 1px rgba(255, 215, 0, 0.06) inset;
@@ -327,7 +328,7 @@
 }
 
 .btn-apply-rule {
-  background-color: var(--color-brand-gold);
+  background-color: var(--color-brand-gold-bright);
   color: #000;
 }
 
@@ -343,36 +344,19 @@
   background-color: #666;
 }
 
-.btn-reset-rule {
-  background-color: #6c3483;
-}
-
-.btn-reset-rule:hover {
-  background-color: #7d4488;
-}
-
-.btn-export-deck {
-  background-color: #2b5797;
-}
-
-.btn-export-deck:hover {
-  background-color: #3a6db3;
-}
-
-.btn-export-image {
-  background-color: #9b59b6;
-}
-
-.btn-export-image:hover {
-  background-color: #aa6ac9;
-}
-
+.btn-reset-rule,
+.btn-export-deck,
+.btn-export-image,
 .btn-import-deck {
-  background-color: #6c757d;
+  background-color: #3b3936;
+  color: #e3ded4;
 }
 
+.btn-reset-rule:hover,
+.btn-export-deck:hover,
+.btn-export-image:hover,
 .btn-import-deck:hover {
-  background-color: #7d868d;
+  background-color: #4a4742;
 }
 
 .clear-category {
@@ -442,7 +426,7 @@
 .card-face {
   background:
     linear-gradient(180deg, rgba(14, 12, 11, 1), rgba(5, 5, 5, 1));
-  border-color: rgba(255, 215, 0, 0.22);
+  border-color: rgba(209, 179, 95, 0.16);
   box-shadow:
     0 12px 28px rgba(0, 0, 0, 0.36),
     0 0 0 1px rgba(255, 215, 0, 0.05) inset;

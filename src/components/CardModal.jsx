@@ -103,6 +103,16 @@ export default function CardModal({
   const hasNext = currentIdx >= 0 && currentIdx < cardList.length - 1;
   if (!card) return null;
 
+  const metadata = [
+    ['教團', card.faction],
+    ['種類', card.type],
+    ['聲量', card.volume],
+    ['守護', card.guard],
+    ['災厄', card.calamity],
+    ['星塵', card.stardust],
+    ['地點', card.locationType],
+  ].filter(([, value]) => value !== undefined && value !== null && value !== '');
+
   const handleArtPrev = (e) => {
     e.stopPropagation();
     if (variantIdx <= 0) return;
@@ -171,27 +181,24 @@ export default function CardModal({
         onKeyDown={handleKeyDown}
         onTouchStart={handleTouchStart}
         onTouchEnd={handleTouchEnd}
-        className="relative mx-4 max-h-[90vh] w-full max-w-2xl overflow-y-auto rounded-lg border border-brand-gold/70 bg-neutral-800 shadow-2xl"
+        className="relative mx-3 max-h-[92vh] w-full max-w-5xl overflow-y-auto rounded-xl border border-brand-gold/30 bg-[#171614] shadow-2xl lg:overflow-hidden"
       >
-        {/* 關閉按鈕 */}
         <button
           type="button"
           onClick={onClose}
           aria-label="關閉"
-          className="absolute top-3 right-3 z-10 flex h-8 w-8 items-center justify-center rounded-full border border-gray-600 bg-neutral-700 text-gray-300 transition hover:border-brand-gold hover:text-brand-gold focus-visible:outline-2 focus-visible:outline-brand-gold"
+          className="absolute right-3 top-3 z-20 flex h-9 w-9 items-center justify-center rounded-full border border-white/15 bg-black/65 text-stone-300 shadow-lg backdrop-blur transition hover:border-brand-gold hover:text-brand-gold focus-visible:outline-2 focus-visible:outline-brand-gold"
         >
           <X className="h-4 w-4" aria-hidden strokeWidth={2.25} />
         </button>
 
-        <div className="p-6">
-
-          {/* 卡片圖片 */}
-          <div className="relative mb-2">
+        <div className="grid lg:grid-cols-[minmax(0,1.08fr)_minmax(22rem,0.92fr)]">
+          <div className="relative flex items-center justify-center bg-black/35 p-5 sm:p-8 lg:min-h-[min(88vh,46rem)] lg:border-r lg:border-white/10">
             {hasAlt && (
-              <div className="absolute left-2 top-2 z-10 flex items-center gap-1">
+              <div className="absolute left-3 top-3 z-10 flex items-center gap-1">
                 {artVariant !== 'main' && (
                   <span
-                    className="pointer-events-none rounded border border-amber-600/80 bg-black/55 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-amber-200"
+                    className="pointer-events-none rounded border border-brand-gold/35 bg-black/70 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-brand-gold"
                     aria-hidden
                   >
                     {variantBadgeLabel(artVariant)}
@@ -202,7 +209,7 @@ export default function CardModal({
                   onClick={handleArtPrev}
                   disabled={variantIdx <= 0}
                   aria-label="切換上一個圖版"
-                  className="flex h-9 w-9 items-center justify-center rounded-full border border-neutral-500 bg-black/70 text-amber-200 shadow-md transition hover:border-brand-gold hover:text-brand-gold disabled:pointer-events-none disabled:opacity-35"
+                  className="flex h-9 w-9 items-center justify-center rounded-full border border-white/20 bg-black/70 text-stone-300 shadow-md transition hover:border-brand-gold hover:text-brand-gold disabled:pointer-events-none disabled:opacity-35"
                 >
                   <ChevronLeft className="h-5 w-5 shrink-0" aria-hidden strokeWidth={2.25} />
                 </button>
@@ -211,14 +218,13 @@ export default function CardModal({
                   onClick={handleArtNext}
                   disabled={variantIdx >= artVariants.length - 1}
                   aria-label="切換下一個圖版"
-                  className="flex h-9 w-9 items-center justify-center rounded-full border border-neutral-500 bg-black/70 text-amber-200 shadow-md transition hover:border-brand-gold hover:text-brand-gold disabled:pointer-events-none disabled:opacity-35"
+                  className="flex h-9 w-9 items-center justify-center rounded-full border border-white/20 bg-black/70 text-stone-300 shadow-md transition hover:border-brand-gold hover:text-brand-gold disabled:pointer-events-none disabled:opacity-35"
                 >
                   <ChevronRight className="h-5 w-5 shrink-0" aria-hidden strokeWidth={2.25} />
                 </button>
               </div>
             )}
-            {/* 骨架佔位：載入中顯示 */}
-            <div className="card-image-slot card-image-slot--contain relative mx-auto w-full max-w-sm">
+            <div className="card-image-slot card-image-slot--contain relative mx-auto w-full max-w-sm shadow-[0_24px_70px_rgba(0,0,0,0.62),0_0_28px_rgba(209,179,95,0.08)]">
               {!imgLoaded && (
                 <div className="absolute inset-0 flex items-center justify-center rounded bg-neutral-700 animate-pulse" aria-hidden>
                   <ImageIcon className="h-12 w-12 text-neutral-500" strokeWidth={2.25} />
@@ -240,178 +246,135 @@ export default function CardModal({
                   }
                   onLoad={() => setImgLoaded(true)}
                   onError={() => setImgLoaded(true)}
-                  className={`card-image-media object-contain rounded touch-manipulation select-none transition-opacity duration-300 ${imgLoaded ? 'opacity-100' : 'opacity-0'}`}
+                  className={`card-image-media touch-manipulation select-none rounded-sm object-contain transition-opacity duration-300 ${imgLoaded ? 'opacity-100' : 'opacity-0'}`}
                 />
               )}
             </div>
           </div>
 
-          {/* 卡名＋卡面編號 */}
-          <div className="mb-3 flex items-baseline gap-2 flex-wrap">
-            <h2 id={titleId} className="font-display text-2xl font-bold text-brand-gold">{card.name}</h2>
-            <span className="font-mono text-sm text-gray-400" aria-label={`卡牌編號 ${formatCardNumber(card.id)}`}>
-              {formatCardNumber(card.id)}
-            </span>
-          </div>
+          <div className="flex flex-col p-5 sm:p-7 lg:max-h-[92vh] lg:overflow-y-auto">
+            <header className="mb-4 border-b border-white/10 pb-4 pr-10">
+              <div className="flex flex-wrap items-baseline gap-x-2 gap-y-1">
+                <h2 id={titleId} className="font-display text-2xl font-bold text-brand-gold sm:text-3xl">
+                  {card.name}
+                </h2>
+                <span className="font-mono text-xs text-stone-500" aria-label={`卡牌編號 ${formatCardNumber(card.id)}`}>
+                  {formatCardNumber(card.id)}
+                </span>
+              </div>
+              <div className="mt-3 flex flex-wrap gap-x-4 gap-y-2 text-xs tracking-[0.08em]">
+                {metadata.map(([label, value]) => (
+                  <span key={label} className="inline-flex items-baseline gap-1.5">
+                    <span className="text-[10px] text-stone-500">{label}</span>
+                    <strong className="font-semibold text-stone-200">{value}</strong>
+                  </span>
+                ))}
+              </div>
+            </header>
 
-          {/* 基本屬性 */}
-          <div className="grid grid-cols-2 gap-4 mb-6">
-            <div>
-              <p className="text-gray-400 text-sm">教團</p>
-              <p className="text-white font-semibold">{card.faction}</p>
-            </div>
-            <div>
-              <p className="text-gray-400 text-sm">種類</p>
-              <p className="text-white font-semibold">{card.type}</p>
-            </div>
-            {card.volume !== undefined && (
-              <div>
-                <p className="text-gray-400 text-sm">聲量</p>
-                <p className="text-white font-semibold">{card.volume}</p>
-              </div>
-            )}
-            {card.guard !== undefined && (
-              <div>
-                <p className="text-gray-400 text-sm">守護</p>
-                <p className="text-white font-semibold">{card.guard}</p>
-              </div>
-            )}
-            {card.calamity !== undefined && (
-              <div>
-                <p className="text-gray-400 text-sm">災厄</p>
-                <p className="text-white font-semibold">{card.calamity}</p>
-              </div>
-            )}
-            {card.stardust !== undefined && (
-              <div>
-                <p className="text-gray-400 text-sm">星塵</p>
-                <p className="text-white font-semibold">{card.stardust}</p>
-              </div>
-            )}
-            {card.locationType && (
-              <div>
-                <p className="text-gray-400 text-sm">地點類型</p>
-                <p className="text-white font-semibold">{card.locationType}</p>
-              </div>
-            )}
-          </div>
-
-          {/* 效果描述 */}
-          {card.effect && (
-            <div className="mb-4">
-              <p className="text-gray-400 text-sm mb-2">效果：</p>
-              <div className="bg-neutral-700/50 p-4 rounded border border-gray-600">
-                <p className="text-gray-200 whitespace-pre-wrap leading-relaxed">{card.effect}</p>
-              </div>
-              {/* 關鍵字說明 — 補充卡面未展開的規則（聖戰／供品…）*/}
-              {getMechanicNotes(card.effect).map(({ term, description }) => (
-                <div
-                  key={term}
-                  className="mt-2 flex gap-2 rounded border border-brand-gold/30 bg-brand-gold/10 px-3 py-2 text-xs leading-relaxed text-amber-100"
-                >
-                  <span className="shrink-0 font-bold text-brand-gold">{term}</span>
-                  <span>{description}</span>
+            {card.effect && (
+              <section className="mb-5" aria-labelledby="card-effect-title">
+                <h3 id="card-effect-title" className="mb-2 text-[11px] font-semibold tracking-[0.18em] text-stone-500">
+                  卡牌效果
+                </h3>
+                <div className="border-y border-white/10 py-4">
+                  <p className="whitespace-pre-wrap text-[15px] leading-7 text-stone-200">{card.effect}</p>
                 </div>
-              ))}
-              {/* 取得方式 — 效果框右下角 */}
-              {displaySource && (
-                <div className="flex items-center justify-end gap-1.5 mt-2 text-xs text-gray-400">
-                  <List className="h-3.5 w-3.5 shrink-0" aria-hidden strokeWidth={2.25} />
-                  <span>取得方式：{displaySource}</span>
-                </div>
-              )}
-            </div>
-          )}
+                {getMechanicNotes(card.effect).map(({ term, description }) => (
+                  <div
+                    key={term}
+                    className="mt-3 flex gap-2 border-l border-brand-gold/35 pl-3 text-xs leading-relaxed text-stone-300"
+                  >
+                    <span className="shrink-0 font-bold text-brand-gold">{term}</span>
+                    <span>{description}</span>
+                  </div>
+                ))}
+              </section>
+            )}
 
-          {/* 若無效果但有來源，單獨顯示取得方式 */}
-          {!card.effect && displaySource && (
-            <div className="flex items-center gap-1.5 mb-4 text-xs text-gray-400">
-              <List className="h-3.5 w-3.5 shrink-0" aria-hidden strokeWidth={2.25} />
-              <span>取得方式：{displaySource}</span>
-            </div>
-          )}
-
-          {/* 符號（含 icon） */}
-          {card.symbols && card.symbols.length > 0 && (
-            <div className="mb-6">
-              <p className="text-gray-400 text-sm mb-2">符號</p>
-              <div className="flex flex-wrap gap-2">
+            {card.symbols && card.symbols.length > 0 && (
+              <div className="mb-4 flex flex-wrap items-center gap-x-4 gap-y-2">
+                <span className="text-[11px] font-semibold tracking-[0.18em] text-stone-500">符號</span>
                 {card.symbols.map((symbol, idx) => (
                   <span
                     key={`${card.id}-symbol-${idx}`}
-                    className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-brand-gold/20 text-amber-300 text-sm rounded border border-brand-gold/50 font-medium"
+                    className="inline-flex items-center gap-1.5 text-sm font-medium text-stone-300"
                   >
                     {SYMBOL_ICONS[symbol] && (
-                      <img src={SYMBOL_ICONS[symbol]} alt={symbol} className="w-4 h-4 object-contain" />
+                      <img src={SYMBOL_ICONS[symbol]} alt="" className="h-4 w-4 object-contain" />
                     )}
                     {symbol}
                   </span>
                 ))}
               </div>
+            )}
+
+            {displaySource && (
+              <div className="mb-5 flex items-center gap-1.5 text-xs text-stone-500">
+                <List className="h-3.5 w-3.5 shrink-0" aria-hidden strokeWidth={2.25} />
+                <span>取得方式：{displaySource}</span>
+              </div>
+            )}
+
+            {factionHasQA(card.faction) && (
+              <button
+                type="button"
+                onClick={() => onViewFactionQA(card.faction)}
+                className="mb-5 flex w-full items-center justify-center gap-2 rounded-lg border border-white/15 px-4 py-2.5 text-sm font-medium text-stone-300 transition hover:border-brand-gold hover:text-brand-gold"
+              >
+                <HelpCircle className="h-4 w-4 shrink-0" aria-hidden strokeWidth={2.25} />
+                查看「{card.faction}」常見問題
+              </button>
+            )}
+
+            <div className="mt-auto flex items-center justify-center gap-3 pt-1">
+              {cardList.length > 1 ? (
+                <button
+                  type="button"
+                  onClick={onPrev}
+                  disabled={!hasPrev}
+                  className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-white/20 bg-black/40 text-stone-300 transition hover:border-brand-gold hover:text-brand-gold disabled:cursor-not-allowed disabled:opacity-30"
+                  aria-label="上一張"
+                >
+                  <ChevronLeft className="h-6 w-6" aria-hidden strokeWidth={2.25} />
+                </button>
+              ) : null}
+
+              <button
+                type="button"
+                onClick={() => onAdd(card)}
+                disabled={isInDeck}
+                className={`inline-flex items-center justify-center gap-2 rounded-full px-8 py-3 text-base font-bold transition ${
+                  isInDeck
+                    ? 'cursor-not-allowed border border-green-500/40 bg-green-950/30 text-green-300'
+                    : 'bg-brand-gold-bright text-neutral-900 hover:bg-amber-300'
+                }`}
+              >
+                {isInDeck ? (
+                  <>
+                    <Check className="h-5 w-5 shrink-0" aria-hidden strokeWidth={2.25} />
+                    已在牌組
+                  </>
+                ) : (
+                  <>
+                    <Plus className="h-5 w-5 shrink-0" aria-hidden strokeWidth={2.25} />
+                    加入牌組
+                  </>
+                )}
+              </button>
+
+              {cardList.length > 1 ? (
+                <button
+                  type="button"
+                  onClick={onNext}
+                  disabled={!hasNext}
+                  className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-white/20 bg-black/40 text-stone-300 transition hover:border-brand-gold hover:text-brand-gold disabled:cursor-not-allowed disabled:opacity-30"
+                  aria-label="下一張"
+                >
+                  <ChevronRight className="h-6 w-6" aria-hidden strokeWidth={2.25} />
+                </button>
+              ) : null}
             </div>
-          )}
-
-          {/* 玩家多半是「這張卡有疑問」才查 QA，直接從卡片導向該教團的問答 */}
-          {factionHasQA(card.faction) && (
-            <button
-              type="button"
-              onClick={() => onViewFactionQA(card.faction)}
-              className="mb-6 flex w-full items-center justify-center gap-2 rounded-lg border border-[#555] px-4 py-2.5 text-sm font-medium text-gray-300 transition hover:border-brand-gold hover:text-brand-gold"
-            >
-              <HelpCircle className="h-4 w-4 shrink-0" aria-hidden strokeWidth={2.25} />
-              查看「{card.faction}」常見問題
-            </button>
-          )}
-
-          {/* 加入牌組 + 左右切換同一行 */}
-          <div className="flex items-center justify-center gap-3 pt-2">
-            {cardList.length > 1 ? (
-              <button
-                type="button"
-                onClick={onPrev}
-                disabled={!hasPrev}
-                className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-brand-gold/70 bg-black/60 text-brand-gold transition hover:bg-brand-gold hover:text-black disabled:cursor-not-allowed disabled:opacity-30"
-                aria-label="上一張"
-              >
-                <ChevronLeft className="h-6 w-6" aria-hidden strokeWidth={2.25} />
-              </button>
-            ) : null}
-
-            {/* 從牌組列開啟時卡片已在牌組，按下只會被阻擋；直接呈現已加入狀態 */}
-            <button
-              type="button"
-              onClick={() => onAdd(card)}
-              disabled={isInDeck}
-              className={`inline-flex items-center justify-center gap-2 font-bold py-3 px-10 rounded-full transition text-base ${
-                isInDeck
-                  ? 'cursor-not-allowed border border-green-500/60 bg-green-950/40 text-green-300'
-                  : 'bg-brand-gold hover:bg-amber-500 text-neutral-900'
-              }`}
-            >
-              {isInDeck ? (
-                <>
-                  <Check className="h-5 w-5 shrink-0" aria-hidden strokeWidth={2.25} />
-                  已在牌組
-                </>
-              ) : (
-                <>
-                  <Plus className="h-5 w-5 shrink-0" aria-hidden strokeWidth={2.25} />
-                  加入牌組
-                </>
-              )}
-            </button>
-
-            {cardList.length > 1 ? (
-              <button
-                type="button"
-                onClick={onNext}
-                disabled={!hasNext}
-                className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-brand-gold/70 bg-black/60 text-brand-gold transition hover:bg-brand-gold hover:text-black disabled:cursor-not-allowed disabled:opacity-30"
-                aria-label="下一張"
-              >
-                <ChevronRight className="h-6 w-6" aria-hidden strokeWidth={2.25} />
-              </button>
-            ) : null}
           </div>
         </div>
       </div>

@@ -327,14 +327,12 @@ function App() {
         {currentMode === 'gallery' && (
           <>
             <BackToTopButton />
-            <div className="text-center mb-8">
+            <div className="mb-4 text-center md:hidden">
               {isLoading ? (
-                <p className="text-gray-400 text-lg">載入卡牌資料中…</p>
+                <p className="text-sm text-gray-400">載入卡牌資料中…</p>
               ) : (
-                <p className="font-display text-brand-gold text-lg font-semibold">
-                  找到{' '}
-                  <span className="text-brand-gold">{filteredCards.length}</span>{' '}
-                  張符合條件的卡片
+                <p className="text-sm font-medium text-stone-400">
+                  找到 <span className="font-bold text-brand-gold">{filteredCards.length}</span> 張卡片
                 </p>
               )}
             </div>
