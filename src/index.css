@@ -125,22 +125,16 @@
   }
 }
 
-/* 三模式各一層、同一張背景.webp（見 AppPageBackground） */
+/* 卡背保留為低對比的中央圖騰，避免與卡牌插畫爭奪焦點。 */
 .app-page-background {
   position: fixed;
   inset: 0;
   z-index: 0;
   pointer-events: none;
   overflow: hidden;
-  background-color: var(--ritual-ink);
-  background-image:
-    linear-gradient(180deg, rgba(5, 4, 4, 0.52) 0%, rgba(8, 7, 7, 0.76) 50%, rgba(5, 4, 4, 0.9) 100%),
-    linear-gradient(90deg, rgba(0, 0, 0, 0.64) 0%, rgba(0, 0, 0, 0.28) 48%, rgba(0, 0, 0, 0.68) 100%),
-    var(--app-background-image);
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
-  filter: saturate(0.86) brightness(0.82) contrast(1.06);
+  background:
+    radial-gradient(ellipse at 50% 34%, rgba(209, 179, 95, 0.09), transparent 58%),
+    var(--ritual-ink);
 }
 
 .app-page-background::before,
@@ -151,23 +145,31 @@
 }
 
 .app-page-background::before {
-  background:
-    linear-gradient(90deg, transparent 0 calc(50% - 1px), rgba(255, 215, 0, 0.12) 50%, transparent calc(50% + 1px)),
-    linear-gradient(180deg, transparent 0%, rgba(255, 215, 0, 0.07) 18%, transparent 55%),
-    linear-gradient(90deg, rgba(116, 19, 19, 0.18), transparent 26%, transparent 74%, rgba(116, 19, 19, 0.15));
-  opacity: 0.74;
-  mask-image: linear-gradient(to bottom, transparent 0%, black 18%, black 78%, transparent 100%);
-  -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 18%, black 78%, transparent 100%);
+  background-image: var(--app-background-image);
+  background-position: center 28%;
+  background-repeat: no-repeat;
+  background-size: auto 112vh;
+  filter: sepia(0.16) saturate(0.72);
+  opacity: 0.16;
+  mix-blend-mode: screen;
+  mask-image: radial-gradient(ellipse 25% 72% at 50% 38%, black 0%, rgba(0, 0, 0, 0.88) 48%, transparent 100%);
+  -webkit-mask-image: radial-gradient(ellipse 25% 72% at 50% 38%, black 0%, rgba(0, 0, 0, 0.88) 48%, transparent 100%);
 }
 
 .app-page-background::after {
-  background-image:
-    repeating-linear-gradient(90deg, transparent 0 118px, rgba(255, 215, 0, 0.045) 119px 120px),
-    repeating-linear-gradient(0deg, transparent 0 94px, rgba(255, 215, 0, 0.025) 95px 96px);
-  opacity: 0.28;
-  mix-blend-mode: screen;
-  mask-image: linear-gradient(to bottom, transparent 0%, black 16%, black 72%, transparent 100%);
-  -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 16%, black 72%, transparent 100%);
+  background:
+    radial-gradient(ellipse at 50% 38%, transparent 22%, rgba(5, 4, 4, 0.28) 68%, rgba(5, 4, 4, 0.72) 100%),
+    linear-gradient(180deg, rgba(5, 4, 4, 0.12), transparent 24%, rgba(5, 4, 4, 0.44));
+}
+
+@media (max-width: 767px) {
+  .app-page-background::before {
+    background-position: center 18%;
+    background-size: auto 112vh;
+    opacity: 0.12;
+    mask-image: radial-gradient(ellipse 72% 72% at 50% 38%, black 0%, rgba(0, 0, 0, 0.88) 48%, transparent 100%);
+    -webkit-mask-image: radial-gradient(ellipse 72% 72% at 50% 38%, black 0%, rgba(0, 0, 0, 0.88) 48%, transparent 100%);
+  }
 }
 
 .app-shell-content {
