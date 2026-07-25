@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback } from 'react';
 import CardGallery from '../CardGallery.jsx';
 
 /** 卡池的金色滑軌開關（隱藏已選／隱藏圖片共用） */
@@ -34,19 +34,6 @@ function PoolToggle({ checked, onChange, label }) {
   );
 }
 
-/** 手機底部 FAB / 安全區留白 */
-function useDeckPoolScrollPadding() {
-  const [padding, setPadding] = useState(64);
-  useEffect(() => {
-    const mq = window.matchMedia('(min-width: 1024px)');
-    const update = () => setPadding(mq.matches ? 0 : 64);
-    update();
-    mq.addEventListener('change', update);
-    return () => mq.removeEventListener('change', update);
-  }, []);
-  return padding;
-}
-
 export default function DeckPoolSection({
   hideSelected,
   onHideSelectedChange,
@@ -59,8 +46,6 @@ export default function DeckPoolSection({
   limitedCardIds,
   inDeckIds,
 }) {
-  const scrollPaddingBottom = useDeckPoolScrollPadding();
-
   /** 穩定識別：inline 箭頭會在每次 render 打破 CardGallery/Card 的 memo */
   const handlePoolCardClick = useCallback(
     (card) => onCardClick(card, displayCards),
@@ -68,7 +53,7 @@ export default function DeckPoolSection({
   );
 
   return (
-    <div className="deck-pool-section deck-builder-column-lg flex min-w-0 w-full flex-col overflow-hidden rounded-lg border-2 border-brand-gold bg-[#252525] px-0 py-3 sm:px-4 sm:py-4 lg:min-w-0 lg:flex-1 lg:px-4 lg:py-4 lg:pb-4">
+    <div className="deck-pool-section deck-builder-column-lg flex min-w-0 w-full flex-col overflow-hidden rounded-lg border border-brand-gold/60 bg-[#252525] px-0 py-3 sm:px-4 sm:py-4 lg:min-w-0 lg:flex-1 lg:px-4 lg:py-4 lg:pb-4">
       <div className="deck-pool-header mb-3 flex shrink-0 flex-col items-center gap-2 px-2 sm:px-0">
         <h2 className="text-lg font-bold text-brand-gold">可選卡牌池</h2>
         <div className="flex flex-wrap items-center justify-center gap-x-5 gap-y-2">
@@ -83,8 +68,7 @@ export default function DeckPoolSection({
       </div>
 
       <div
-        className="deck-pool-scroll flex min-h-[280px] min-w-0 w-full flex-col overflow-x-hidden overflow-y-auto max-lg:h-[min(60vh,720px)] lg:min-h-0 lg:flex-1"
-        style={{ paddingBottom: scrollPaddingBottom }}
+        className="deck-pool-scroll flex min-h-[280px] min-w-0 w-full flex-col overflow-x-hidden overflow-y-auto pb-16 max-lg:h-[min(60vh,720px)] lg:min-h-0 lg:flex-1 lg:pb-0"
       >
         <CardGallery
           cards={displayCards}

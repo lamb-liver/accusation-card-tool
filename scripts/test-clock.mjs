@@ -1,3 +1,4 @@
+import assert from 'node:assert/strict';
 import {
   createInitialState,
   formatTime,
@@ -10,21 +11,9 @@ import {
   reduceEndTurn,
   reducePauseFromRunning,
   reduceSetStartingPlayer,
-  reduceStart,
   reduceTick,
   reduceToggleRun,
 } from '../src/features/clock/clockEngine.js';
-
-let failed = 0;
-
-function fail(message) {
-  console.error(`FAIL: ${message}`);
-  failed += 1;
-}
-
-function assert(condition, message) {
-  if (!condition) fail(message);
-}
 
 const MS_PER_MINUTE = 60_000;
 const INITIAL_MS = INITIAL_MINUTES * MS_PER_MINUTE;
@@ -51,7 +40,7 @@ assert(otherPlayer('B') === 'A', 'otherPlayer B');
 
 try {
   patchPlayer(initial, 'A', {});
-  fail('patchPlayer empty patch should throw');
+  assert.fail('patchPlayer empty patch should throw');
 } catch (error) {
   assert(error instanceof Error, 'patchPlayer throws Error');
 }
@@ -64,9 +53,8 @@ assert(initial.playerB.moves === 0, 'patchPlayer immutable');
 
 let state = createInitialState();
 
-state = reduceStart(state);
-assert(state.status === 'running', 'reduceStart idle → running');
-assert(reduceStart(state) === state, 'reduceStart no-op while running');
+state = reduceToggleRun(state, 0);
+assert(state.status === 'running', 'reduceToggleRun idle → running');
 
 state = reducePauseFromRunning(state, 30_000);
 assert(state.status === 'paused', 'reducePause deducts to paused');
@@ -80,7 +68,7 @@ assert(state.status === 'paused', 'reduceToggleRun running → paused');
 assert(state.playerA.remainingMs === INITIAL_MS - 35_000, 'reduceToggleRun pause deducts');
 
 state = createInitialState();
-state = reduceStart(state);
+state = reduceToggleRun(state, 0);
 state = reducePauseFromRunning(state, INITIAL_MS);
 assert(state.status === 'finished', 'reducePause timeout → finished');
 assert(state.winner === 'B', 'reducePause timeout winner B');
@@ -99,8 +87,8 @@ assert(
   'reduceSetStartingPlayer same player no-op',
 );
 
-state = reduceStart(state);
-assert(state.activePlayer === 'B', 'reduceStart preserves selected active player');
+state = reduceToggleRun(state, 0);
+assert(state.activePlayer === 'B', 'reduceToggleRun preserves selected active player');
 assert(
   reduceSetStartingPlayer(state, 'A') === state,
   'reduceSetStartingPlayer running no-op',
@@ -143,13 +131,12 @@ assert(reduceEndTurn(state, 1_000) === state, 'reduceEndTurn idle no-op');
 assert(reducePauseFromRunning(state, 1_000) === state, 'reducePause idle no-op');
 
 state = { ...createInitialState(), status: 'finished', winner: 'A' };
-assert(reduceStart(state) === state, 'reduceStart finished no-op');
 assert(reduceToggleRun(state, 0) === state, 'reduceToggleRun finished no-op');
 
 // ── integrated scenario ────────────────────────────────────────────────────
 
 state = createInitialState();
-state = reduceStart(state);
+state = reduceToggleRun(state, 0);
 state = reduceTick(state, 10_000);
 state = reduceEndTurn(state, 0);
 assert(state.activePlayer === 'B' && state.playerA.moves === 1, 'scenario turn switch');
@@ -163,15 +150,10 @@ state = reduceToggleRun(state, 0);
 assert(state.status === 'running', 'scenario resume after pause');
 
 state = createInitialState();
-state = reduceStart(state);
+state = reduceToggleRun(state, 0);
 state = reducePauseFromRunning(state, 0);
 assert(state.status === 'paused', 'scenario start then pause');
 state = reduceToggleRun(state, 0);
 assert(state.status === 'running', 'scenario start-pause-resume');
-
-if (failed > 0) {
-  console.error(`\n${failed} clock test(s) failed`);
-  process.exit(1);
-}
 
 console.log('OK: clock tests passed');

@@ -2,10 +2,8 @@ import {
   useState,
   useMemo,
   useCallback,
-  useTransition,
-  useDeferredValue,
 } from 'react';
-import { filterCardIndices } from '../utils/cardFilterLogic.js';
+import { cardMatchesFilters } from '../utils/cardFilterLogic.js';
 
 const INITIAL_FILTERS = {
   faction: '',
@@ -33,8 +31,6 @@ export function pickFilters(source) {
 
 /**
  * 管理搜尋詞、下拉篩選與過濾結果。
- * startTransition + useDeferredValue 足夠支撐目前卡量。
- *
  * @param {object[]} allCards
  * @param {{ searchTerm?: string, filters?: Record<string, string> }} [initial]
  *   僅用於首次 mount（例如從網址還原）；後續變更由呼叫端同步回網址。
@@ -44,40 +40,30 @@ export function useCardFilters(allCards, initial = {}) {
     typeof initial.searchTerm === 'string' ? initial.searchTerm : '',
   );
   const [filters, setFiltersState] = useState(() => pickFilters(initial.filters));
-  const [isPending, startTransition] = useTransition();
-
   const setSearchTerm = useCallback((value) => {
-    startTransition(() => setSearchTermState(value));
+    setSearchTermState(value);
   }, []);
 
   const setFilters = useCallback((value) => {
-    startTransition(() => {
-      setFiltersState(typeof value === 'function' ? value : value);
-    });
+    setFiltersState(value);
   }, []);
 
   const handleFilterChange = useCallback((key, value) => {
-    startTransition(() => {
-      setFiltersState((prev) => ({ ...prev, [key]: value === 'all' ? '' : value }));
-    });
+    setFiltersState((prev) => ({ ...prev, [key]: value === 'all' ? '' : value }));
   }, []);
 
-  const filteredCards = useMemo(() => {
-    return filterCardIndices(allCards, searchTerm, filters).map((i) => allCards[i]);
-  }, [allCards, searchTerm, filters]);
-
-  const deferredFilteredCards = useDeferredValue(filteredCards);
-  const isFilterStale = filteredCards !== deferredFilteredCards;
+  const filteredCards = useMemo(
+    () => allCards.filter((card) => cardMatchesFilters(card, searchTerm, filters)),
+    [allCards, searchTerm, filters],
+  );
 
   /** 啟用中的條件數（含搜尋）；鍵源自 FILTER_KEYS，新增篩選維度不必改 App */
   const activeFilterCount =
     (searchTerm.trim() ? 1 : 0) + FILTER_KEYS.filter((key) => filters[key]).length;
 
   const resetFilters = useCallback(() => {
-    startTransition(() => {
-      setSearchTermState('');
-      setFiltersState(INITIAL_FILTERS);
-    });
+    setSearchTermState('');
+    setFiltersState(INITIAL_FILTERS);
   }, []);
 
   return {
@@ -87,8 +73,6 @@ export function useCardFilters(allCards, initial = {}) {
     setFilters,
     handleFilterChange,
     filteredCards,
-    deferredFilteredCards,
-    isFilterPending: isPending || isFilterStale,
     activeFilterCount,
     resetFilters,
   };

@@ -17,23 +17,13 @@ export function useCardData() {
     const isStale = () => requestId !== requestIdRef.current;
 
     setIsError(false);
-    let showedCache = false;
-
     try {
-      await loadCardCatalog({
-        onUpdate: (cards) => {
-          if (isStale()) return;
-          setAllCards(cards);
-          setIsLoading(false);
-          showedCache = true;
-        },
-        onCacheMiss: () => {
-          if (!showedCache && !isStale()) setIsLoading(true);
-        },
-      });
+      const cards = await loadCardCatalog();
+      if (isStale()) return;
+      setAllCards(cards);
     } catch (err) {
       console.error('讀取卡片失敗:', err);
-      if (!showedCache && !isStale()) {
+      if (!isStale()) {
         setIsError(true);
         setAllCards([]);
       }

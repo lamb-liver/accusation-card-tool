@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect, useRef, useMemo, memo } from 'react';
+import { useState, useCallback, useEffect, useMemo, memo } from 'react';
 import { ChevronLeft, ChevronRight, List, Minus, Plus } from 'lucide-react';
 import OptimizedImage from './common/OptimizedImage.jsx';
 import { SYMBOL_ICONS } from '../constants/symbols.js';
@@ -15,7 +15,12 @@ import {
   setStoredArtVariant,
   variantBadgeLabel,
 } from '../utils/cardAlternateArt.js';
-import { getCardMetaCells, getCardStats, CARD_STAT_COLORS } from '../utils/cardMeta.js';
+import {
+  CARD_STAT_COLORS,
+  getCardMetaCells,
+  getCardStats,
+  getFactionDotClass,
+} from '../utils/cardMeta.js';
 
 /**
  * 異畫切換膠囊內的方向鍵。不可用方向仍佔位（invisible）以固定膠囊寬度，
@@ -36,7 +41,7 @@ function ArtNavButton({ usable, onClick, label, Icon, compact }) {
       <Icon
         className={`shrink-0 ${compact ? 'h-3.5 w-3.5' : 'h-4 w-4'}`}
         aria-hidden
-        strokeWidth={2.75}
+        strokeWidth={2.25}
       />
     </button>
   );
@@ -52,9 +57,9 @@ function Card({
   imagePriority = false,
   hideImage = false,
   compact = false,
+  minimalMeta = false,
 }) {
   const [artRev, setArtRev] = useState(0);
-  const imageRootRef = useRef(null);
 
   const hasAlt = cardHasAlternateArt(card);
   const artVariants = useMemo(() => getCardArtVariants(card), [card]);
@@ -82,8 +87,8 @@ function Card({
   const statColors = CARD_STAT_COLORS;
 
   const tagCellClass = compact
-    ? 'min-h-6 flex items-center justify-center px-1 py-0.5 rounded border-2 border-solid text-[10px] font-bold text-center leading-tight'
-    : 'min-h-9 flex items-center justify-center px-1.5 py-1 rounded-md border-2 border-solid text-[11px] font-bold text-center leading-snug';
+    ? 'min-h-6 flex items-center justify-center px-1 py-0.5 rounded border border-solid text-[10px] font-bold text-center leading-tight'
+    : 'min-h-9 flex items-center justify-center px-1.5 py-1 rounded-md border border-solid text-[11px] font-bold text-center leading-snug';
 
   const statGridClass = stats.length <= 1 ? 'grid-cols-1' : 'grid-cols-2';
 
@@ -135,19 +140,18 @@ function Card({
       <button
         type="button"
         onClick={handleClick}
-        aria-label={`查看卡牌：${card.name}`}
+        aria-label={`查看卡牌：${card.name}（${card.faction}）`}
         className={`block w-full cursor-pointer bg-transparent p-0 text-left focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-gold ${
           alignActionBar ? 'min-h-0 flex-1' : compact ? 'shrink-0' : 'min-h-0 flex-1'
         } ${showActionButton ? 'rounded-t-lg' : 'rounded-lg'}`}
       >
         <div
-          className={`card-face relative flex flex-col overflow-hidden border-2 border-gray-600 bg-black shadow-lg transition-[border-color,box-shadow] duration-300 group-hover:border-brand-gold group-hover:shadow-brand-gold/50 focus-visible:border-brand-gold ${
+          className={`card-face relative flex flex-col overflow-hidden border border-gray-600 bg-black shadow-lg transition-[border-color,box-shadow] duration-300 group-hover:border-brand-gold group-hover:shadow-brand-gold/50 focus-visible:border-brand-gold ${
             alignActionBar ? 'h-full min-h-0' : compact ? 'shrink-0' : 'h-full min-h-0'
           } ${showActionButton ? 'rounded-t-lg border-b-0' : 'rounded-lg'}`}
         >
           {!hideImage && (
             <div
-              ref={imageRootRef}
               className="card-image-slot card-image-slot--contain relative w-full shrink-0 overflow-hidden bg-black"
             >
               <OptimizedImage
@@ -158,9 +162,7 @@ function Card({
                 alt={cardImageAlt}
                 imgKey={`${card.id}-${artVariant}-${artRev}`}
                 priority={imagePriority}
-                rootRef={imageRootRef}
                 className="card-image-media touch-manipulation select-none"
-                placeholderClassName="absolute inset-0 animate-pulse bg-black"
               />
             </div>
           )}
@@ -170,7 +172,11 @@ function Card({
               alignActionBar
                 ? 'flex min-h-0 flex-1 flex-col'
                 : `relative flex flex-col bg-black ${
-                    compact ? 'shrink-0 gap-1 p-2' : 'min-h-0 grow gap-2 p-3'
+                    minimalMeta
+                      ? 'shrink-0 p-3'
+                      : compact
+                        ? 'shrink-0 gap-1 p-2'
+                        : 'min-h-0 grow gap-2 p-3'
                   }`
             }
           >
@@ -182,14 +188,28 @@ function Card({
                   : 'contents'
               }
             >
-            <p
-              className={`line-clamp-2 font-bold text-white transition group-hover:text-amber-300 ${
-                compact ? 'text-xs leading-tight' : 'text-sm leading-snug'
-              }`}
-            >
-              {card.name}
-            </p>
+            <div className="flex min-w-0 items-center gap-2">
+              {minimalMeta && (
+                <span
+                  className={`h-2.5 w-2.5 shrink-0 rounded-full shadow-[0_0_0_1px_rgba(255,255,255,0.22)] ${getFactionDotClass(card.faction)}`}
+                  aria-hidden
+                />
+              )}
+              <p
+                className={`line-clamp-2 min-w-0 font-bold text-white transition group-hover:text-amber-300 ${
+                  minimalMeta
+                    ? 'font-display text-sm leading-snug'
+                    : compact
+                      ? 'text-xs leading-tight'
+                      : 'text-sm leading-snug'
+                }`}
+              >
+                {card.name}
+              </p>
+            </div>
 
+            {!minimalMeta && (
+              <>
             <div
               className={`grid w-full shrink-0 gap-1 ${metaCells.length >= 3 ? 'grid-cols-3' : 'grid-cols-2'}`}
             >
@@ -268,6 +288,8 @@ function Card({
                 <span>取得方式：{displaySource}</span>
               </div>
             )}
+              </>
+            )}
             </div>
             {alignActionBar && (
               <div data-card-body-spacer className="min-h-0 flex-1 bg-black" aria-hidden />
@@ -276,7 +298,7 @@ function Card({
         </div>
       </button>
 
-      {hasAlt && !hideImage && (
+      {hasAlt && !hideImage && !minimalMeta && (
         <>
           {artVariant !== 'main' && (
             <div
@@ -320,7 +342,7 @@ function Card({
           onClick={isInDeck ? handleRemove : handleAdd}
           disabled={!isInDeck && isAtLimit}
           aria-label={isInDeck ? `移除 ${card.name}` : `加入 ${card.name} 到牌組`}
-          className={`card-action-button z-10 flex w-full shrink-0 items-center justify-center border-2 border-t-0 border-gray-600 font-bold rounded-b-lg transition-colors duration-200 group-hover:border-brand-gold
+          className={`card-action-button z-10 flex w-full shrink-0 items-center justify-center border border-t-0 border-gray-600 font-bold rounded-b-lg transition-colors duration-200 group-hover:border-brand-gold
             ${compact ? 'gap-1 py-2 text-[10px]' : 'gap-1.5 py-2.5 text-xs'}
             ${isInDeck
               ? 'bg-red-900 hover:bg-red-800 text-red-200 cursor-pointer active:scale-95'
@@ -331,14 +353,14 @@ function Card({
         >
           {isInDeck ? (
             <>
-              <Minus className="h-3.5 w-3.5 shrink-0" aria-hidden strokeWidth={2.75} />
+              <Minus className="h-3.5 w-3.5 shrink-0" aria-hidden strokeWidth={2.25} />
               <span>移除</span>
             </>
           ) : isAtLimit ? (
             <span>已達上限</span>
           ) : (
             <>
-              <Plus className="h-3.5 w-3.5 shrink-0" aria-hidden strokeWidth={2.75} />
+              <Plus className="h-3.5 w-3.5 shrink-0" aria-hidden strokeWidth={2.25} />
               <span>加入</span>
             </>
           )}

@@ -5,6 +5,7 @@
  *   npm run test:deck-layout
  */
 import { chromium } from 'playwright';
+import assert from 'node:assert/strict';
 import { collectDeckLayoutMetrics } from './lib/deck-layout-metrics.mjs';
 import { getChromiumLaunchOptions } from './lib/playwright-browser.mjs';
 
@@ -25,16 +26,7 @@ async function resolveBaseUrl() {
   );
 }
 
-let failed = 0;
-
-function fail(message) {
-  console.error(`FAIL: ${message}`);
-  failed += 1;
-}
-
-function expect(condition, message) {
-  if (!condition) fail(message);
-}
+const expect = assert;
 
 async function openDeckMode(page, baseUrl, { beforeDeck } = {}) {
   await page.goto(baseUrl, { waitUntil: 'domcontentloaded' });
@@ -97,10 +89,6 @@ async function run() {
     await browser.close();
   }
 
-  if (failed > 0) {
-    console.error(`\n${failed} assertion(s) failed.`);
-    process.exit(1);
-  }
   console.log('OK: deck layout assertions passed.');
 }
 

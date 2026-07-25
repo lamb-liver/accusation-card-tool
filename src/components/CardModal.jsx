@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import {
   Check,
   ChevronLeft,
@@ -19,14 +19,12 @@ import {
   CARD_MODAL_SIZES,
   cardHasAlternateArt,
   getCardArtVariants,
-  getCardImageFullSrc,
   getCardPictureSources,
   getStoredArtVariant,
   getVariantSource,
   setStoredArtVariant,
   variantBadgeLabel,
 } from '../utils/cardAlternateArt.js';
-import { cancelScheduledPrefetch, schedulePrefetch } from '../utils/imageHints.js';
 
 const FOCUSABLE_SELECTORS =
   'button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
@@ -103,23 +101,6 @@ export default function CardModal({
   const currentIdx = card ? cardList.findIndex((c) => c.id === card.id) : -1;
   const hasPrev = currentIdx > 0;
   const hasNext = currentIdx >= 0 && currentIdx < cardList.length - 1;
-  const prevCard = hasPrev ? cardList[currentIdx - 1] : null;
-  const nextCard = hasNext ? cardList[currentIdx + 1] : null;
-
-  const prefetchNeighbor = useCallback((neighbor) => {
-    if (!neighbor) return;
-    const variant = cardHasAlternateArt(neighbor)
-      ? getStoredArtVariant(neighbor.id, getCardArtVariants(neighbor))
-      : 'main';
-    schedulePrefetch(getCardImageFullSrc(neighbor.id, variant));
-  }, []);
-
-  useEffect(() => {
-    if (!card || !hasNext || !nextCard) return undefined;
-    prefetchNeighbor(nextCard);
-    return cancelScheduledPrefetch;
-  }, [card, hasNext, nextCard, prefetchNeighbor]);
-
   if (!card) return null;
 
   const handleArtPrev = (e) => {
@@ -190,7 +171,7 @@ export default function CardModal({
         onKeyDown={handleKeyDown}
         onTouchStart={handleTouchStart}
         onTouchEnd={handleTouchEnd}
-        className="relative bg-neutral-800 border-2 border-brand-gold rounded-lg max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto shadow-2xl"
+        className="relative mx-4 max-h-[90vh] w-full max-w-2xl overflow-y-auto rounded-lg border border-brand-gold/70 bg-neutral-800 shadow-2xl"
       >
         {/* 關閉按鈕 */}
         <button
@@ -221,18 +202,18 @@ export default function CardModal({
                   onClick={handleArtPrev}
                   disabled={variantIdx <= 0}
                   aria-label="切換上一個圖版"
-                  className="flex h-9 w-9 items-center justify-center rounded-full border-2 border-neutral-500 bg-black/70 text-amber-200 shadow-md transition hover:border-brand-gold hover:text-brand-gold disabled:pointer-events-none disabled:opacity-35"
+                  className="flex h-9 w-9 items-center justify-center rounded-full border border-neutral-500 bg-black/70 text-amber-200 shadow-md transition hover:border-brand-gold hover:text-brand-gold disabled:pointer-events-none disabled:opacity-35"
                 >
-                  <ChevronLeft className="h-5 w-5 shrink-0" aria-hidden strokeWidth={2.75} />
+                  <ChevronLeft className="h-5 w-5 shrink-0" aria-hidden strokeWidth={2.25} />
                 </button>
                 <button
                   type="button"
                   onClick={handleArtNext}
                   disabled={variantIdx >= artVariants.length - 1}
                   aria-label="切換下一個圖版"
-                  className="flex h-9 w-9 items-center justify-center rounded-full border-2 border-neutral-500 bg-black/70 text-amber-200 shadow-md transition hover:border-brand-gold hover:text-brand-gold disabled:pointer-events-none disabled:opacity-35"
+                  className="flex h-9 w-9 items-center justify-center rounded-full border border-neutral-500 bg-black/70 text-amber-200 shadow-md transition hover:border-brand-gold hover:text-brand-gold disabled:pointer-events-none disabled:opacity-35"
                 >
-                  <ChevronRight className="h-5 w-5 shrink-0" aria-hidden strokeWidth={2.75} />
+                  <ChevronRight className="h-5 w-5 shrink-0" aria-hidden strokeWidth={2.25} />
                 </button>
               </div>
             )}
@@ -240,7 +221,7 @@ export default function CardModal({
             <div className="card-image-slot card-image-slot--contain relative mx-auto w-full max-w-sm">
               {!imgLoaded && (
                 <div className="absolute inset-0 flex items-center justify-center rounded bg-neutral-700 animate-pulse" aria-hidden>
-                  <ImageIcon className="h-12 w-12 text-neutral-500" strokeWidth={1.5} />
+                  <ImageIcon className="h-12 w-12 text-neutral-500" strokeWidth={2.25} />
                 </div>
               )}
               {picture && (
@@ -267,7 +248,7 @@ export default function CardModal({
 
           {/* 卡名＋卡面編號 */}
           <div className="mb-3 flex items-baseline gap-2 flex-wrap">
-            <h2 id={titleId} className="text-2xl font-bold text-brand-gold">{card.name}</h2>
+            <h2 id={titleId} className="font-display text-2xl font-bold text-brand-gold">{card.name}</h2>
             <span className="font-mono text-sm text-gray-400" aria-label={`卡牌編號 ${formatCardNumber(card.id)}`}>
               {formatCardNumber(card.id)}
             </span>
@@ -388,13 +369,11 @@ export default function CardModal({
               <button
                 type="button"
                 onClick={onPrev}
-                onMouseEnter={() => prefetchNeighbor(prevCard)}
-                onFocus={() => prefetchNeighbor(prevCard)}
                 disabled={!hasPrev}
-                className="w-10 h-10 flex items-center justify-center rounded-full border-2 border-brand-gold bg-black/60 text-brand-gold transition hover:bg-brand-gold hover:text-black disabled:opacity-30 disabled:cursor-not-allowed shrink-0"
+                className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-brand-gold/70 bg-black/60 text-brand-gold transition hover:bg-brand-gold hover:text-black disabled:cursor-not-allowed disabled:opacity-30"
                 aria-label="上一張"
               >
-                <ChevronLeft className="h-6 w-6" aria-hidden strokeWidth={2.5} />
+                <ChevronLeft className="h-6 w-6" aria-hidden strokeWidth={2.25} />
               </button>
             ) : null}
 
@@ -405,18 +384,18 @@ export default function CardModal({
               disabled={isInDeck}
               className={`inline-flex items-center justify-center gap-2 font-bold py-3 px-10 rounded-full transition text-base ${
                 isInDeck
-                  ? 'cursor-not-allowed border-2 border-green-500/60 bg-green-950/40 text-green-300'
+                  ? 'cursor-not-allowed border border-green-500/60 bg-green-950/40 text-green-300'
                   : 'bg-brand-gold hover:bg-amber-500 text-neutral-900'
               }`}
             >
               {isInDeck ? (
                 <>
-                  <Check className="h-5 w-5 shrink-0" aria-hidden strokeWidth={2.75} />
+                  <Check className="h-5 w-5 shrink-0" aria-hidden strokeWidth={2.25} />
                   已在牌組
                 </>
               ) : (
                 <>
-                  <Plus className="h-5 w-5 shrink-0" aria-hidden strokeWidth={2.75} />
+                  <Plus className="h-5 w-5 shrink-0" aria-hidden strokeWidth={2.25} />
                   加入牌組
                 </>
               )}
@@ -426,13 +405,11 @@ export default function CardModal({
               <button
                 type="button"
                 onClick={onNext}
-                onMouseEnter={() => prefetchNeighbor(nextCard)}
-                onFocus={() => prefetchNeighbor(nextCard)}
                 disabled={!hasNext}
-                className="w-10 h-10 flex items-center justify-center rounded-full border-2 border-brand-gold bg-black/60 text-brand-gold transition hover:bg-brand-gold hover:text-black disabled:opacity-30 disabled:cursor-not-allowed shrink-0"
+                className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-brand-gold/70 bg-black/60 text-brand-gold transition hover:bg-brand-gold hover:text-black disabled:cursor-not-allowed disabled:opacity-30"
                 aria-label="下一張"
               >
-                <ChevronRight className="h-6 w-6" aria-hidden strokeWidth={2.5} />
+                <ChevronRight className="h-6 w-6" aria-hidden strokeWidth={2.25} />
               </button>
             ) : null}
           </div>

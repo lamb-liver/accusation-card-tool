@@ -1,8 +1,23 @@
 @import "tailwindcss";
 
+/* ===== 展示用襯線字體（明體）：自我托管的最小子集，見 scripts/build-display-font.mjs =====
+   僅含品牌題字／區段標題／卡牌名稱會用到的字（約 114KB）；font-display: swap 不阻擋首屏，
+   缺字時逐字回退到堆疊中的下一個字體。Noto Serif TC 採 SIL OFL 1.1（見 public/fonts/OFL.txt）。 */
+@font-face {
+  font-family: 'Noto Serif TC Subset';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url('/fonts/NotoSerifTC-display-subset.woff2') format('woff2');
+}
+
 /* ===== 設計權杖：由 @tailwindcss/vite 處理；對應 text-brand-gold、bg-bg-card 等工具類 ===== */
 @theme {
   --color-brand-gold: #ffd700;
+
+  /* 展示字體堆疊；對應 font-display 工具類，正文仍走系統無襯線 */
+  --font-display: 'Noto Serif TC Subset', 'Noto Serif TC', 'Songti TC',
+    'Source Han Serif TC', serif;
 
   --color-bg-dark: #1a1a1a;
   --color-bg-card: #252525;
@@ -161,6 +176,8 @@
 
 .app-brand-title {
   display: inline-block;
+  font-family: var(--font-display);
+  letter-spacing: 0.02em;
   text-shadow:
     0 0 16px rgba(255, 215, 0, 0.22),
     0 1px 0 rgba(0, 0, 0, 0.9);
@@ -518,4 +535,19 @@
 
 .mobile-drawer.translate-y-full {
   transform: translateY(100%);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+  }
 }

@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+import assert from 'node:assert/strict';
 import { existsSync, readFileSync, writeFileSync, unlinkSync } from 'node:fs';
 import { spawn } from 'node:child_process';
 import { setTimeout as delay } from 'node:timers/promises';
@@ -30,7 +31,6 @@ import {
   verifyAdminToken,
 } from '../functions/_shared/auth.js';
 import { createResponder, jsonResponse, runDbQuery } from '../functions/_shared/response.js';
-import { isUniqueConstraintError } from '../functions/_shared/shareId.js';
 import { canTransition } from '../functions/_shared/statusMachine.js';
 import {
   validateDeckJson,
@@ -42,17 +42,7 @@ import {
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const projectRoot = resolve(__dirname, '..');
 const runIntegration = process.argv.includes('--integration');
-
-let failed = 0;
-
-function fail(message) {
-  console.error(`FAIL: ${message}`);
-  failed += 1;
-}
-
-function assert(condition, message) {
-  if (!condition) fail(message);
-}
+const fail = (message) => assert.fail(message);
 
 async function withMutedConsole(method, callback) {
   const original = console[method];
@@ -79,19 +69,10 @@ function sampleRuleJson(type = 'rule1') {
   return { type: 'rule2', primary: '鴉教團', secondary: '白狐神社' };
 }
 
-// manifest 與 public/cards 一致
-const index = JSON.parse(
-  readFileSync(resolve(projectRoot, 'public/cards/index.json'), 'utf8'),
-);
-const shardIds = [];
-for (const shard of index.shards) {
-  const cards = JSON.parse(
-    readFileSync(resolve(projectRoot, 'public', shard.path.replace(/^\//, '')), 'utf8'),
-  );
-  for (const card of cards) shardIds.push(card.id);
-}
-assert(cardIds.size === shardIds.length, 'manifest card count mismatch with shards');
-for (const id of shardIds) {
+// manifest 與 public/cards.json 一致
+const cards = JSON.parse(readFileSync(resolve(projectRoot, 'public/cards.json'), 'utf8'));
+assert(cardIds.size === cards.length, 'manifest card count mismatch');
+for (const { id } of cards) {
   assert(cardIds.has(id), `manifest missing card id: ${id}`);
 }
 assert(factions.size >= 5, 'manifest should include multiple factions');
@@ -391,24 +372,6 @@ assert(
 );
 assert(!shouldSetSecureCookie({}), 'local env should not set Secure cookie');
 assert(shouldSetSecureCookie({ ENVIRONMENT: 'production' }), 'production should set Secure cookie');
-
-// share_id 碰撞重試耗盡應回 500（模擬與 decks.js 相同邏輯）
-{
-  let exhaustedStatus = null;
-  for (let attempt = 0; attempt < 5; attempt += 1) {
-    try {
-      throw new Error('UNIQUE constraint failed: deck_shares.share_id');
-    } catch (insertError) {
-      if (isUniqueConstraintError(insertError)) {
-        if (attempt === 4) exhaustedStatus = 500;
-        continue;
-      }
-      exhaustedStatus = 500;
-      break;
-    }
-  }
-  assert(exhaustedStatus === 500, 'share_id collision exhaustion should yield 500');
-}
 
 function parseDevVars(content) {
   const vars = {};
@@ -847,12 +810,8 @@ if (runIntegration) {
   await runIntegrationTests();
 }
 
-if (failed === 0) {
-  console.log(
-    runIntegration
-      ? 'OK: share-wall unit + integration tests passed'
-      : 'OK: share-wall unit tests passed',
-  );
-} else {
-  process.exit(1);
-}
+console.log(
+  runIntegration
+    ? 'OK: share-wall unit + integration tests passed'
+    : 'OK: share-wall unit tests passed',
+);

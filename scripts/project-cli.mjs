@@ -21,35 +21,8 @@ const commands = new Map([
   ['build', runBuild],
   ['build:ci', runBuildCi],
   ['build:deploy', runBuildDeploy],
-  ['check:assets', (_name, args) => runNodeScript('check-assets.mjs', args)],
-  ['check:generated', (_name, args) => runNodeScript('check-generated.mjs', args)],
-  ['check:lockfile', (_name, args) => runNodeScript('check-lockfile.mjs', args)],
-  ['check:public-orphans', (_name, args) => runNodeScript('check-public-orphans.mjs', args)],
-  ['clean:public-orphans', (_name, args) => runNodeScript('clean-public-orphans.mjs', args)],
-  ['check:deploy-flow', (_name, args) => runNodeScript('check-deploy-flow.mjs', args)],
-  ['doctor:build-env', (_name, args) => runNodeScript('doctor-build-env.mjs', args)],
-  ['check:pwa-sw', (_name, args) => runNodeScript('check-pwa-sw.mjs', args)],
-  ['lint', (_name, args) => runPackageBin('eslint', 'bin/eslint.js', ['.', ...args])],
-  ['test', runAllTests],
-  ['test:rule-engine', (_name, args) => runNodeScript('test-rule-engine.mjs', args)],
-  ['test:card-catalog', (_name, args) => runNodeScript('test-card-catalog.mjs', args)],
-  ['test:deck', (_name, args) => runNodeScript('test-deck.mjs', args)],
-  ['test:gallery-layout', (_name, args) => runNodeScript('test-gallery-layout.mjs', args)],
-  ['test:deck-layout', (_name, args) => runNodeScript('test-deck-layout.mjs', args)],
-  ['test:clock', (_name, args) => runNodeScript('test-clock.mjs', args)],
-  ['test:utils', (_name, args) => runNodeScript('test-utils.mjs', args)],
-  ['audit:deck-layout', (_name, args) => runNodeScript('audit-deck-layout.mjs', args)],
-  ['optimize:images', (_name, args) => runNodeScript('optimize-images.mjs', args)],
-  ['split:cards', (_name, args) => runNodeScript('split-cards.mjs', args)],
-  ['sync:qa', (_name, args) => runNodeScript('sync-qa.mjs', args)],
-  ['cards:manifest', (_name, args) => runNodeScript('generate-card-manifest.mjs', args)],
-  ['api:constants', (_name, args) => runNodeScript('generate-api-constants.mjs', args)],
-  ['test:share-wall', runShareWallTests],
   ['validate:repo', runValidateRepo],
-  ['validate:browser', (_name, args) => runNodeScript('validate-browser.mjs', args)],
   ['cf:dev', runCfDev],
-  ['d1:migrations:apply:local', (_name, args) => runWrangler(['d1', 'migrations', 'apply', 'DB', '--local', ...args])],
-  ['d1:migrations:apply:remote', (_name, args) => runWrangler(['d1', 'migrations', 'apply', 'DB', '--remote', ...args])],
   ['port:check', (_name, args) => checkPorts(args)],
   ['port:clean', (_name, args) => cleanPorts(args)],
 ]);
@@ -80,15 +53,8 @@ function printHelp() {
 
 Commands:
   dev, preview
-  build, build:ci, build:deploy, check:assets, check:generated, check:lockfile, check:pwa-sw
-  check:public-orphans, clean:public-orphans, check:deploy-flow, doctor:build-env
-  lint
-  test, test:rule-engine, test:card-catalog, test:deck, test:gallery-layout, test:deck-layout, test:clock, test:utils
-  validate:repo, validate:browser
-  audit:deck-layout
-  optimize:images, split:cards, sync:qa
-  cards:manifest, api:constants, test:share-wall [--integration]
-  cf:dev, d1:migrations:apply:local, d1:migrations:apply:remote
+  build, build:ci, build:deploy
+  validate:repo, cf:dev
   port:check [--port <port> ...]
   port:clean [--port <port> ...] [--force]
 `);
@@ -171,40 +137,23 @@ function runWrangler(args) {
   return runPackageBin('wrangler', 'bin/wrangler.js', args);
 }
 
-async function runAllTests() {
-  for (const commandName of [
-    'test:rule-engine',
-    'test:card-catalog',
-    'test:deck',
-    'test:gallery-layout',
-    'test:clock',
-    'test:utils',
-    'test:share-wall',
-  ]) {
-    console.log(`\n> ${commandName}`);
-    const code = await commands.get(commandName)(commandName, []);
-    if (code !== 0) return code;
-  }
-  return 0;
-}
-
 async function runValidateRepo() {
-  for (const commandName of [
-    'check:assets',
-    'check:generated',
-    'check:lockfile',
-    'check:deploy-flow',
-    'lint',
-    'test:rule-engine',
-    'test:card-catalog',
-    'test:deck',
-    'test:gallery-layout',
-    'test:clock',
-    'test:utils',
-    'test:share-wall',
-  ]) {
-    console.log(`\n> ${commandName}`);
-    const code = await commands.get(commandName)(commandName, []);
+  const checks = [
+    ['check:assets', () => runNodeScript('check-assets.mjs')],
+    ['check:generated', () => runNodeScript('check-generated.mjs')],
+    ['check:lockfile', () => runNodeScript('check-lockfile.mjs')],
+    ['check:deploy-flow', () => runNodeScript('check-deploy-flow.mjs')],
+    ['lint', () => runPackageBin('eslint', 'bin/eslint.js', ['.'])],
+    ['test:rule-engine', () => runNodeScript('test-rule-engine.mjs')],
+    ['test:card-catalog', () => runNodeScript('test-card-catalog.mjs')],
+    ['test:deck', () => runNodeScript('test-deck.mjs')],
+    ['test:clock', () => runNodeScript('test-clock.mjs')],
+    ['test:utils', () => runNodeScript('test-utils.mjs')],
+    ['test:share-wall', () => runShareWallTests()],
+  ];
+  for (const [name, check] of checks) {
+    console.log(`\n> ${name}`);
+    const code = await check();
     if (code !== 0) return code;
   }
   return 0;

@@ -1,3 +1,4 @@
+import assert from 'node:assert/strict';
 import {
   getAddBlockReason,
   getDeckTotal,
@@ -20,12 +21,7 @@ import { createDeckController } from '../src/deck/createDeckController.js';
 import { loadShareWallDeckIntoBuilder } from '../src/deck/shareWallHandlers.js';
 import { sortMainDeck } from '../src/deck/sortMainDeck.js';
 
-let failed = 0;
-
-function fail(message) {
-  console.error(`FAIL: ${message}`);
-  failed += 1;
-}
+const fail = (message) => assert.fail(message);
 
 async function withMutedConsoleError(callback) {
   const original = console.error;
@@ -223,7 +219,7 @@ const savedWithRule = normalizeSavedDeckEntry({
   rule: { isActive: true, type: 'not-a-rule', primary: '鴉教團', secondary: '' },
 });
 if (!savedWithRule?.rule || savedWithRule.rule.type !== 'rule1') {
-  fail('normalizeSavedDeckEntry should normalize rule via normalizeImportedRule');
+  fail('normalizeSavedDeckEntry should normalize rule');
 }
 
 // React hook 初始化時 allCards 可能仍是空陣列；setAllCards 後 import handlers 必須使用最新卡表。
@@ -527,8 +523,4 @@ if (!savedWithRule?.rule || savedWithRule.rule.type !== 'rule1') {
   }
 }
 
-if (failed === 0) {
-  console.log('OK: deck domain tests passed');
-} else {
-  process.exit(1);
-}
+console.log('OK: deck domain tests passed');

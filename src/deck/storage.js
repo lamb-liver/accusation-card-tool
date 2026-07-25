@@ -3,7 +3,7 @@ import {
   SAVED_DECKS_KEY,
   STORAGE_KEY,
 } from './constants.js';
-import { normalizeImportedRule } from './normalizeImportedRule.js';
+import { normalizeRule } from '../rules/normalizeRule.js';
 
 /** @param {unknown} item */
 function isCardLike(item) {
@@ -41,7 +41,7 @@ export function normalizeSavedDeckEntry(entry) {
     deck: normalizeDeck(entry.deck),
     rule:
       entry.rule && typeof entry.rule === 'object' && !Array.isArray(entry.rule)
-        ? normalizeImportedRule(entry.rule)
+        ? normalizeRule(entry.rule)
         : undefined,
     savedAt: typeof entry.savedAt === 'number' ? entry.savedAt : Date.now(),
   };

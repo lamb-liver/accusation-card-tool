@@ -22,21 +22,6 @@ function buildStatusClause(status) {
   return { clause: 'AND status = ?', bind: [status] };
 }
 
-/**
- * resolvePageQuery 只認 `cursor` 參數，但本端點有兩份獨立列表、各自一個游標。
- * 複製一份 URL 並把指定參數改名為 `cursor`，讓兩份列表共用同一套解析邏輯。
- *
- * @param {URL} url
- * @param {'deckCursor' | 'messageCursor'} paramName
- */
-function withCursorParam(url, paramName) {
-  const copy = new URL(url);
-  const value = copy.searchParams.get(paramName);
-  copy.searchParams.delete('cursor');
-  if (value) copy.searchParams.set('cursor', value);
-  return copy;
-}
-
 export async function onRequestGet(context) {
   const { request, env } = context;
   const { requestId, respond } = createResponder(request);
@@ -60,10 +45,10 @@ export async function onRequestGet(context) {
 
   // 兩份列表各自分頁，故各有一個游標參數。共用一個 cursor 會在 type='all'
   // 時把牌組的位置套到留言上（兩者的 created_at 完全無關）。
-  const deckPage = resolvePageQuery(withCursorParam(url, 'deckCursor'), 'created_at');
+  const deckPage = resolvePageQuery(url, 'created_at', 'deckCursor');
   if (deckPage.error) return respond(errorResponse(`deck ${deckPage.error}`, 400));
 
-  const messagePage = resolvePageQuery(withCursorParam(url, 'messageCursor'), 'created_at');
+  const messagePage = resolvePageQuery(url, 'created_at', 'messageCursor');
   if (messagePage.error) return respond(errorResponse(`message ${messagePage.error}`, 400));
 
   const { clause, bind } = buildStatusClause(status);

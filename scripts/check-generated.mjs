@@ -3,7 +3,7 @@ import { readFileSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { INDEX_PATH, readJson } from './lib/public-assets.mjs';
+import { CARD_JSON_PATH, readJson } from './lib/public-assets.mjs';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const projectRoot = resolve(__dirname, '..');
@@ -39,47 +39,35 @@ export const CSRF_HEADER_VALUE = ${JSON.stringify(headerValue)};
 }
 
 function generateCardManifests() {
-  const index = readJson(projectRoot, INDEX_PATH, failures);
-  if (!index) return null;
+  const cards = readJson(projectRoot, CARD_JSON_PATH, failures);
+  if (!Array.isArray(cards)) {
+    failures.push(`${CARD_JSON_PATH} must be an array`);
+    return null;
+  }
 
   const cardIds = [];
   const factions = new Set();
   const cardsByIdEntries = [];
 
-  for (const shard of index.shards ?? []) {
-    const shardPath = resolve(projectRoot, 'public', shard.path.replace(/^\//, ''));
-    const cards = JSON.parse(readFileSync(shardPath, 'utf8'));
-    if (!Array.isArray(cards)) {
-      failures.push(`shard ${shard.path} is not an array`);
+  for (const card of cards) {
+    if (!card?.id || typeof card.id !== 'string') {
+      failures.push(`${CARD_JSON_PATH} has a card without string id`);
       continue;
     }
-    if (cards.length !== shard.count) {
-      failures.push(`shard ${shard.path} count mismatch (index=${shard.count}, actual=${cards.length})`);
-    }
-    for (const card of cards) {
-      if (!card?.id || typeof card.id !== 'string') {
-        failures.push(`shard ${shard.path} has card without string id`);
-        continue;
-      }
-      cardIds.push(card.id);
-      if (card.faction) factions.add(card.faction);
-      cardsByIdEntries.push([
-        card.id,
-        {
-          faction: card.faction ?? '',
-          type: card.type ?? '',
-          name: card.name ?? card.id,
-        },
-      ]);
-    }
-  }
-
-  if (cardIds.length !== index.total) {
-    failures.push(`card total mismatch (index=${index.total}, actual=${cardIds.length})`);
+    cardIds.push(card.id);
+    if (card.faction) factions.add(card.faction);
+    cardsByIdEntries.push([
+      card.id,
+      {
+        faction: card.faction ?? '',
+        type: card.type ?? '',
+        name: card.name ?? card.id,
+      },
+    ]);
   }
 
   const uniqueIds = new Set(cardIds);
-  if (uniqueIds.size !== cardIds.length) failures.push('duplicate card ids across shards');
+  if (uniqueIds.size !== cardIds.length) failures.push('duplicate card ids');
 
   const sortedIds = [...uniqueIds].sort();
   const sortedFactions = [...factions].sort();

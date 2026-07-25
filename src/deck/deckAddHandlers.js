@@ -1,4 +1,4 @@
-import { getMainDeckFactionDecision, checkSpecialCardFaction } from '../rules/index.js';
+import { getMainDeckFactionDecision, checkSpecialCardFaction } from '../rules/deckBuildValidity.js';
 import { getAddBlockReason, getFactionAutoFill } from './rules.js';
 
 /** @import { Card } from '../types.js' */

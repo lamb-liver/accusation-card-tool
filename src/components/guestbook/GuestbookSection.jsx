@@ -104,7 +104,7 @@ export default function GuestbookSection({ showToast, embedded = false }) {
 
       <form
         onSubmit={handleSubmit}
-        className="guestbook-form rounded-lg border-2 border-[#444] bg-[#252525] p-4 space-y-3"
+        className="guestbook-form space-y-3 rounded-lg border border-[#444] bg-[#252525] p-4"
       >
         <div>
           <label htmlFor="guestbook-author" className="mb-1 block text-sm text-gray-400">

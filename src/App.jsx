@@ -1,9 +1,4 @@
 import { lazy, Suspense, useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { useGridColumnCount } from './hooks/useGridColumnCount.js';
-import {
-  estimateGalleryMinHeight,
-  GALLERY_DEFAULT_PAGE_SIZE,
-} from './utils/galleryLayout.js';
 import { TriangleAlert } from 'lucide-react';
 import { useCardData }    from './hooks/useCardData.js';
 import { useCardFilters, FILTER_KEYS } from './hooks/useCardFilters.js';
@@ -14,7 +9,7 @@ import { useToast }       from './hooks/useToast.js';
 import { useDialog }      from './hooks/useDialog.js';
 import { useHashRoute } from './hooks/useHashRoute.js';
 import { useCommunityDeckFlow } from './hooks/useCommunityDeckFlow.js';
-import { filterCardsByRule } from './rules/index.js';
+import { filterCardsByRule } from './rules/deckPoolDisplay.js';
 import DeckSubmitModal from './components/shareWall/DeckSubmitModal.jsx';
 
 import FilterToolbar       from './components/FilterToolbar.jsx';
@@ -96,21 +91,13 @@ function App() {
   // ── 資料層 ────────────────────────────────────────────────────────────────
   const { allCards, isLoading, isError, retry }                         = useCardData();
   const { searchTerm, setSearchTerm, filters, setFilters, handleFilterChange,
-          deferredFilteredCards, isFilterPending,
+          filteredCards,
           activeFilterCount, resetFilters }                            = useCardFilters(allCards, {
             searchTerm: initialQuery.q,
             filters: initialQuery,
           });
   const { setCurrentPage, perPage, isPaginationMode,
-          totalPages, safePage, paginatedCards, handlePerPageChange }   = usePagination(deferredFilteredCards);
-  const galleryColumns = useGridColumnCount();
-  const galleryReserveCount = isLoading
-    ? (perPage > 0 ? perPage : GALLERY_DEFAULT_PAGE_SIZE)
-    : paginatedCards.length;
-  const galleryMinHeight = useMemo(
-    () => estimateGalleryMinHeight(galleryReserveCount, galleryColumns),
-    [galleryReserveCount, galleryColumns],
-  );
+          totalPages, safePage, paginatedCards, handlePerPageChange }   = usePagination(filteredCards);
 
   // ── Toast & Dialog ────────────────────────────────────────────────────────
   const { toasts, showToast }                     = useToast();
@@ -163,9 +150,9 @@ function App() {
 
   // ── 組牌模式：套用規則後的卡牌數量（供 FilterToolbar 顯示）────────────────
   const deckFilteredCount = useMemo(() => {
-    if (currentMode !== 'deck' || !currentRule.isActive) return deferredFilteredCards.length;
-    return filterCardsByRule(deferredFilteredCards, currentRule).length;
-  }, [currentMode, deferredFilteredCards, currentRule]);
+    if (currentMode !== 'deck' || !currentRule.isActive) return filteredCards.length;
+    return filterCardsByRule(filteredCards, currentRule).length;
+  }, [currentMode, filteredCards, currentRule]);
 
   // ── Modal 層 ──────────────────────────────────────────────────────────────
   const {
@@ -179,8 +166,8 @@ function App() {
 
   /** 穩定識別：inline 箭頭會在每次 render 打破 CardGallery/Card 的 memo */
   const handleGalleryCardClick = useCallback(
-    (card) => handleCardClick(card, deferredFilteredCards),
-    [handleCardClick, deferredFilteredCards],
+    (card) => handleCardClick(card, filteredCards),
+    [handleCardClick, filteredCards],
   );
 
   /**
@@ -212,8 +199,8 @@ function App() {
     restoredCardRef.current = true;
     const card = allCards.find((item) => item.id === cardId);
     // 找不到（網址帶了不存在的 id）就當作沒有彈窗，不打擾使用者
-    if (card) handleCardClick(card, deferredFilteredCards);
-  }, [allCards, deferredFilteredCards, handleCardClick, initialQuery]);
+    if (card) handleCardClick(card, filteredCards);
+  }, [allCards, filteredCards, handleCardClick, initialQuery]);
 
   /**
    * 篩選／彈窗 → 網址。單向投影：state 是真相源，網址只反映它，
@@ -344,20 +331,18 @@ function App() {
               {isLoading ? (
                 <p className="text-gray-400 text-lg">載入卡牌資料中…</p>
               ) : (
-                <p className="text-brand-gold text-lg font-semibold">
+                <p className="font-display text-brand-gold text-lg font-semibold">
                   找到{' '}
-                  <span className={`text-green-400 ${isFilterPending ? 'opacity-60' : ''}`}>
-                    {deferredFilteredCards.length}
-                  </span>{' '}
+                  <span className="text-brand-gold">{filteredCards.length}</span>{' '}
                   張符合條件的卡片
                 </p>
               )}
             </div>
 
-            <div className="card-gallery-slot" style={{ minHeight: galleryMinHeight }}>
+            <div className="card-gallery-slot">
               {isLoading ? (
                 <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
-                  {Array.from({ length: galleryReserveCount }).map((_, i) => (
+                  {Array.from({ length: perPage }).map((_, i) => (
                     <div
                       key={i}
                       className="min-h-[320px] rounded-lg bg-neutral-800 animate-pulse"
@@ -369,14 +354,14 @@ function App() {
                 <>
                   <CardGallery
                     cards={paginatedCards}
-                    layoutMinHeight={galleryMinHeight}
                     onCardClick={handleGalleryCardClick}
+                    minimalMeta
                   />
 
                   <PaginationControls
                     currentPage={safePage}
                     totalPages={totalPages}
-                    totalCards={deferredFilteredCards.length}
+                    totalCards={filteredCards.length}
                     perPage={perPage}
                     isPaginationMode={isPaginationMode}
                     onPageChange={handlePageChange}
@@ -392,7 +377,7 @@ function App() {
           <Suspense fallback={<SectionFallback label="載入組牌工具…" />}>
           <DeckBuilder
             deck={deck}
-            filteredCards={deferredFilteredCards}
+            filteredCards={filteredCards}
             onRemoveCard={removeFromDeck}
             onCardClick={handleCardClick}
             onAddCard={addToDeck}

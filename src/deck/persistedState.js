@@ -6,7 +6,7 @@ import {
   STORAGE_KEY,
   VALID_RULE_TYPES,
 } from './constants.js';
-import { normalizeImportedRule } from './normalizeImportedRule.js';
+import { normalizeRule } from '../rules/normalizeRule.js';
 import { collectDeckStructureViolations } from './deckCompositionRules.js';
 import { normalizeDeck, normalizeSavedDeckEntry } from './storage.js';
 
@@ -40,7 +40,7 @@ function loadRuleState() {
       typeof rule.isActive === 'boolean' &&
       typeof rule.type === 'string' &&
       VALID_RULE_TYPES.includes(rule.type)
-        ? normalizeImportedRule(rule)
+        ? normalizeRule(rule)
         : EMPTY_RULE;
 
     return {

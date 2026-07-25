@@ -49,7 +49,7 @@ export default function AsyncPanel({
   if (isEmpty) {
     return (
       <div className={`flex ${loadingMinHeight} items-center justify-center`}>
-        <div className="max-w-md rounded-lg border-4 border-dashed border-brand-gold/30 p-12 text-center">
+        <div className="max-w-md rounded-lg border border-dashed border-brand-gold/30 p-12 text-center">
           {EmptyIcon && (
             <EmptyIcon className="mx-auto mb-4 h-12 w-12 text-gray-400" aria-hidden strokeWidth={2} />
           )}

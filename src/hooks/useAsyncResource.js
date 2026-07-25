@@ -5,9 +5,8 @@ import { formatShareWallError } from '../utils/formatShareWallError.js';
 /**
  * @template T
  * @param {() => Promise<T>} loader
- * @param {{ enabled?: boolean }} [options]
  */
-export function useAsyncResource(loader, { enabled = true } = {}) {
+export function useAsyncResource(loader) {
   const [data, setData] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isRetrying, setIsRetrying] = useState(false);
@@ -48,15 +47,9 @@ export function useAsyncResource(loader, { enabled = true } = {}) {
   );
 
   useEffect(() => {
-    if (!enabled) {
-      requestIdRef.current += 1;
-      setIsLoading(false);
-      setIsRetrying(false);
-      return undefined;
-    }
     load();
     return undefined;
-  }, [load, enabled]);
+  }, [load]);
 
   const reload = useCallback(() => load({ retry: true }), [load]);
 

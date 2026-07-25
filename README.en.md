@@ -11,13 +11,15 @@ An unofficial **card search, filter, and deck-building** web app (PWA) for the *
 | **Gallery** | Search and filter by name, faction, type, symbols, mechanics; paginated grid; tap for full card detail |
 | **Deck builder** | Leader / rituals / main deck slots; construction rules (single faction, dual-faction quotas); drag-and-drop main deck order; hide already selected |
 | **FAQ** | Built-in Q&A section |
+| **Community** | Guestbook, public deck submissions, and admin review |
+| **Game clock** | Two-player countdown, turn switching, and move tracking |
 | **Export** | Text list, JSON backup, deck screenshot (via html2canvas) |
 | **Alternate art** | Toggle main / alt art where available (preference stored in `localStorage`) |
 
 ### Technical highlights
 
-- **Card catalog**: sharded JSON under `public/cards/` + versioned `index.json`; browser and Workbox caching handle repeat requests
-- **Filtering**: React transition / deferred value with synchronous filtering; pagination limits gallery render size
+- **Card catalog**: one `public/cards.json` file (currently ~51 KB / ~7 KB gzip); browser and Workbox caching handle repeat requests
+- **Filtering**: direct synchronous filtering over 156 cards; pagination limits gallery render size
 - **Deck pool**: single scroll container for the card pool, avoiding nested page/pool scroll conflicts
 - **Images**: responsive AVIF / WebP `srcset` (160 / 320 / 640); HTML preload for the LCP hero card image
 - **PWA**: Workbox caches static assets, card JSON, and images; `autoUpdate` service worker
@@ -28,6 +30,7 @@ An unofficial **card search, filter, and deck-building** web app (PWA) for the *
 - [vite-plugin-pwa](https://vite-pwa-org.netlify.app/) (Workbox)
 - [sortablejs](https://sortablejs.github.io/Sortable/) · [lucide-react](https://lucide.dev/)
 - Image pipeline: [sharp](https://sharp.pixelplumbing.com/) (build-time)
+- Cloudflare Pages Functions · D1 · Turnstile
 
 ## Requirements
 
@@ -47,6 +50,13 @@ npm run dev          # http://localhost:5173
 ```bash
 npm run build        # output to dist/
 npm run preview      # serve dist/ (default http://localhost:4173)
+```
+
+To test Pages Functions and D1 locally:
+
+```bash
+npm run d1:migrations:apply:local
+npm run cf:dev       # build, then start the complete app with Wrangler
 ```
 
 ## Scripts
@@ -71,25 +81,24 @@ npm run preview      # serve dist/ (default http://localhost:4173)
 | `npm run test:rule-engine` | Deck construction rule tests |
 | `npm run test:card-catalog` | Card catalog loader tests |
 | `npm run test:deck` | Deck domain module tests |
-| `npm run test:gallery-layout` | Gallery layout estimation tests |
 | `npm run test:deck-layout` | Playwright assertions for deck viewport / scroll containers |
 | `npm run audit:deck-layout` | Verbose deck layout dump (debugging) |
-| `npm run split:cards` | Split `public/cards.json` into `public/cards/*.json` |
 | `npm run optimize:images` | Generate `-w160` / `-w320` / `-w640` WebP & AVIF from master WebP |
 | `npm run check:pwa-sw` | Assert `dist/sw.js` exists |
+| `npm run cf:dev` | Build and start Cloudflare Pages Functions with local D1 |
+| `npm run d1:migrations:apply:local` | Apply D1 migrations to the local database |
 
 ## Project layout
 
 ```
 accusation-v2/
 ├── public/
-│   ├── cards.json          # full catalog (optional source for split:cards)
-│   ├── cards/
-│   │   ├── index.json      # shard manifest + version
-│   │   ├── cro.json        # e.g. Crow faction shard
-│   │   └── …
+│   ├── cards.json          # single source of truth for the card catalog
 │   ├── images/             # card art + symbol icons (responsive -w* variants)
 │   └── favicon.svg
+├── functions/              # Cloudflare Pages Functions API
+├── migrations/             # D1 schema and indexes
+├── shared/                 # deck rules shared by frontend and backend
 ├── scripts/                # build, test, deploy, data tooling
 ├── src/
 │   ├── App.jsx             # shell: modes, data hooks, lazy routes
@@ -102,6 +111,7 @@ accusation-v2/
 │   └── data/               # qaData.js
 ├── index.html
 ├── vite.config.js
+├── wrangler.toml           # Pages output and D1 binding
 └── package.json
 ```
 
@@ -114,23 +124,31 @@ accusation-v2/
 
 ## Environment variables
 
-None required today—all data is served from `public/`. For future config, use the `VITE_` prefix and document keys in `.env.example` ([Vite env docs](https://vite.dev/guide/env-and-mode.html)).
+Card lookup and local deck building need no environment variables. Community writes and admin features use:
+
+| Variable | Purpose |
+|----------|---------|
+| `ALLOWED_ORIGINS` | Comma-separated origins allowed to submit and perform admin mutations |
+| `ADMIN_PASSWORD` | Admin login password |
+| `ADMIN_SESSION_SECRET` | HMAC secret for the admin cookie |
+| `VITE_TURNSTILE_SITE_KEY` | Frontend Turnstile site key |
+| `TURNSTILE_SECRET_KEY` | Turnstile secret used by Pages Functions |
+| `ENVIRONMENT=production` | Enables production Turnstile, Secure cookies, and rate-limit checks |
+
+Use `REQUIRE_CSRF_HEADER=false` and `RATE_LIMIT_DISABLED=true` only for controlled local debugging.
 
 ## Deployment
 
-This repository is **source only**. Suggested static hosting flow:
+For the complete app, connect this repository to Cloudflare Pages with `npm run build` as the build command and `dist` as the output directory. Cloudflare deploys `functions/` as Pages Functions; the D1 binding and migrations live in `wrangler.toml` and `migrations/`.
 
-1. `npm run build:deploy` — builds `dist/` and copies to `deploy-output/`
-2. Publish the contents of `deploy-output/` (e.g. a separate repo wired to Cloudflare Pages)
+Run `npm run d1:migrations:apply:remote` after the first deployment or a schema change. `npm run build:deploy` and the GitHub Actions `deploy-output` artifact contain static output only, so they are suitable for backups or frontend-only previews—not the Pages Functions API.
 
-The GitHub Actions workflow only builds and uploads a `deploy-output` artifact on `main` or manual runs; it does not force-push or rewrite any deployment repo.
-
-`dist/` and `deploy-output/` are gitignored and should not be committed here.
+`dist/` and `deploy-output/` are gitignored and should not be committed.
 
 ## Data maintenance
 
 1. **Card text**  
-   Edit `public/cards.json` (or shard files) → run `npm run split:cards` if you changed the merged file → bump `version` in `public/cards/index.json` so clients refetch
+   Edit the single source `public/cards.json` → run `npm run cards:manifest` → `npm run validate:repo`
 
 2. **New card images**  
    Add `public/images/<id>.webp` → `npm run optimize:images`

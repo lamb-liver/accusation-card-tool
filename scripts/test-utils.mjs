@@ -1,3 +1,4 @@
+import assert from 'node:assert/strict';
 import {
   ShareWallApiError,
   fetchAdminSubmissions,
@@ -15,8 +16,13 @@ import {
   getStoredArtVariant,
   setStoredArtVariant,
 } from '../src/utils/cardAlternateArt.js';
-import { cardMatchesFilters, filterCardIndices } from '../src/utils/cardFilterLogic.js';
-import { getCardMetaCells, getCardStats, formatCardNumber } from '../src/utils/cardMeta.js';
+import { cardMatchesFilters } from '../src/utils/cardFilterLogic.js';
+import {
+  formatCardNumber,
+  getCardMetaCells,
+  getCardStats,
+  getFactionDotClass,
+} from '../src/utils/cardMeta.js';
 import { formatApiDate } from '../src/utils/formatApiDate.js';
 import { formatShareWallError } from '../src/utils/formatShareWallError.js';
 import { ruleToApiPayload, apiRuleToDeckRule } from '../src/utils/shareWallRule.js';
@@ -30,24 +36,8 @@ import {
   SYMBOL_ORDER,
 } from '../src/deck/deckSymbolStats.js';
 
-let failed = 0;
-
-function fail(message) {
-  console.error(`FAIL: ${message}`);
-  failed += 1;
-}
-
-function assert(condition, message) {
-  if (!condition) fail(message);
-}
-
-function assertDeepEqual(actual, expected, message) {
-  const actualJson = JSON.stringify(actual);
-  const expectedJson = JSON.stringify(expected);
-  if (actualJson !== expectedJson) {
-    fail(`${message}: expected ${expectedJson}, got ${actualJson}`);
-  }
-}
+const fail = (message) => assert.fail(message);
+const assertDeepEqual = assert.deepEqual;
 
 // ── hash route parsing ─────────────────────────────────────────────────────
 assertDeepEqual(parseHashRoute(''), { kind: 'home' }, 'empty hash routes home');
@@ -164,10 +154,12 @@ assert(!cardMatchesFilters(cards[1], 'CRO-01', noFilters), 'id search should not
 assert(formatCardNumber('cro01') === 'CRO-01', 'formatCardNumber cro01');
 assert(formatCardNumber('mot12') === 'MOT-12', 'formatCardNumber mot12');
 assert(formatCardNumber('kit24') === 'KIT-24', 'formatCardNumber kit24');
+assert(getFactionDotClass('鴉教團') === 'bg-purple-400', 'known faction dot color');
+assert(getFactionDotClass('未知') === 'bg-neutral-400', 'unknown faction dot fallback');
 assertDeepEqual(
-  filterCardIndices(cards, '', { faction: '', type: '信徒', symbol: '', mechanic: '' }),
-  [1],
-  'filterCardIndices returns original indices',
+  cards.filter((card) => cardMatchesFilters(card, '', { faction: '', type: '信徒', symbol: '', mechanic: '' })),
+  [cards[1]],
+  'card filter returns matching cards',
 );
 
 // ── share-wall rule mapping ────────────────────────────────────────────────
@@ -414,10 +406,5 @@ assert(formatShareWallError(null, 'fallback') === 'fallback', 'format unknown er
 assert(formatApiDate(null) === '—', 'empty api date placeholder');
 assert(formatApiDate('not a date') === 'not a date', 'invalid api date preserved');
 assert(formatApiDate('2026-01-01 00:00:00').includes('2026'), 'sqlite datetime formats as local display string');
-
-if (failed > 0) {
-  console.error(`\n${failed} utility test(s) failed`);
-  process.exit(1);
-}
 
 console.log('OK: utility tests passed');
