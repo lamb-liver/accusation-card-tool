@@ -8,7 +8,6 @@ import {
 } from '../../src/utils/cardAlternateArt.js';
 import { FACTION_ORDER, factionIconPath } from '../../src/constants/factionOrder.js';
 import { SYMBOL_ICONS } from '../../src/constants/symbols.js';
-import { APP_BACKGROUND_IMAGE } from '../../src/constants/appBackground.js';
 import { LCP_CARD_ID, LCP_IMAGE_WIDTH } from '../../src/utils/galleryLayout.js';
 
 export const CARD_JSON_PATH = 'public/cards.json';
@@ -110,7 +109,6 @@ function collectCardArt(required, cards) {
 
 function collectUiAssets(required) {
   for (const asset of STATIC_PUBLIC_ASSETS) addRequired(required, asset, 'static public asset');
-  addRequired(required, APP_BACKGROUND_IMAGE, 'app page background');
 
   for (const src of Object.values(SYMBOL_ICONS)) {
     addRequired(required, src, 'symbol icon');
