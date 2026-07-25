@@ -271,13 +271,10 @@ function App() {
     [setSearchTerm, setFilters],
   );
 
-  const backgroundMode =
-    currentMode === 'admin' ? 'admin' : currentMode === 'clock' ? 'gallery' : currentMode;
-
   // ── Render ────────────────────────────────────────────────────────────────
   return (
     <div className="app-shell min-h-screen text-gray-200 font-sans">
-      <AppPageBackground activeMode={backgroundMode} />
+      <AppPageBackground />
       <div className="app-shell-content flex min-h-screen flex-col">
       {currentMode !== 'admin' && (
         <div className={currentMode === 'deck' ? 'shrink-0' : undefined}>
