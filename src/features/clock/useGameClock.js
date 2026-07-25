@@ -2,9 +2,7 @@ import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react
 import {
   createInitialState,
   reduceEndTurn,
-  reducePauseFromRunning,
   reduceSetStartingPlayer,
-  reduceStart,
   reduceTick,
   reduceToggleRun,
 } from './clockEngine.js';
@@ -65,20 +63,6 @@ export function useGameClock() {
     return () => cancelAnimationFrame(rafId);
   }, [state.status]);
 
-  const start = useCallback(() => {
-    setState((prev) => reduceStart(prev));
-  }, []);
-
-  const pause = useCallback(() => {
-    setState((prev) => {
-      if (prev.status !== 'running') return prev;
-      const next = reducePauseFromRunning(prev, performance.now() - lastTickRef.current);
-      lastTickRef.current = performance.now();
-      syncStatusRef(next.status, statusRef);
-      return next;
-    });
-  }, []);
-
   const reset = useCallback(() => {
     lastTickRef.current = 0;
     setState(createInitialState);
@@ -118,8 +102,6 @@ export function useGameClock() {
 
   return {
     state,
-    start,
-    pause,
     reset,
     setStartingPlayer,
     endTurn,

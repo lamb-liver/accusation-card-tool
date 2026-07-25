@@ -7,9 +7,9 @@ function toDraftValue(field) {
 }
 
 const inputClass =
-  'w-full px-3 py-2 bg-neutral-800 border-2 border-brand-gold rounded text-white text-sm focus:outline-none focus:ring-2 focus:ring-brand-gold';
+  'w-full rounded border border-brand-gold/60 bg-neutral-800 px-3 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-brand-gold';
 const drawerSelectClass =
-  'native-select w-full rounded border-2 border-brand-gold bg-neutral-800 px-3 py-2 text-sm text-brand-gold outline-none focus:ring-2 focus:ring-brand-gold';
+  'native-select w-full rounded border border-brand-gold/60 bg-neutral-800 px-3 py-2 text-sm text-brand-gold outline-none focus:ring-2 focus:ring-brand-gold';
 
 export default function MobileFilterDrawer({
   searchTerm = '',
@@ -95,7 +95,7 @@ export default function MobileFilterDrawer({
           <Funnel className="h-6 w-6" aria-hidden strokeWidth={2} />
           {activeFilterCount > 0 && (
             <span
-              className="absolute -right-1 -top-1 flex h-5 min-w-5 items-center justify-center rounded-full border-2 border-neutral-900 bg-red-600 px-1 text-[11px] font-bold text-white"
+              className="absolute -right-1 -top-1 flex h-5 min-w-5 items-center justify-center rounded-full border border-neutral-900 bg-red-600 px-1 text-[11px] font-bold text-white"
               aria-label={`已套用 ${activeFilterCount} 個篩選`}
             >
               {activeFilterCount}
@@ -115,7 +115,7 @@ export default function MobileFilterDrawer({
 
       <div
         id="mobileFilterDrawer"
-        className={`mobile-drawer md:hidden fixed bottom-0 left-0 right-0 z-[1000] max-h-[85vh] overflow-y-auto border-t-2 border-brand-gold bg-[#1a1a1a] p-5 shadow-[0_-4px_24px_rgba(0,0,0,0.4)] transition-transform duration-300 ease-out ${
+        className={`mobile-drawer fixed bottom-0 left-0 right-0 z-[1000] max-h-[85vh] overflow-y-auto border-t border-brand-gold/70 bg-[#1a1a1a] p-5 shadow-[0_-4px_24px_rgba(0,0,0,0.4)] transition-transform duration-300 ease-out md:hidden ${
           open ? 'translate-y-0' : 'translate-y-full pointer-events-none'
         }`}
         {...(!open ? { inert: true } : {})}

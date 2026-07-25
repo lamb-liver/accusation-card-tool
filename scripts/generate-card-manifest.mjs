@@ -5,54 +5,39 @@ import { fileURLToPath } from 'node:url';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const projectRoot = resolve(__dirname, '..');
-const indexPath = resolve(projectRoot, 'public/cards/index.json');
+const cardsPath = resolve(projectRoot, 'public/cards.json');
 const outputPath = resolve(projectRoot, 'functions/_shared/cardManifest.generated.js');
 const frontendNamesPath = resolve(projectRoot, 'src/data/cardNames.generated.js');
 
-const index = JSON.parse(readFileSync(indexPath, 'utf8'));
+const cards = JSON.parse(readFileSync(cardsPath, 'utf8'));
+if (!Array.isArray(cards)) {
+  console.error('FAIL: public/cards.json is not an array');
+  process.exit(1);
+}
 const cardIds = [];
 const factions = new Set();
 const cardsByIdEntries = [];
 
-for (const shard of index.shards) {
-  const shardPath = resolve(projectRoot, 'public', shard.path.replace(/^\//, ''));
-  const cards = JSON.parse(readFileSync(shardPath, 'utf8'));
-  if (!Array.isArray(cards)) {
-    console.error(`FAIL: shard ${shard.path} is not an array`);
+for (const card of cards) {
+  if (!card?.id || typeof card.id !== 'string') {
+    console.error('FAIL: public/cards.json has a card without string id');
     process.exit(1);
   }
-  if (cards.length !== shard.count) {
-    console.error(
-      `FAIL: shard ${shard.path} count mismatch (index=${shard.count}, actual=${cards.length})`,
-    );
-    process.exit(1);
-  }
-  for (const card of cards) {
-    if (!card?.id || typeof card.id !== 'string') {
-      console.error(`FAIL: shard ${shard.path} has card without string id`);
-      process.exit(1);
-    }
-    cardIds.push(card.id);
-    if (card.faction) factions.add(card.faction);
-    cardsByIdEntries.push([
-      card.id,
-      {
-        faction: card.faction ?? '',
-        type: card.type ?? '',
-        name: card.name ?? card.id,
-      },
-    ]);
-  }
-}
-
-if (cardIds.length !== index.total) {
-  console.error(`FAIL: total mismatch (index=${index.total}, actual=${cardIds.length})`);
-  process.exit(1);
+  cardIds.push(card.id);
+  if (card.faction) factions.add(card.faction);
+  cardsByIdEntries.push([
+    card.id,
+    {
+      faction: card.faction ?? '',
+      type: card.type ?? '',
+      name: card.name ?? card.id,
+    },
+  ]);
 }
 
 const uniqueIds = new Set(cardIds);
 if (uniqueIds.size !== cardIds.length) {
-  console.error('FAIL: duplicate card ids across shards');
+  console.error('FAIL: duplicate card ids');
   process.exit(1);
 }
 

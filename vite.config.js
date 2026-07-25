@@ -97,26 +97,12 @@ function createPwaPlugins(viteMode) {
         },
       },
       {
-        urlPattern: ({ url }) => /\/assets\/.*\.(?:js|mjs|css)$/i.test(url.pathname),
-        handler: 'StaleWhileRevalidate',
-        options: {
-          cacheName: 'accusation-bundled-assets',
-          expiration: {
-            maxEntries: 64,
-            maxAgeSeconds: 60 * 60 * 24 * 7,
-          },
-          cacheableResponse: { statuses: [0, 200] },
-        },
-      },
-      {
-        urlPattern: ({ url }) =>
-          url.pathname.endsWith('cards.json') || url.pathname.startsWith('/cards/'),
+        urlPattern: ({ url }) => url.pathname === '/cards.json',
         handler: 'StaleWhileRevalidate',
         options: {
           cacheName: 'accusation-card-data',
           expiration: {
-            // index.json + 每教團一個分片；目前 8 個條目，保留擴充空間避免新增教團時 LRU 互逐
-            maxEntries: 32,
+            maxEntries: 1,
             maxAgeSeconds: 60 * 60 * 24,
           },
           cacheableResponse: { statuses: [0, 200] },
@@ -143,15 +129,8 @@ export default defineConfig(({ mode }) => {
   ],
   build: {
     target: 'esnext',
-    sourcemap: false,
-    cssCodeSplit: true,
-    cssMinify: true,
-    minify: true,
-    modulePreload: { polyfill: true },
-    assetsInlineLimit: 4096,
     chunkSizeWarningLimit: 600,
     rollupOptions: {
-      treeshake: true,
       output: {
         // react 生態獨立 chunk：內容跨部署穩定 → hash 不變 → SW/瀏覽器快取直接命中，
         // app code 更新時使用者不必重新下載 react
@@ -161,9 +140,6 @@ export default defineConfig(({ mode }) => {
           }
           return undefined
         },
-        chunkFileNames: 'assets/[name]-[hash].js',
-        entryFileNames: 'assets/[name]-[hash].js',
-        assetFileNames: 'assets/[name]-[hash][extname]',
       },
     },
   },

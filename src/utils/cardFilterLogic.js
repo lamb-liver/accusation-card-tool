@@ -25,17 +25,3 @@ export function cardMatchesFilters(card, searchTerm, filters) {
 
   return matchesSearch && matchesFaction && matchesType && matchesSymbol && matchesMechanic;
 }
-
-/**
- * @param {object[]} cards
- * @param {string} searchTerm
- * @param {CardFilters} filters
- * @returns {number[]} indices into `cards`
- */
-export function filterCardIndices(cards, searchTerm, filters) {
-  const indices = [];
-  for (let i = 0; i < cards.length; i++) {
-    if (cardMatchesFilters(cards[i], searchTerm, filters)) indices.push(i);
-  }
-  return indices;
-}

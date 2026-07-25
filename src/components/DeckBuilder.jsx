@@ -1,5 +1,5 @@
 import { useState, useMemo, useRef, useEffect, useLayoutEffect, useCallback } from 'react';
-import { filterCardsByRule, sortCardsForRuleDisplay } from '../rules/index.js';
+import { filterCardsByRule, sortCardsForRuleDisplay } from '../rules/deckPoolDisplay.js';
 import { sortMainDeck } from '../deck/sortMainDeck.js';
 import { collectDeckSymbolCounts } from '../deck/deckSymbolStats.js';
 import DeckListPanel from './deckBuilder/DeckListPanel.jsx';

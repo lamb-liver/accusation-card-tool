@@ -9,12 +9,10 @@ import AsyncPanel, { LoadMoreButton } from '../common/AsyncPanel.jsx';
 export default function ShareWallSection({
   onOpenDeck,
   embedded = false,
-  loadEnabled = true,
 }) {
   const loadDecks = useCallback(() => fetchPublicDecks({ limit: PUBLIC_PAGE_SIZE }), []);
   const { data, isLoading, isRetrying, isError, errorMessage, reload } = useAsyncResource(
     loadDecks,
-    { enabled: loadEnabled },
   );
 
   const [decks, setDecks] = useState([]);
@@ -48,14 +46,7 @@ export default function ShareWallSection({
     }
   }
 
-  const listPanel = embedded && !loadEnabled ? (
-    <div
-      className="flex min-h-52 items-center justify-center rounded-lg bg-neutral-800/50 text-sm text-gray-500"
-      aria-hidden
-    >
-      準備載入牌組…
-    </div>
-  ) : (
+  const listPanel = (
     <AsyncPanel
       isLoading={isLoading}
       isRetrying={isRetrying}
@@ -74,7 +65,7 @@ export default function ShareWallSection({
             <button
               type="button"
               onClick={() => onOpenDeck(deck.share_id)}
-              className="share-wall-card w-full rounded-lg border-2 border-[#444] bg-[#252525] p-4 text-left transition hover:border-brand-gold"
+              className="share-wall-card w-full rounded-lg border border-[#444] bg-[#252525] p-4 text-left transition hover:border-brand-gold"
             >
               <div className="flex items-start justify-between gap-3">
                 <div className="min-w-0">

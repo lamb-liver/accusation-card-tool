@@ -8,6 +8,16 @@ const FACTION_COLORS = {
   '放逐者': 'border-neutral-400 bg-neutral-800/90 text-neutral-100',
 };
 
+const FACTION_DOT_COLORS = {
+  '白狐神社': 'bg-red-400',
+  '鴉教團': 'bg-purple-400',
+  '瘋人院': 'bg-pink-400',
+  '門教團': 'bg-blue-400',
+  '逐光者': 'bg-amber-400',
+  '禁忌廚房': 'bg-rose-400',
+  '放逐者': 'bg-neutral-400',
+};
+
 const TYPE_COLORS = {
   '教主': 'border-brand-gold bg-amber-950/45 text-amber-100',
   '儀式': 'border-orange-400 bg-orange-950/45 text-orange-100',
@@ -29,6 +39,10 @@ const LOCATION_TYPE_COLORS = {
 export function formatCardNumber(id) {
   const match = /^([a-z]+)(\d+)$/i.exec(id ?? '');
   return match ? `${match[1].toUpperCase()}-${match[2]}` : String(id ?? '').toUpperCase();
+}
+
+export function getFactionDotClass(faction) {
+  return FACTION_DOT_COLORS[faction] || 'bg-neutral-400';
 }
 
 export function getCardStats(card) {

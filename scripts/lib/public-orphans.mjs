@@ -1,10 +1,7 @@
 import { readdirSync, statSync } from 'node:fs';
 import { join, relative, resolve, sep } from 'node:path';
 
-import {
-  collectRequiredPublicAssets,
-  expectedPrecompressedCardShardPaths,
-} from './public-assets.mjs';
+import { collectRequiredPublicAssets } from './public-assets.mjs';
 
 function walkFiles(rootDir) {
   const out = [];
@@ -22,15 +19,11 @@ function walkFiles(rootDir) {
   return out;
 }
 
-function classifyPath(path, { required, precompressed }) {
+function classifyPath(path, { required }) {
   const baseName = path.split('/').pop();
 
   if (required.has(path)) {
     return { bucket: 'required', reason: 'current asset reference chain' };
-  }
-
-  if (precompressed.has(path)) {
-    return { bucket: 'keep', reason: 'precompressed card shard for static serving' };
   }
 
   if (baseName === '.DS_Store') {
@@ -51,7 +44,6 @@ function classifyPath(path, { required, precompressed }) {
 export function getPublicOrphanReport(projectRoot) {
   const publicRoot = resolve(projectRoot, 'public');
   const { required, failures, cards } = collectRequiredPublicAssets(projectRoot);
-  const precompressed = new Set(expectedPrecompressedCardShardPaths(required));
   const buckets = {
     required: [],
     keep: [],
@@ -62,7 +54,7 @@ export function getPublicOrphanReport(projectRoot) {
   for (const absolutePath of walkFiles(publicRoot)) {
     const rel = relative(projectRoot, absolutePath).split(sep).join('/');
     const stats = statSync(absolutePath);
-    const classified = classifyPath(rel, { required, precompressed });
+    const classified = classifyPath(rel, { required });
     buckets[classified.bucket].push({
       path: rel,
       reason: classified.reason,
@@ -74,7 +66,6 @@ export function getPublicOrphanReport(projectRoot) {
     failures,
     cards,
     required,
-    precompressed,
     buckets,
   };
 }

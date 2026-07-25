@@ -1,13 +1,10 @@
 import { VALID_RULE_TYPES } from './constants.js';
-import { normalizeImportedRule } from './normalizeImportedRule.js';
 import {
   cardHasAlternateArt,
   getCardArtVariants,
   getCardImageFullSrc,
   getStoredArtVariant,
 } from '../utils/cardAlternateArt.js';
-
-export { normalizeImportedRule };
 
 /** 匯入 JSON 各欄位 ID 數量上限（高於合法牌組上限，用於拒絕惡意超大陣列） */
 const MAX_IMPORT_SECTION_LENGTH = 32;

@@ -7,15 +7,6 @@ import {
 
 /**
  * @param {import('./clockUtils.js').GameClockState} prev
- * @returns {import('./clockUtils.js').GameClockState}
- */
-export function reduceStart(prev) {
-  if (prev.status === 'finished' || prev.status === 'running') return prev;
-  return { ...prev, status: 'running' };
-}
-
-/**
- * @param {import('./clockUtils.js').GameClockState} prev
  * @param {import('./clockUtils.js').PlayerId} playerId
  * @returns {import('./clockUtils.js').GameClockState}
  */

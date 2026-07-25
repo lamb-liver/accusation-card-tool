@@ -1,24 +1,17 @@
 import { readFileSync } from 'node:fs';
+import assert from 'node:assert/strict';
 import {
   filterCardsByRule,
   sortCardsForRuleDisplay,
   isCardAllowedInRulePool,
+} from '../src/rules/deckPoolDisplay.js';
+import {
   getMainDeckFactionDecision,
   checkSpecialCardFaction,
-} from '../src/rules/index.js';
+} from '../src/rules/deckBuildValidity.js';
 
+const fail = (message) => assert.fail(message);
 const cards = JSON.parse(readFileSync(new URL('../public/cards.json', import.meta.url), 'utf8'));
-
-let failed = 0;
-
-function fail(message) {
-  console.error(`FAIL: ${message}`);
-  failed += 1;
-}
-
-function assert(condition, message) {
-  if (!condition) fail(message);
-}
 
 // ── rule1 展示篩選 ─────────────────────────────────────────────────────────
 const rule1 = { isActive: true, type: 'rule1', primary: '鴉教團', secondary: '' };
@@ -115,13 +108,9 @@ const askSecondary = getMainDeckFactionDecision(
 );
 assert(askSecondary.kind === 'ask_secondary', 'missing secondary triggers ask_secondary');
 
-if (failed === 0) {
-  console.log('OK: rule engine contract tests passed');
-  console.log('Counts (rule2 pool):', {
-    primary: pool.filter((c) => c.faction === rule2.primary).length,
-    secondary: pool.filter((c) => c.faction === rule2.secondary).length,
-    exile: pool.filter((c) => c.faction === '放逐者').length,
-  });
-}
-
-process.exit(failed > 0 ? 1 : 0);
+console.log('OK: rule engine contract tests passed');
+console.log('Counts (rule2 pool):', {
+  primary: pool.filter((c) => c.faction === rule2.primary).length,
+  secondary: pool.filter((c) => c.faction === rule2.secondary).length,
+  exile: pool.filter((c) => c.faction === '放逐者').length,
+});

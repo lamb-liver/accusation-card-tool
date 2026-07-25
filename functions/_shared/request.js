@@ -52,7 +52,7 @@ export function parseOffsetParam(url) {
 }
 
 /**
- * 解析 `cursor` 查詢參數。
+ * 解析指定的 cursor 查詢參數。
  *
  * 三種結果需分開處理，故不用 null 兼表「沒帶」與「不合法」：
  * - 沒帶 → `{ cursor: null }`，代表第一頁。
@@ -61,10 +61,11 @@ export function parseOffsetParam(url) {
  *   否則「載入更多」會無聲地重複回傳第一頁。
  *
  * @param {URL} url
+ * @param {string} [paramName]
  * @returns {{ cursor: { sortValue: string, id: number } | null, invalid?: boolean }}
  */
-export function parseCursorParam(url) {
-  const raw = url.searchParams.get('cursor');
+export function parseCursorParam(url, paramName = 'cursor') {
+  const raw = url.searchParams.get(paramName);
   if (raw === null || raw === '') return { cursor: null };
 
   const cursor = decodeCursor(raw);
@@ -86,11 +87,12 @@ export function parseCursorParam(url) {
  *
  * @param {URL} url
  * @param {string} timeColumn 主排序欄位名（字面量，不可來自請求資料）
+ * @param {string} [cursorParam]
  * @returns {{ clause: string, bind: Array<string|number>, limitClause: string,
  *   tailBind: number[], error?: undefined } | { error: string }}
  */
-export function resolvePageQuery(url, timeColumn) {
-  const { cursor, invalid } = parseCursorParam(url);
+export function resolvePageQuery(url, timeColumn, cursorParam = 'cursor') {
+  const { cursor, invalid } = parseCursorParam(url, cursorParam);
   if (invalid) return { error: 'Invalid cursor parameter' };
 
   if (cursor) {

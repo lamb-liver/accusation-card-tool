@@ -184,7 +184,7 @@ export default function AdminSection({ showToast, showConfirm }) {
           </div>
         )}
         {!authProbeError && (
-          <form onSubmit={handleLogin} className="rounded-lg border-2 border-[#444] bg-[#252525] p-6 space-y-4">
+          <form onSubmit={handleLogin} className="space-y-4 rounded-lg border border-[#444] bg-[#252525] p-6">
             <div>
               <label htmlFor="admin-password" className="mb-1 block text-sm text-gray-400">
                 管理員密碼

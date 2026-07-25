@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import GuestbookSection from '../guestbook/GuestbookSection.jsx';
 import ShareWallSection from '../shareWall/ShareWallSection.jsx';
 import { usePageTitle } from '../../hooks/usePageTitle.js';
@@ -8,18 +8,10 @@ import {
 } from '../../utils/communityScroll.js';
 
 /**
- * 留言區 mount 後延遲載入牌組，僅錯開兩段 loading 視覺，不等待留言 API 完成。
- * 與 API 延遲無關；留言慢時牌組仍會並行載入。
- */
-const DECKS_STAGGER_MS = 150;
-
-/**
  * @param {{ showToast: Function, onOpenDeck: (shareId: string) => void, initialSection?: 'guestbook' | 'decks' }} props
  */
 export default function CommunitySection({ showToast, onOpenDeck, initialSection }) {
   usePageTitle('控訴 - 交流區');
-
-  const [decksLoadEnabled, setDecksLoadEnabled] = useState(false);
 
   useEffect(() => {
     restoreCommunityScroll();
@@ -32,11 +24,6 @@ export default function CommunitySection({ showToast, onOpenDeck, initialSection
     }, 0);
     return () => window.clearTimeout(timer);
   }, [initialSection]);
-
-  useEffect(() => {
-    const timer = window.setTimeout(() => setDecksLoadEnabled(true), DECKS_STAGGER_MS);
-    return () => window.clearTimeout(timer);
-  }, []);
 
   return (
     <div className="mx-auto max-w-3xl">
@@ -72,11 +59,7 @@ export default function CommunitySection({ showToast, onOpenDeck, initialSection
           id="community-decks"
           className="scroll-mt-28 border-t border-[#444] pt-10"
         >
-          <ShareWallSection
-            embedded
-            loadEnabled={decksLoadEnabled}
-            onOpenDeck={onOpenDeck}
-          />
+          <ShareWallSection embedded onOpenDeck={onOpenDeck} />
         </div>
       </div>
     </div>

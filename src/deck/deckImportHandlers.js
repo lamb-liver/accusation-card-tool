@@ -5,9 +5,9 @@ import {
   createDeckFromJsonIds,
   createDeckFromText,
   exportDeckAsImage,
-  normalizeImportedRule,
   validateImportedJson,
 } from './importExport.js';
+import { normalizeRule } from '../rules/normalizeRule.js';
 
 /** 匯入貼上內容長度上限，避免超大 JSON 卡住主線程 */
 const MAX_IMPORT_TEXT_LENGTH = 512_000;
@@ -71,7 +71,7 @@ export function createDeckImportHandlers({ getState, ctx, commit }) {
 
         const { deck: newDeck, missingIds } = createDeckFromJsonIds(json.deck, ctx.allCards);
         const { currentRule } = getState();
-        const normalizedRule = json.rule ? normalizeImportedRule(json.rule) : currentRule;
+        const normalizedRule = json.rule ? normalizeRule(json.rule) : currentRule;
         const composition = validateDeckComposition(newDeck, normalizedRule);
         if (!composition.valid) {
           ctx.showToast(`匯入失敗：${composition.reason}`, 'error');

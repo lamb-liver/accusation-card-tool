@@ -43,7 +43,7 @@ export default function DeckListPanel({
   return (
     <div
       className={`
-        deck-list-section flex flex-col overflow-hidden border-2 border-brand-gold bg-[#252525]
+        deck-list-section flex flex-col overflow-hidden border border-brand-gold/60 bg-[#252525]
         max-lg:fixed max-lg:bottom-0 max-lg:left-0 max-lg:right-0 max-lg:z-[400] max-lg:rounded-t-2xl
         max-lg:transition-[height] max-lg:duration-300 max-lg:ease-in-out
         ${bottomSheetOpen ? 'max-lg:h-[min(70vh,560px)]' : 'max-lg:h-14'}
@@ -59,7 +59,7 @@ export default function DeckListPanel({
       >
         <div className="flex items-center gap-2.5">
           <span className="text-brand-gold font-bold text-sm">我的牌組</span>
-          <span className={`text-xs font-semibold ${totalCards > 24 ? 'text-red-400' : 'text-green-400'}`}>
+          <span className={`text-xs font-semibold ${totalCards > 24 ? 'text-red-400' : 'text-brand-gold'}`}>
             {totalCards}/24
           </span>
           <div className="w-20 h-1.5 bg-neutral-700 rounded-full overflow-hidden">
@@ -85,8 +85,8 @@ export default function DeckListPanel({
       </button>
 
       <div className="deck-list-scroll flex min-h-0 min-w-0 flex-1 flex-col gap-4 overflow-x-hidden overflow-y-auto overscroll-y-contain p-4">
-        <h2 className="hidden lg:block text-brand-gold font-bold text-xl">
-          我的牌組 (<span className="text-green-400">{totalCards}</span>/24)
+        <h2 className="hidden lg:block font-display text-brand-gold font-bold text-xl">
+          我的牌組 (<span className={totalCards > 24 ? 'text-red-400' : 'text-brand-gold'}>{totalCards}</span>/24)
         </h2>
 
         {totalCards > 24 && (

@@ -12,7 +12,6 @@ import {
   logApiError,
   runDbQuery,
 } from '../_shared/response.js';
-import { generateShareId, isUniqueConstraintError } from '../_shared/shareId.js';
 import { stripTurnstileToken } from '../_shared/submissionBody.js';
 import { verifyTurnstileToken } from '../_shared/turnstile.js';
 import { validateDeckSubmission } from '../_shared/validation.js';
@@ -47,41 +46,16 @@ export async function onRequestPost(context) {
   const deckJson = JSON.stringify(payload.deck_json);
   const ruleJson = JSON.stringify(payload.rule_json);
 
-  let lastShareId = null;
-  for (let attempt = 0; attempt < 5; attempt += 1) {
-    const shareId = generateShareId();
-    lastShareId = shareId;
-    try {
-      await env.DB.prepare(INSERT_SQL)
-        .bind(shareId, payload.title, payload.author_name, description, deckJson, ruleJson)
-        .run();
-      return respond(jsonResponse({ share_id: shareId, status: 'pending' }, 201));
-    } catch (insertError) {
-      if (isUniqueConstraintError(insertError)) {
-        console.warn('deck share insert collision', {
-          requestId,
-          attempt: attempt + 1,
-          shareId,
-          title: payload.title,
-        });
-        continue;
-      }
-      logApiError('deck share insert failed', insertError, {
-        requestId,
-        attempt: attempt + 1,
-        shareId,
-        title: payload.title,
-      });
-      return respond(errorResponse('Internal server error', 500));
-    }
+  const shareId = crypto.randomUUID();
+  try {
+    await env.DB.prepare(INSERT_SQL)
+      .bind(shareId, payload.title, payload.author_name, description, deckJson, ruleJson)
+      .run();
+    return respond(jsonResponse({ share_id: shareId, status: 'pending' }, 201));
+  } catch (insertError) {
+    logApiError('deck share insert failed', insertError, { requestId, shareId, title: payload.title });
+    return respond(errorResponse('Internal server error', 500));
   }
-
-  logApiError(
-    'deck share insert failed: share_id collision exhausted',
-    new Error('share_id collision exhausted'),
-    { requestId, attempts: 5, lastShareId, title: payload.title },
-  );
-  return respond(errorResponse('Internal server error', 500));
 }
 
 export async function onRequestGet(context) {

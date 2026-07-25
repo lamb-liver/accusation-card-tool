@@ -11,8 +11,7 @@ import { SYMBOL_ICONS } from '../../src/constants/symbols.js';
 import { APP_BACKGROUND_IMAGE } from '../../src/constants/appBackground.js';
 import { LCP_CARD_ID, LCP_IMAGE_WIDTH } from '../../src/utils/galleryLayout.js';
 
-export const INDEX_PATH = 'public/cards/index.json';
-export const CARD_JSON_SOURCE_PATH = 'public/cards.json';
+export const CARD_JSON_PATH = 'public/cards.json';
 export const STATIC_PUBLIC_ASSETS = [
   'public/favicon.svg',
   'public/manifest.webmanifest',
@@ -20,6 +19,9 @@ export const STATIC_PUBLIC_ASSETS = [
   'public/sitemap.xml',
   // footer「下載規則書」的目標檔；曾在部署整理時被誤刪導致下載到 SPA fallback 的 HTML
   'public/rules.pdf',
+  // 展示用襯線字體子集（見 scripts/build-display-font.mjs）與其 SIL OFL 授權
+  'public/fonts/NotoSerifTC-display-subset.woff2',
+  'public/fonts/OFL.txt',
 ];
 
 export function normalizePublicPath(path) {
@@ -63,59 +65,23 @@ function addRequired(required, path, reason) {
 }
 
 function collectCatalogCards(projectRoot, required, failures) {
-  addRequired(required, INDEX_PATH, 'card catalog index');
-
-  const index = readJson(projectRoot, INDEX_PATH, failures);
-  if (!index) return { cards: [], index: null };
-
-  if (!Array.isArray(index.shards) || index.shards.length === 0) {
-    failures.push(`${INDEX_PATH} must contain a non-empty shards array`);
-    return { cards: [], index };
+  addRequired(required, CARD_JSON_PATH, 'card catalog');
+  const cards = readJson(projectRoot, CARD_JSON_PATH, failures);
+  if (!Array.isArray(cards)) {
+    failures.push(`${CARD_JSON_PATH} must be an array`);
+    return [];
   }
-
-  const cards = [];
   const seenIds = new Set();
-  let declaredTotal = 0;
 
-  for (const shard of index.shards) {
-    if (!shard || typeof shard.path !== 'string') {
-      failures.push(`${INDEX_PATH} contains a shard without a string path`);
+  for (const card of cards) {
+    if (!card || typeof card.id !== 'string' || !card.id) {
+      failures.push(`${CARD_JSON_PATH} contains a card without a string id`);
       continue;
     }
-
-    const shardPath = normalizePublicPath(shard.path);
-    addRequired(required, shardPath, `card catalog shard ${shard.key ?? shard.path}`);
-
-    const shardCards = readJson(projectRoot, shardPath, failures);
-    if (!Array.isArray(shardCards)) {
-      failures.push(`${shardPath} must be an array`);
-      continue;
-    }
-
-    if (typeof shard.count === 'number' && shardCards.length !== shard.count) {
-      failures.push(`${shardPath} count mismatch: index=${shard.count}, actual=${shardCards.length}`);
-    }
-    declaredTotal += shard.count ?? shardCards.length;
-
-    for (const card of shardCards) {
-      if (!card || typeof card.id !== 'string' || !card.id) {
-        failures.push(`${shardPath} contains a card without a string id`);
-        continue;
-      }
-      if (seenIds.has(card.id)) failures.push(`Duplicate card id across shards: ${card.id}`);
-      seenIds.add(card.id);
-      cards.push(card);
-    }
+    if (seenIds.has(card.id)) failures.push(`Duplicate card id: ${card.id}`);
+    seenIds.add(card.id);
   }
-
-  if (typeof index.total === 'number' && cards.length !== index.total) {
-    failures.push(`${INDEX_PATH} total mismatch: index=${index.total}, actual=${cards.length}`);
-  }
-  if (typeof index.total === 'number' && declaredTotal !== index.total) {
-    failures.push(`${INDEX_PATH} shard counts do not add up: total=${index.total}, shards=${declaredTotal}`);
-  }
-
-  return { cards, index };
+  return cards;
 }
 
 function collectCardArt(required, cards) {
@@ -144,7 +110,6 @@ function collectCardArt(required, cards) {
 
 function collectUiAssets(required) {
   for (const asset of STATIC_PUBLIC_ASSETS) addRequired(required, asset, 'static public asset');
-  addRequired(required, CARD_JSON_SOURCE_PATH, 'card catalog maintenance source');
   addRequired(required, APP_BACKGROUND_IMAGE, 'app page background');
 
   for (const src of Object.values(SYMBOL_ICONS)) {
@@ -160,10 +125,10 @@ function collectUiAssets(required) {
 export function collectRequiredPublicAssets(projectRoot) {
   const required = new Map();
   const failures = [];
-  const { cards, index } = collectCatalogCards(projectRoot, required, failures);
+  const cards = collectCatalogCards(projectRoot, required, failures);
   collectCardArt(required, cards);
   collectUiAssets(required);
-  return { required, failures, cards, index };
+  return { required, failures, cards };
 }
 
 export function checkRequiredFiles(projectRoot, required) {
@@ -179,14 +144,4 @@ export function checkRequiredFiles(projectRoot, required) {
     }
   }
   return failures;
-}
-
-export function expectedPrecompressedCardShardPaths(required) {
-  const out = [];
-  const shardPaths = [...required.keys()].filter((path) => /^public\/cards\/.+\.json$/.test(path));
-  for (const path of shardPaths) {
-    if (path === INDEX_PATH) continue;
-    out.push(`${path}.br`, `${path}.gz`);
-  }
-  return out;
 }
