@@ -39,9 +39,7 @@ function errorFromResponse(response, data) {
 }
 
 /**
- * 列表查詢參數。分頁一律用 cursor：offset 會在資料變動時漏項或重複
- * （後端仍接受 offset，只為相容 service worker 快取的舊前端）。
- * cursor 為 null／undefined 代表第一頁。
+ * 列表查詢一律使用 cursor；null／undefined 代表第一頁。
  */
 function buildListParams({ limit, cursor } = {}) {
   const params = new URLSearchParams();

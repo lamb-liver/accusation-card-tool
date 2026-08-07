@@ -10,7 +10,7 @@ import jsxA11y from 'eslint-plugin-jsx-a11y';
  * @see https://eslint.org/docs/latest/use/configure/configuration-files
  */
 export default [
-  { ignores: ['dist/**', 'deploy-output/**', 'dev-dist/**', 'node_modules/**', '.wrangler/**'] },
+  { ignores: ['dist/**', 'dev-dist/**', 'node_modules/**', '.wrangler/**'] },
 
   js.configs.recommended,
 

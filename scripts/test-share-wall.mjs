@@ -15,7 +15,7 @@ import { CSRF_HEADER_NAME, CSRF_HEADER_VALUE, MAX_BODY_BYTES } from '../function
 import { CSRF_HEADER_VALUE as generatedBackendCsrf } from '../functions/_shared/csrf.generated.js';
 import { CSRF_HEADER_VALUE as generatedFrontendCsrf } from '../src/api/csrfHeader.generated.js';
 import { checkCsrfHeader, normalizeOrigin } from '../functions/_shared/origin.js';
-import { parseOffsetParam, readJsonBody, resolvePageQuery } from '../functions/_shared/request.js';
+import { readJsonBody, resolvePageQuery } from '../functions/_shared/request.js';
 import {
   buildKeysetClause,
   decodeCursor,
@@ -165,9 +165,6 @@ assert(
     undefined,
   'stripTurnstileToken should remove turnstile_token',
 );
-assert(parseOffsetParam(new URL('http://test/?offset=5')) === 5, 'parse offset');
-assert(parseOffsetParam(new URL('http://test/')) === 0, 'default offset zero');
-
 {
   const raw = JSON.stringify({ message: '你'.repeat(11_000) });
   assert(raw.length < MAX_BODY_BYTES, 'multi-byte body fixture should be under char limit');
@@ -257,43 +254,27 @@ assert(session?.role === 'admin', 'admin token should verify');
   );
 }
 
-// 分頁參數解析：cursor 優先，offset 為舊前端的相容路徑
+// 分頁參數解析：無 cursor 是第一頁，有 cursor 才加入 keyset 條件
 {
   const pageUrl = (qs) => new URL(`https://example.test/api/decks${qs}`);
 
   const firstPage = resolvePageQuery(pageUrl(''), 'reviewed_at');
-  assert(firstPage.clause === '', 'no cursor and no offset means first page (no extra clause)');
-  assert(firstPage.limitClause === 'LIMIT ? OFFSET ?', 'first page still binds an offset of 0');
-  assert(firstPage.tailBind[0] === 0, 'default offset is 0');
+  assert(firstPage.clause === '', 'no cursor means first page (no extra clause)');
+  assert(firstPage.bind.length === 0, 'first page has no keyset values');
+  assert(firstPage.limitClause === 'LIMIT ?', 'first page only binds the limit');
 
   const cursored = resolvePageQuery(
     pageUrl(`?cursor=${encodeCursor('T', 5)}`),
     'reviewed_at',
   );
   assert(cursored.clause.includes('reviewed_at'), 'cursor produces a keyset clause');
-  assert(cursored.limitClause === 'LIMIT ?', 'keyset paging does not use OFFSET');
-  assert(cursored.tailBind.length === 0, 'keyset paging binds nothing after the limit');
-
-  const legacy = resolvePageQuery(pageUrl('?offset=40'), 'reviewed_at');
-  assert(legacy.clause === '', 'offset path adds no keyset clause');
-  assert(legacy.tailBind[0] === 40, 'offset path still honours the legacy parameter');
+  assert(cursored.limitClause === 'LIMIT ?', 'keyset paging only binds the limit after cursor values');
 
   // 不可靜默當成第一頁，否則「載入更多」會無聲重複回傳第一頁
   assert(
     resolvePageQuery(pageUrl('?cursor=garbage'), 'reviewed_at').error !== undefined,
     'invalid cursor is an error, not a silent fallback to page one',
   );
-  assert(
-    resolvePageQuery(pageUrl('?offset=-1'), 'reviewed_at').error !== undefined,
-    'negative offset is rejected',
-  );
-
-  // 兩者同時出現時以 cursor 為準（只有新前端會送 cursor）
-  const both = resolvePageQuery(
-    pageUrl(`?offset=40&cursor=${encodeCursor('T', 5)}`),
-    'reviewed_at',
-  );
-  assert(both.limitClause === 'LIMIT ?', 'cursor wins when both parameters are present');
 }
 
 // 常數時間密碼比對

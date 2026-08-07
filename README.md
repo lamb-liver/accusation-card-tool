@@ -41,7 +41,7 @@
 
 ```bash
 git clone <repo-url>
-cd accusation-v2
+cd accusation-card-tool
 
 npm install
 npm run dev          # http://localhost:5173
@@ -66,7 +66,6 @@ npm run cf:dev       # 建置後以 Wrangler 啟動完整站點
 | `npm run dev` | 本機開發伺服器 |
 | `npm run build` | 正式建置至 `dist/` |
 | `npm run build:ci` | 建置並檢查 PWA `sw.js`（CI） |
-| `npm run build:deploy` | 建置後同步至 `deploy-output/` |
 | `npm run preview` | 預覽建置結果 |
 | `npm run validate:repo` | 資產、generated 檔、lockfile、部署流程、lint 與核心測試總檢查 |
 | `npm run validate:browser` | 啟動或使用既有本機站台，跑組牌版面與水平溢位檢查 |
@@ -76,7 +75,7 @@ npm run cf:dev       # 建置後以 Wrangler 啟動完整站點
 | `npm run check:lockfile` | 檢查 `package-lock.json` 是否與 `package.json` 對齊 |
 | `npm run check:public-orphans` | 列出 `public/` 未被目前引用鏈使用的檔案 |
 | `npm run clean:public-orphans` | dry-run 顯示可安全清理的 `public/` 檔案；加 `-- --apply` 才會刪除 |
-| `npm run check:deploy-flow` | 檢查部署 workflow、`wrangler.toml` 與 `sync-deploy` 的高風險設定 |
+| `npm run check:deploy-flow` | 確認 Cloudflare Pages 設定，並防止舊靜態 artifact 流程被加回 |
 | `npm run doctor:build-env` | 診斷本機 Node/Vite/Rolldown native binding 狀態 |
 | `npm run test:rule-engine` | 構築規則單元測試 |
 | `npm run test:card-catalog` | 卡牌目錄載入測試 |
@@ -93,7 +92,7 @@ npm run cf:dev       # 建置後以 Wrangler 啟動完整站點
 ## 專案結構
 
 ```
-accusation-v2/
+accusation-card-tool/
 ├── public/
 │   ├── cards.json          # 唯一卡牌目錄來源
 │   ├── images/             # 卡圖與符號圖示（含響應式 -w* 變體）
@@ -110,8 +109,8 @@ accusation-v2/
 │   ├── rules/              # 構築規則（展示篩選 vs 加入合法性）
 │   ├── hooks/              # useCardData、useDeck 等
 │   ├── utils/              # cardCatalog、篩選、圖片、LCP preload
-│   ├── constants/          # 篩選選項、符號、背景主題
-│   └── data/               # qaData.js
+│   ├── constants/          # 篩選選項、符號與機制說明
+│   └── data/               # generated QA 資料
 ├── index.html              # LCP preload、PWA manifest 連結
 ├── vite.config.js          # PWA 與 build 設定
 ├── wrangler.toml           # Pages output 與 D1 binding
@@ -144,9 +143,9 @@ accusation-v2/
 
 完整站點應由 Cloudflare Pages 連接本 repo，build command 使用 `npm run build`、輸出目錄使用 `dist`；`functions/` 會作為 Pages Functions 部署，D1 binding 與 migrations 定義在 `wrangler.toml`／`migrations/`。
 
-首次部署或 schema 更新後執行 `npm run d1:migrations:apply:remote`。`npm run build:deploy` 與 GitHub Actions 的 `deploy-output` artifact 只包含靜態輸出，適合備份或純前端預覽，不包含 Pages Functions。
+首次部署或 schema 更新後執行 `npm run d1:migrations:apply:remote`。Cloudflare Pages 的 Git integration 是唯一部署路徑；不要另建只含靜態輸出的 artifact 或第二個部署 repo。
 
-`dist/` 與 `deploy-output/` 已在 `.gitignore`，不應 commit。
+`dist/` 已在 `.gitignore`，不應 commit。
 
 ## 資料維護
 
@@ -163,7 +162,7 @@ accusation-v2/
    > 重建 `public/fonts/*.woff2` 並一併 commit（缺字會逐字回退，不會破版）。
 
 4. **常見問題**  
-   編輯 `src/data/qaData.js`
+   執行 `npm run sync:qa` 從 Google Sheets 更新；`src/data/qaData.js` 是 generated output，不應手動編輯。若輸出格式有問題，修正 `scripts/sync-qa.mjs`／`scripts/lib/qa-module.mjs`
 
 ## 授權與免責
 

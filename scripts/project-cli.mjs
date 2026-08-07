@@ -20,7 +20,6 @@ const commands = new Map([
   ['preview', runServerCommand],
   ['build', runBuild],
   ['build:ci', runBuildCi],
-  ['build:deploy', runBuildDeploy],
   ['validate:repo', runValidateRepo],
   ['cf:dev', runCfDev],
   ['port:check', (_name, args) => checkPorts(args)],
@@ -53,7 +52,7 @@ function printHelp() {
 
 Commands:
   dev, preview
-  build, build:ci, build:deploy
+  build, build:ci
   validate:repo, cf:dev
   port:check [--port <port> ...]
   port:clean [--port <port> ...] [--force]
@@ -109,16 +108,6 @@ async function runBuildCi(_commandName, args) {
   const buildCode = await runBuild('build', args);
   if (buildCode !== 0) return buildCode;
   return runNodeScript('check-pwa-sw.mjs');
-}
-
-async function runBuildDeploy(_commandName, args) {
-  const buildCode = await runBuild('build', args);
-  if (buildCode !== 0) return buildCode;
-
-  const checkCode = await runNodeScript('check-pwa-sw.mjs');
-  if (checkCode !== 0) return checkCode;
-
-  return runNodeScript('sync-deploy.mjs');
 }
 
 async function runShareWallTests(_commandName, args) {

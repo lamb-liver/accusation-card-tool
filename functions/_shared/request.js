@@ -43,14 +43,6 @@ export function parseLimitParam(url, { defaultValue, maxValue }) {
   return Math.min(parsed, maxValue);
 }
 
-export function parseOffsetParam(url) {
-  const raw = url.searchParams.get('offset');
-  if (raw === null || raw === '') return 0;
-  const parsed = Number.parseInt(raw, 10);
-  if (!Number.isFinite(parsed) || parsed < 0) return null;
-  return parsed;
-}
-
 /**
  * 解析指定的 cursor 查詢參數。
  *
@@ -74,43 +66,25 @@ export function parseCursorParam(url, paramName = 'cursor') {
 }
 
 /**
- * 組出列表查詢的分頁片段，同時支援 cursor（新）與 offset（舊）。
- *
- * 為何仍留著 offset：service worker 會快取前端 bundle，部署後仍有使用者跑著
- * 舊前端。若後端只認 cursor，舊前端送的 `offset=20` 會被忽略、「載入更多」
- * 無聲地重複回傳第一頁。offset 路徑保留到舊快取自然淘汰後再移除。
- * 兩者同時出現時以 cursor 為準（只有新前端會送 cursor）。
+ * 組出列表查詢的 cursor 分頁片段；未帶 cursor 代表第一頁。
  *
  * 用法（注意 bind 順序）：
  *   `WHERE ... ${statusClause} ${page.clause} ORDER BY ... ${page.limitClause}`
- *   `.bind(...statusBind, ...page.bind, fetchLimit, ...page.tailBind)`
+ *   `.bind(...statusBind, ...page.bind, fetchLimit)`
  *
  * @param {URL} url
  * @param {string} timeColumn 主排序欄位名（字面量，不可來自請求資料）
  * @param {string} [cursorParam]
  * @returns {{ clause: string, bind: Array<string|number>, limitClause: string,
- *   tailBind: number[], error?: undefined } | { error: string }}
+ *   error?: undefined } | { error: string }}
  */
 export function resolvePageQuery(url, timeColumn, cursorParam = 'cursor') {
   const { cursor, invalid } = parseCursorParam(url, cursorParam);
   if (invalid) return { error: 'Invalid cursor parameter' };
 
-  if (cursor) {
-    const keyset = buildKeysetClause(timeColumn, cursor);
-    return {
-      clause: keyset.clause,
-      bind: keyset.bind,
-      limitClause: 'LIMIT ?',
-      tailBind: [],
-    };
-  }
-
-  const offset = parseOffsetParam(url);
-  if (offset === null) return { error: 'Invalid offset parameter' };
+  const page = cursor ? buildKeysetClause(timeColumn, cursor) : { clause: '', bind: [] };
   return {
-    clause: '',
-    bind: [],
-    limitClause: 'LIMIT ? OFFSET ?',
-    tailBind: [offset],
+    ...page,
+    limitClause: 'LIMIT ?',
   };
 }

@@ -345,7 +345,7 @@ assert(formatShareWallError(null, 'fallback') === 'fallback', 'format unknown er
     nextStatus: 'approved',
     statusFilter: 'pending',
   });
-  assert(missing.removed === false, 'unknown id reports nothing removed (offset must not shift)');
+  assert(missing.removed === false, 'unknown id reports nothing removed (pagination must not shift)');
   assert(missing.items.length === 3, 'unknown id leaves the list unchanged');
 }
 

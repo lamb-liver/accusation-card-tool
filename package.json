@@ -10,7 +10,6 @@
   "scripts": {
     "dev": "node scripts/project-cli.mjs dev",
     "build": "node scripts/project-cli.mjs build",
-    "build:deploy": "node scripts/project-cli.mjs build:deploy",
     "build:ci": "node scripts/project-cli.mjs build:ci",
     "check:assets": "node scripts/check-assets.mjs",
     "check:generated": "node scripts/check-generated.mjs",

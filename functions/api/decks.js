@@ -81,7 +81,7 @@ export async function onRequestGet(context) {
        ORDER BY reviewed_at DESC, id DESC
        ${page.limitClause}`,
     )
-      .bind(...page.bind, fetchLimit, ...page.tailBind)
+      .bind(...page.bind, fetchLimit)
       .all(),
   );
   if (query.error) return respond(query.error);

@@ -69,7 +69,7 @@ export async function onRequestGet(context) {
          ORDER BY created_at DESC, id DESC
          ${deckPage.limitClause}`,
       )
-        .bind(...bind, ...deckPage.bind, fetchLimit, ...deckPage.tailBind)
+        .bind(...bind, ...deckPage.bind, fetchLimit)
         .all(),
     );
     if (query.error) return respond(query.error);
@@ -92,7 +92,7 @@ export async function onRequestGet(context) {
          ORDER BY created_at DESC, id DESC
          ${messagePage.limitClause}`,
       )
-        .bind(...bind, ...messagePage.bind, fetchLimit, ...messagePage.tailBind)
+        .bind(...bind, ...messagePage.bind, fetchLimit)
         .all(),
     );
     if (query.error) return respond(query.error);

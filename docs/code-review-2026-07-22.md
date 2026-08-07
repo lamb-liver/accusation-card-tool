@@ -5,6 +5,8 @@
 這份文件記錄一次完整的人工審查：**看過哪些檔案、發現什麼、修了什麼、什麼沒修以及為什麼**。
 目的是讓下一次審查能從這裡接手，不必重新掃一遍全庫。
 
+> 這是 2026-07-22 的歷史快照；後續狀態以各節的日期註記與 `docs/project-state.md` 為準。
+
 ---
 
 ## 1. 審查範圍
@@ -99,13 +101,13 @@
 | 13 | 整合測試假設本地 D1 是空的（`hasMore === false`），跨回合累積資料後會誤紅 | `scripts/test-share-wall.mjs` | 改成明確驗證 `hasMore` 的兩種狀態；seed 資料加上回合唯一標記並於結束時清理 |
 
 回歸測試：
-- `scripts/test-share-wall.mjs` — `timingSafeEqual`、`createResponder` 的 id 一致性、`runDbQuery` 的錯誤轉換、游標編解碼與 `resolvePageQuery` 的 cursor／offset 分支
+- `scripts/test-share-wall.mjs` — 當時涵蓋 `timingSafeEqual`、`createResponder` 的 id 一致性、`runDbQuery` 的錯誤轉換、游標編解碼與 `resolvePageQuery` 的 cursor／offset 分支
 - `scripts/test-utils.mjs` — `applyStatusChangeToList` 的移除／就地更新／未命中 id 三種路徑，含不可變性檢查
 - **整合測試**（`--integration`，實際跑 wrangler + D1）— keyset 逐頁走訪的無重複／無遺漏，以及「翻頁途中插入資料」這個 OFFSET 會出錯的關鍵情境
 
-### 後續清理（待舊快取淘汰）
+### 後續清理（2026-08-08 已完成）
 
-`functions/_shared/request.js` 的 `resolvePageQuery` 仍保留 offset 分支，只為相容 service worker 快取的舊前端。待舊快取自然淘汰後，可移除 offset 路徑與 `parseOffsetParam`。
+本節原先保留 offset 分支以相容 service worker 快取的舊前端。確認舊前端不再影響現行專案後，已移除 `parseOffsetParam`、`LIMIT ? OFFSET ?`、`tailBind` 與對應測試；cursor、migration 與唯一排序鍵保留。
 
 ---
 

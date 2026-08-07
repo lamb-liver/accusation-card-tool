@@ -1,4 +1,4 @@
-# Accusation 
+# Accusation
 
 An unofficial **card search, filter, and deck-building** web app (PWA) for the *Accusation* living card game. Works in the browser and can be installed for offline card lookup and deck editing.
 
@@ -41,7 +41,7 @@ An unofficial **card search, filter, and deck-building** web app (PWA) for the *
 
 ```bash
 git clone <repo-url>
-cd accusation-v2
+cd accusation-card-tool
 
 npm install
 npm run dev          # http://localhost:5173
@@ -66,7 +66,6 @@ npm run cf:dev       # build, then start the complete app with Wrangler
 | `npm run dev` | Development server |
 | `npm run build` | Production build → `dist/` |
 | `npm run build:ci` | Build + verify PWA `sw.js` (CI) |
-| `npm run build:deploy` | Build and sync to `deploy-output/` |
 | `npm run preview` | Preview production build |
 | `npm run validate:repo` | Full repo check for assets, generated files, lockfile, deploy flow, lint, and core tests |
 | `npm run validate:browser` | Start or reuse a local site, then run deck layout and horizontal overflow checks |
@@ -76,7 +75,7 @@ npm run cf:dev       # build, then start the complete app with Wrangler
 | `npm run check:lockfile` | Verify `package-lock.json` matches `package.json` |
 | `npm run check:public-orphans` | Report files under `public/` not used by the current reference chain |
 | `npm run clean:public-orphans` | Dry-run safe public asset cleanup; add `-- --apply` to remove files |
-| `npm run check:deploy-flow` | Audit deploy workflow, `wrangler.toml`, and `sync-deploy` high-risk settings |
+| `npm run check:deploy-flow` | Verify Cloudflare Pages config and reject the retired static artifact path |
 | `npm run doctor:build-env` | Diagnose local Node/Vite/Rolldown native binding state |
 | `npm run test:rule-engine` | Deck construction rule tests |
 | `npm run test:card-catalog` | Card catalog loader tests |
@@ -91,7 +90,7 @@ npm run cf:dev       # build, then start the complete app with Wrangler
 ## Project layout
 
 ```
-accusation-v2/
+accusation-card-tool/
 ├── public/
 │   ├── cards.json          # single source of truth for the card catalog
 │   ├── images/             # card art + symbol icons (responsive -w* variants)
@@ -108,7 +107,7 @@ accusation-v2/
 │   ├── hooks/              # useCardData, useDeck, …
 │   ├── utils/              # catalog, filters, images, LCP preload
 │   ├── constants/
-│   └── data/               # qaData.js
+│   └── data/               # generated FAQ data
 ├── index.html
 ├── vite.config.js
 ├── wrangler.toml           # Pages output and D1 binding
@@ -141,9 +140,9 @@ Use `REQUIRE_CSRF_HEADER=false` and `RATE_LIMIT_DISABLED=true` only for controll
 
 For the complete app, connect this repository to Cloudflare Pages with `npm run build` as the build command and `dist` as the output directory. Cloudflare deploys `functions/` as Pages Functions; the D1 binding and migrations live in `wrangler.toml` and `migrations/`.
 
-Run `npm run d1:migrations:apply:remote` after the first deployment or a schema change. `npm run build:deploy` and the GitHub Actions `deploy-output` artifact contain static output only, so they are suitable for backups or frontend-only previews—not the Pages Functions API.
+Run `npm run d1:migrations:apply:remote` after the first deployment or a schema change. Cloudflare Pages Git integration is the only deployment path; do not add a static-only artifact or a second deployment repository.
 
-`dist/` and `deploy-output/` are gitignored and should not be committed.
+`dist/` is gitignored and should not be committed.
 
 ## Data maintenance
 
@@ -157,7 +156,7 @@ Run `npm run d1:migrations:apply:remote` after the first deployment or a schema 
    Edit `src/rules/` → `npm run test:rule-engine`
 
 4. **FAQ copy**  
-   Edit `src/data/qaData.js`
+   Run `npm run sync:qa` to update from Google Sheets. `src/data/qaData.js` is generated output and should not be edited directly; fix `scripts/sync-qa.mjs` or `scripts/lib/qa-module.mjs` when output formatting is wrong.
 
 ## License & disclaimer
 
