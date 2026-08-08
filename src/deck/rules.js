@@ -1,6 +1,7 @@
 import { checkSpecialCardFaction, getMainDeckFactionDecision } from '../rules/deckBuildValidity.js';
 import {
   collectDeckStructureViolations,
+  collectPublishedDeckViolations,
   DECK_LIMITS,
   getRule2QuotaBlockReasonForAdd,
 } from './deckCompositionRules.js';
@@ -90,6 +91,16 @@ export function getFactionAutoFill(allCards, faction) {
  */
 export function validateDeckComposition(deck, rule) {
   const issues = collectDeckStructureViolations(deck, rule);
+  return {
+    valid: issues.length === 0,
+    reason: issues.join('；'),
+  };
+}
+
+export function validateDeckForPublication(deck, rule) {
+  const composition = validateDeckComposition(deck, rule);
+  if (!composition.valid) return composition;
+  const issues = collectPublishedDeckViolations(deck);
   return {
     valid: issues.length === 0,
     reason: issues.join('；'),

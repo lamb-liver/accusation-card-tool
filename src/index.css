@@ -31,6 +31,7 @@
 }
 
 :root {
+  color-scheme: dark;
   --ritual-ink: #090807;
   --ritual-panel: rgba(28, 25, 22, 0.88);
   --ritual-panel-strong: rgba(35, 31, 27, 0.95);

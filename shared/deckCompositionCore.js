@@ -170,6 +170,30 @@ export function collectDeckStructureViolations(deck, rule) {
 }
 
 /**
+ * 本機組牌允許未完成草稿；只有公開投稿要求完整 1／3／20／24。
+ * @param {{ leader: unknown[], rituals: unknown[], main: unknown[] }} deck
+ */
+export function collectPublishedDeckViolations(deck) {
+  const limits = DECK_COMPOSITION_LIMITS;
+  const issues = [];
+  if (deck.leader.length !== limits.maxLeader) {
+    issues.push(`公開牌組須有 1 張教主（目前 ${deck.leader.length} 張）`);
+  }
+  if (deck.rituals.length !== limits.maxRituals) {
+    issues.push(`公開牌組須有 3 張儀式（目前 ${deck.rituals.length} 張）`);
+  }
+  if (deck.main.length !== limits.maxMain) {
+    issues.push(`公開牌組須有 20 張主牌（目前 ${deck.main.length} 張）`);
+  }
+
+  const total = deck.leader.length + deck.rituals.length + deck.main.length;
+  if (total !== limits.maxTotal) {
+    issues.push(`公開牌組須共 24 張（目前 ${total} 張）`);
+  }
+  return issues;
+}
+
+/**
  * @param {ReturnType<typeof collectDeckStructureViolations>} issues
  */
 export function formatDeckCompositionError(issues) {

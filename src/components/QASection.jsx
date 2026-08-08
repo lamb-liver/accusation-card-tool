@@ -196,27 +196,25 @@ export default function QASection({ initialCategory = '' }) {
           <div key={cat.category} className="qa-category mb-9">
             <h2 className="qa-category-title mb-4 flex items-center justify-center gap-4 text-center text-xl font-bold text-brand-gold">
               <CategoryFlourish side="left" />
-              <img
-                className="qa-faction-icon h-7 w-auto shrink-0 object-contain"
-                src={`images/icons/${cat.category}左.webp`}
-                width={28}
-                height={28}
-                alt=""
-                onError={(e) => {
-                  e.currentTarget.style.display = 'none';
-                }}
-              />
+              {cat.category !== '通用規則' && (
+                <img
+                  className="qa-faction-icon h-7 w-auto shrink-0 object-contain"
+                  src={`images/icons/${cat.category}左.webp`}
+                  width={28}
+                  height={28}
+                  alt=""
+                />
+              )}
               <span>{cat.category}</span>
-              <img
-                className="qa-faction-icon h-7 w-auto shrink-0 object-contain"
-                src={`images/icons/${cat.category}右.webp`}
-                width={28}
-                height={28}
-                alt=""
-                onError={(e) => {
-                  e.currentTarget.style.display = 'none';
-                }}
-              />
+              {cat.category !== '通用規則' && (
+                <img
+                  className="qa-faction-icon h-7 w-auto shrink-0 object-contain"
+                  src={`images/icons/${cat.category}右.webp`}
+                  width={28}
+                  height={28}
+                  alt=""
+                />
+              )}
               <CategoryFlourish side="right" />
             </h2>
 

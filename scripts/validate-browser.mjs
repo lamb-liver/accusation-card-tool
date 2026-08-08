@@ -85,10 +85,10 @@ try {
   });
   if (layoutCode !== 0) process.exit(layoutCode);
 
-  const overflowCode = await runNodeScript('find-horizontal-overflow.mjs', {
-    BASE_URL: baseUrl,
+  const smokeCode = await runNodeScript('test-site-smoke.mjs', {
+    SITE_SMOKE_BASE_URL: baseUrl,
   });
-  if (overflowCode !== 0) process.exit(overflowCode);
+  if (smokeCode !== 0) process.exit(smokeCode);
 } finally {
   if (server) {
     server.kill('SIGTERM');

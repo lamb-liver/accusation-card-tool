@@ -3,7 +3,7 @@ import {
   useMemo,
   useCallback,
 } from 'react';
-import { cardMatchesFilters } from '../utils/cardFilterLogic.js';
+import { filterAndRankCards } from '../utils/cardFilterLogic.js';
 
 const INITIAL_FILTERS = {
   faction: '',
@@ -53,7 +53,7 @@ export function useCardFilters(allCards, initial = {}) {
   }, []);
 
   const filteredCards = useMemo(
-    () => allCards.filter((card) => cardMatchesFilters(card, searchTerm, filters)),
+    () => filterAndRankCards(allCards, searchTerm, filters),
     [allCards, searchTerm, filters],
   );
 

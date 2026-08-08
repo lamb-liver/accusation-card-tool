@@ -5,6 +5,7 @@ import {
   checkMainCapacity,
   getPoolBlockedCardIds,
   validateDeckComposition,
+  validateDeckForPublication,
 } from '../src/deck/rules.js';
 import { upsertSavedDeck, findSavedDeckByName } from '../src/deck/savedDecks.js';
 import {
@@ -48,6 +49,29 @@ const deck = {
 
 if (getDeckTotal(deck) !== 1) fail('getDeckTotal');
 if (checkMainCapacity(deck)) fail('checkMainCapacity should pass for small deck');
+if (!validateDeckComposition(deck, { isActive: false }).valid) {
+  fail('incomplete local draft should remain valid');
+}
+if (validateDeckForPublication(deck, { isActive: false }).valid) {
+  fail('incomplete public deck should fail');
+}
+
+const completeDeck = {
+  leader: [{ id: 'leader', faction: '鴉教團', type: '教主' }],
+  rituals: Array.from({ length: 3 }, (_, i) => ({
+    id: `ritual-${i}`,
+    faction: '鴉教團',
+    type: '儀式',
+  })),
+  main: Array.from({ length: 20 }, (_, i) => ({
+    id: `main-${i}`,
+    faction: '鴉教團',
+    type: '信徒',
+  })),
+};
+if (!validateDeckForPublication(completeDeck, { isActive: false }).valid) {
+  fail('complete 1/3/20/24 public deck should pass');
+}
 
 const dup = getAddBlockReason(sampleCard, deck, { isActive: false, type: 'rule1', primary: '', secondary: '' });
 if (!dup.blocked) fail('duplicate card should block');

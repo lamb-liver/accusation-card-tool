@@ -1,6 +1,10 @@
 import { cardIds, factions } from './cardManifest.generated.js';
 import { DECK_LIMITS, FIELD_LIMITS } from './constants.js';
 import { validateDeckComposition } from './deckComposition.js';
+import {
+  collectPublishedDeckViolations,
+  formatDeckCompositionError,
+} from '../../shared/deckCompositionCore.js';
 
 function stringLength(value) {
   return [...String(value)].length;
@@ -58,6 +62,11 @@ export function validateDeckSubmission(body) {
 
   const compositionError = validateDeckComposition(body.deck_json, body.rule_json);
   if (compositionError) return compositionError;
+
+  const publicationError = formatDeckCompositionError(
+    collectPublishedDeckViolations(body.deck_json),
+  );
+  if (publicationError) return publicationError;
 
   return null;
 }

@@ -99,6 +99,8 @@ function runBuild(_commandName, args) {
 }
 
 async function runBuildWithManifest(args) {
+  const contentCode = await runNodeScript('check-content.mjs');
+  if (contentCode !== 0) return contentCode;
   const manifestCode = await runShareWallCodegen();
   if (manifestCode !== 0) return manifestCode;
   return runPackageBin('vite', 'bin/vite.js', ['build', ...args]);
@@ -129,12 +131,14 @@ function runWrangler(args) {
 async function runValidateRepo() {
   const checks = [
     ['check:assets', () => runNodeScript('check-assets.mjs')],
+    ['check:content', () => runNodeScript('check-content.mjs')],
     ['check:generated', () => runNodeScript('check-generated.mjs')],
     ['check:lockfile', () => runNodeScript('check-lockfile.mjs')],
     ['check:deploy-flow', () => runNodeScript('check-deploy-flow.mjs')],
     ['lint', () => runPackageBin('eslint', 'bin/eslint.js', ['.'])],
     ['test:rule-engine', () => runNodeScript('test-rule-engine.mjs')],
     ['test:card-catalog', () => runNodeScript('test-card-catalog.mjs')],
+    ['test:search', () => runNodeScript('test-search.mjs')],
     ['test:deck', () => runNodeScript('test-deck.mjs')],
     ['test:clock', () => runNodeScript('test-clock.mjs')],
     ['test:utils', () => runNodeScript('test-utils.mjs')],

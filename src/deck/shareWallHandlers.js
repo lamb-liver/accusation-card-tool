@@ -1,6 +1,6 @@
 import { submitPublicDeck } from '../api/shareWallApi.js';
 import { createDeckFromJsonIds } from './importExport.js';
-import { validateDeckComposition } from './rules.js';
+import { validateDeckComposition, validateDeckForPublication } from './rules.js';
 import { apiRuleToDeckRule, ruleToApiPayload } from '../utils/shareWallRule.js';
 import { validateApiDeckJson, validateApiRuleJson } from '../utils/shareWallShape.js';
 
@@ -18,7 +18,7 @@ export function canSubmitDeckToShareWall(deck, currentRule, showToast) {
     return false;
   }
 
-  const composition = validateDeckComposition(deck, currentRule);
+  const composition = validateDeckForPublication(deck, currentRule);
   if (!composition.valid) {
     showToast(`無法投稿：${composition.reason}`, 'error');
     return false;

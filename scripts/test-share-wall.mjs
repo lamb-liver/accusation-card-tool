@@ -57,8 +57,8 @@ async function withMutedConsole(method, callback) {
 function sampleDeckJson() {
   return {
     leader: ['cro01'],
-    rituals: ['cro02'],
-    main: ['cro05', 'cro06'],
+    rituals: ['cro02', 'cro03', 'cro04'],
+    main: Array.from({ length: 20 }, (_, index) => `cro${String(index + 5).padStart(2, '0')}`),
   };
 }
 
@@ -87,6 +87,16 @@ assert(
     rule_json: sampleRuleJson(),
   }) === null,
   'valid deck submission should pass',
+);
+assert(
+  validateDeckSubmission({
+    title: '未完成牌組',
+    author_name: '作者',
+    description: '',
+    deck_json: { leader: ['cro01'], rituals: ['cro02'], main: ['cro05'] },
+    rule_json: sampleRuleJson(),
+  })?.includes('公開牌組須'),
+  'incomplete public deck submission should fail',
 );
 assert(
   validateDeckSubmission({

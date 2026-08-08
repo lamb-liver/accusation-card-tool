@@ -2,6 +2,7 @@ import { normalizeRule } from '../rules/normalizeRule.js';
 import {
   DECK_COMPOSITION_LIMITS,
   collectDeckStructureViolations,
+  collectPublishedDeckViolations,
   getMainDeckFactionViolation,
   getRule2MainQuotaViolations,
 } from '../../shared/deckCompositionCore.js';
@@ -10,7 +11,12 @@ import {
 
 export const DECK_LIMITS = DECK_COMPOSITION_LIMITS;
 
-export { collectDeckStructureViolations, getMainDeckFactionViolation, getRule2MainQuotaViolations };
+export {
+  collectDeckStructureViolations,
+  collectPublishedDeckViolations,
+  getMainDeckFactionViolation,
+  getRule2MainQuotaViolations,
+};
 
 /**
  * 若加入此卡是否會超過 rule2 配額（單卡加入檢查）。

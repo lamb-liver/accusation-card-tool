@@ -8,10 +8,10 @@
 
 | 模式 | 說明 |
 |------|------|
-| **查卡** | 關鍵字、教團、類型、符號、機制等多條件篩選；分頁瀏覽；點擊開啟大圖與完整效果 |
+| **查卡** | 卡名優先的關鍵字排序、全半形／空白／標點正規化，以及教團、類型、符號、機制等多條件篩選 |
 | **組牌** | 教主／儀式／主牌組分欄；構築規則（單教團、雙教團配額）；拖曳排序主牌；隱藏已選 |
 | **常見問題** | 內建 QA，可摺疊瀏覽 |
-| **交流區** | 留言板、公開牌組投稿與管理員審核 |
+| **交流區** | 留言板、公開牌組投稿與管理員審核；投稿牌組必須完整為 1 教主／3 儀式／20 主牌 |
 | **對局時鐘** | 雙方倒數、回合切換與行動次數 |
 | **匯出** | 文字清單、JSON 備份、牌組截圖（html2canvas） |
 | **異畫** | 支援異畫的卡可切換主圖／異畫（偏好存於 `localStorage`） |
@@ -68,9 +68,10 @@ npm run cf:dev       # 建置後以 Wrangler 啟動完整站點
 | `npm run build:ci` | 建置並檢查 PWA `sw.js`（CI） |
 | `npm run preview` | 預覽建置結果 |
 | `npm run validate:repo` | 資產、generated 檔、lockfile、部署流程、lint 與核心測試總檢查 |
-| `npm run validate:browser` | 啟動或使用既有本機站台，跑組牌版面與水平溢位檢查 |
+| `npm run validate:browser` | 啟動或使用既有本機站台，跑組牌版面，以及 6 個主要 mode × 4 個 viewport 的溢位、控制項、圖片與站內連結 smoke test |
 | `npm run lint` | ESLint |
 | `npm run check:assets` | 檢查目前引用鏈需要的 `public/` 資產是否齊全 |
+| `npm run check:content` | 阻擋 template、debug 與解析失敗字串進入 production 資料 |
 | `npm run check:generated` | 檢查 generated 檔是否與來源資料同步 |
 | `npm run check:lockfile` | 檢查 `package-lock.json` 是否與 `package.json` 對齊 |
 | `npm run check:public-orphans` | 列出 `public/` 未被目前引用鏈使用的檔案 |
@@ -79,9 +80,11 @@ npm run cf:dev       # 建置後以 Wrangler 啟動完整站點
 | `npm run doctor:build-env` | 診斷本機 Node/Vite/Rolldown native binding 狀態 |
 | `npm run test:rule-engine` | 構築規則單元測試 |
 | `npm run test:card-catalog` | 卡牌目錄載入測試 |
+| `npm run test:search` | 搜尋正規化、排序與 Golden Search Tests |
 | `npm run test:deck` | 牌組領域模組測試 |
 | `npm run test:utils` | 路由、篩選、卡片 metadata、分享牆 API client 等純工具測試 |
 | `npm run test:deck-layout` | 組牌模式 viewport／scroll 容器 Playwright 斷言（需先啟動 dev 或 preview server） |
+| `npm run test:site-smoke` | 全站主要 mode 的 Playwright smoke test（需先啟動 dev 或 preview server） |
 | `npm run audit:deck-layout` | 組牌版面詳細 dump（除錯用） |
 | `npm run optimize:images` | 由 master WebP 產生 `-w160` / `-w320` / `-w640` 的 WebP、AVIF |
 | `npm run fonts:display` | 由卡名＋標題文案重建展示用襯線字體子集 `public/fonts/*.woff2` |
@@ -122,6 +125,8 @@ accusation-card-tool/
 - **`src/rules/deckPoolDisplay.js`**：組牌池「顯示哪些卡」（例如 rule2 隱藏次要教團的教主／儀式）
 - **`src/rules/deckBuildValidity.js`**：點擊加入時的合法性（教團、配額、對話框）
 - **`src/deck/createDeckController.js`**：牌組狀態與 UI 回呼的集中入口；`useDeck` 為薄適配層
+- **牌組完整性**：本機草稿可未完成；送往交流區時，前後端共用 `shared/deckCompositionCore.js` 強制精確 1／3／20／24
+- **搜尋排序**：`src/utils/cardFilterLogic.js` 統一正規化、卡名優先排序與多條件篩選
 - **圖片常數**：`src/utils/cardAlternateArt.js` 的 `CARD_IMAGE_WIDTHS` 須與 `scripts/optimize-images.mjs` 同步
 
 ## 環境變數
@@ -162,7 +167,7 @@ accusation-card-tool/
    > 重建 `public/fonts/*.woff2` 並一併 commit（缺字會逐字回退，不會破版）。
 
 4. **常見問題**  
-   執行 `npm run sync:qa` 從 Google Sheets 更新；`src/data/qaData.js` 是 generated output，不應手動編輯。若輸出格式有問題，修正 `scripts/sync-qa.mjs`／`scripts/lib/qa-module.mjs`
+   執行 `npm run sync:qa` 從 Google Sheets 更新；`src/data/qaData.js` 是 generated output，不應手動編輯。若輸出格式有問題，修正 `scripts/sync-qa.mjs`／`scripts/lib/qa-module.mjs`，並以 `npm run check:content` 確認 production 資料沒有洩漏 template 或 parser 訊息
 
 ## 授權與免責
 
