@@ -56,7 +56,12 @@ export default function AppFooter() {
         </div>
         <p className="mt-6 text-sm text-gray-400">© 愚人古堡工作室 | 版權所有</p>
         <p className="mt-1 text-xs text-gray-400">
-          <a href="https://lambliver.dev/" target="_blank" rel="noopener noreferrer">
+          <a
+            href="https://lambliver.dev/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex rounded-full border border-white/10 bg-white/5 px-2.5 py-1 text-[11px] transition hover:border-white/20 hover:bg-white/10 hover:text-gray-300 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-gold"
+          >
             Site by 羊肝
           </a>
         </p>
