@@ -1,4 +1,5 @@
 User-agent: *
 Allow: /
+Disallow: /api/
 
 Sitemap: https://accusation-card-tool.pages.dev/sitemap.xml

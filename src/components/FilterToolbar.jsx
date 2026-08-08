@@ -41,7 +41,7 @@ export default function FilterToolbar({
     <>
       <header className="w-full px-4 pt-2 text-center">
         <h1 className="app-brand-title m-0 break-words text-lg font-bold text-brand-gold sm:text-xl">
-          控訴-查卡＆組牌＆QA
+          《控訴》LCG 查卡、組牌與規則 QA
         </h1>
       </header>
 

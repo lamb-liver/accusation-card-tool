@@ -103,7 +103,9 @@ async function runBuildWithManifest(args) {
   if (contentCode !== 0) return contentCode;
   const manifestCode = await runShareWallCodegen();
   if (manifestCode !== 0) return manifestCode;
-  return runPackageBin('vite', 'bin/vite.js', ['build', ...args]);
+  const buildCode = await runPackageBin('vite', 'bin/vite.js', ['build', ...args]);
+  if (buildCode !== 0) return buildCode;
+  return runNodeScript('generate-seo-pages.mjs');
 }
 
 async function runBuildCi(_commandName, args) {
