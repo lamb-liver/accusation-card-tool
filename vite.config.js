@@ -70,7 +70,7 @@ function createPwaPlugins(viteMode) {
     // 本站為 hash 路由，真實導航一律指向 '/'，因此任何帶副檔名的路徑都是靜態檔
     // （規則書 PDF、sitemap.xml、日後的字型/壓縮檔…），一律排除於 SPA fallback，
     // 否則直接開啟會拿到 index.html（rules.pdf 曾因此壞掉）。
-    navigateFallbackDenylist: [/^\/api\//, /\/[^/]+\.[a-z0-9]+$/i],
+    navigateFallbackDenylist: [/^\/api\//, /^\/card(?:\/|$)/, /\/[^/]+\.[a-z0-9]+$/i],
     runtimeCaching: [
       {
         urlPattern: ({ url }) => /\.(?:webp|avif)$/i.test(url.pathname),
