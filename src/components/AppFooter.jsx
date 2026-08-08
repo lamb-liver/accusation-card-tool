@@ -55,7 +55,11 @@ export default function AppFooter() {
           </div>
         </div>
         <p className="mt-6 text-sm text-gray-400">© 愚人古堡工作室 | 版權所有</p>
-        <p className="mt-1 text-xs text-gray-400">Website Developed by 羊肝</p>
+        <p className="mt-1 text-xs text-gray-400">
+          <a href="https://lambliver.dev/" target="_blank" rel="noopener noreferrer">
+            Site by 羊肝
+          </a>
+        </p>
       </div>
     </footer>
   );
