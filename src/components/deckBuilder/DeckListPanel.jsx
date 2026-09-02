@@ -50,8 +50,8 @@ export default function DeckListPanel({
         lg:relative lg:z-auto lg:w-[280px] lg:shrink-0 lg:rounded-lg deck-builder-column-lg
       `}
     >
-      <div className="hidden lg:flex shrink-0 items-center justify-between gap-2 border-b border-[#333] px-4 pb-2 pt-4">
-        <h2 className="font-display text-brand-gold font-bold text-xl">
+      <div className="hidden lg:flex shrink-0 items-center justify-between gap-2 border-b border-[#333] px-4 py-3">
+        <h2 className="m-0 font-display text-xl font-bold leading-none text-brand-gold">
           我的牌組 (<span className={totalCards > 24 ? 'text-red-400' : 'text-brand-gold'}>{totalCards}</span>/24)
         </h2>
         <DeckExportMenu
