@@ -42,13 +42,14 @@
     <script type="application/ld+json">
       {
         "@context": "https://schema.org",
-        "@type": "WebSite",
+        "@type": ["WebSite", "WebApplication"],
         "@id": "https://accusation-card-tool.pages.dev/#website",
         "url": "https://accusation-card-tool.pages.dev/",
         "name": "《控訴》LCG 查卡工具",
         "alternateName": "控訴查卡",
         "description": "《控訴》LCG 卡牌查詢、篩選、牌組構築與規則 QA 工具。",
-        "inLanguage": "zh-TW"
+        "inLanguage": "zh-TW",
+        "applicationCategory": "GameApplication"
       }
     </script>
     <link rel="preload" href="/cards.json" as="fetch" crossorigin />
@@ -65,6 +66,11 @@
     <title>《控訴》LCG 查卡、組牌與規則 QA</title>
   </head>
   <body>
+    <noscript>
+      <h1>《控訴》LCG 查卡、組牌與規則 QA</h1>
+      <p>給《控訴》玩家用的免費查卡與組牌工具。可依教團、種類、符號篩選，檢查構築規則，也能離線使用。</p>
+      <p><a href="https://lambliver.dev/projects/card-deck-builder">說明頁</a></p>
+    </noscript>
     <div id="root"></div>
     <script type="module" src="/src/main.jsx"></script>
   </body>
