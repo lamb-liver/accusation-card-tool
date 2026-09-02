@@ -9,10 +9,10 @@ function closeDetails(event) {
 
 export function DeckExportMenu({ onExportText, onExportJson, onExportImage }) {
   return (
-    <details className="deck-export-menu relative">
+    <details className="deck-export-menu relative flex items-center">
       <summary
         aria-label="匯出牌組"
-        className="cursor-pointer list-none rounded border border-brand-gold/60 px-2.5 py-1 text-xs font-semibold text-brand-gold hover:bg-brand-gold/10 [&::-webkit-details-marker]:hidden"
+        className="inline-flex cursor-pointer list-none items-center justify-center rounded border border-brand-gold/60 px-3 py-2 text-sm font-bold leading-none text-brand-gold hover:bg-brand-gold/10 [&::-webkit-details-marker]:hidden"
       >
         匯出
       </summary>
