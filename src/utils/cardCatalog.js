@@ -1,5 +1,11 @@
 export const CARD_CATALOG_PATH = '/cards.json';
 
+/** @param {object[]} cards @param {string} id */
+export function findCardById(cards, id) {
+  if (!id || !Array.isArray(cards)) return null;
+  return cards.find((card) => card.id === id) ?? null;
+}
+
 /**
  * 載入完整卡牌目錄。瀏覽器與 Workbox 處理重複請求。
  *

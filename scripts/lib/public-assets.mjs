@@ -16,6 +16,12 @@ export const STATIC_PUBLIC_ASSETS = [
   'public/manifest.webmanifest',
   'public/robots.txt',
   'public/sitemap.xml',
+  'public/_headers',
+  'public/og-share.jpg',
+  'public/icons/apple-touch-icon.png',
+  'public/icons/icon-192.png',
+  'public/icons/icon-512.png',
+  'public/icons/icon-512-maskable.png',
   // footer「下載規則書」的目標檔；曾在部署整理時被誤刪導致下載到 SPA fallback 的 HTML
   'public/rules.pdf',
   // 展示用襯線字體子集（見 scripts/build-display-font.mjs）與其 SIL OFL 授權

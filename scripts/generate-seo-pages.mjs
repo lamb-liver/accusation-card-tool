@@ -48,7 +48,7 @@ function pageShell({ title, description, canonical, image, structuredData, body,
     <meta property="og:title" content="${safeTitle}" />
     <meta property="og:description" content="${safeDescription}" />
     <meta property="og:url" content="${safeCanonical}" />
-    ${image ? `<meta property="og:image" content="${safeImage}" />\n    <meta property="og:image:alt" content="${safeTitle}" />\n    <meta name="twitter:card" content="summary" />\n    <meta name="twitter:image" content="${safeImage}" />` : '<meta name="twitter:card" content="summary" />'}
+    ${image ? `<meta property="og:image" content="${safeImage}" />\n    <meta property="og:image:type" content="image/jpeg" />\n    <meta property="og:image:alt" content="${safeTitle}" />\n    <meta name="twitter:card" content="summary_large_image" />\n    <meta name="twitter:image" content="${safeImage}" />` : '<meta name="twitter:card" content="summary_large_image" />'}
     <meta name="twitter:title" content="${safeTitle}" />
     <meta name="twitter:description" content="${safeDescription}" />
     <script type="application/ld+json">${jsonLd(structuredData)}</script>
@@ -84,7 +84,8 @@ function pageShell({ title, description, canonical, image, structuredData, body,
 
 function cardPage(card) {
   const canonical = `${SITE_URL}/card/${encodeURIComponent(card.id)}/`;
-  const image = `${SITE_URL}/images/${encodeURIComponent(card.id)}-w640.webp`;
+  const cardImage = `${SITE_URL}/images/${encodeURIComponent(card.id)}-w640.webp`;
+  const image = `${SITE_URL}/og-share.jpg`;
   const title = `${card.name}（${card.faction}）卡牌資料｜《控訴》LCG`;
   const description = summary(`《控訴》LCG ${card.faction}${card.type}「${card.name}」：${card.effect}`);
   const symbols = Array.isArray(card.symbols) && card.symbols.length > 0
@@ -98,7 +99,7 @@ function cardPage(card) {
     description,
     inLanguage: 'zh-TW',
     isPartOf: { '@id': `${SITE_URL}/#website` },
-    primaryImageOfPage: { '@type': 'ImageObject', url: image },
+    primaryImageOfPage: { '@type': 'ImageObject', url: cardImage },
     mainEntity: {
       '@type': 'Thing',
       name: card.name,
@@ -135,6 +136,7 @@ function indexPage() {
     title: '《控訴》LCG 卡牌索引｜卡名、教團與種類',
     description: `瀏覽《控訴》LCG 全部 ${cards.length} 張卡牌，依教團查找卡名、種類、符號與卡牌效果。`,
     canonical: `${SITE_URL}/card/`,
+    image: `${SITE_URL}/og-share.jpg`,
     structuredData: {
       '@context': 'https://schema.org',
       '@type': 'CollectionPage',

@@ -20,7 +20,7 @@ export default function FilterToolbar({
   activeFilterCount = 0,
   onClearFilters = () => {},
 }) {
-  const showCardFilters = currentMode === 'gallery' || currentMode === 'deck';
+  const showCardFilters = currentMode === 'gallery';
 
   const modes = [
     { id: 'gallery', label: '查卡', Icon: Search },

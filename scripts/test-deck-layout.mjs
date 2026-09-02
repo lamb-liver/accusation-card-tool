@@ -75,7 +75,7 @@ async function run() {
           await p.getByRole('textbox', { name: '搜尋卡片' }).fill('zzznomatchzzz');
         },
       });
-      assertDeckLayout(m, 'desktop-empty-pool');
+      assertDeckLayout(m, 'desktop-gallery-search-cleared-on-deck');
       await page.close();
     }
 
