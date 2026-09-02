@@ -1,5 +1,6 @@
 import { ArrowDownWideNarrow, Trash2 } from 'lucide-react';
 import DeckCardRow from './DeckCardRow.jsx';
+import DeckTypeStats from './DeckTypeStats.jsx';
 
 export default function DeckSlotsSection({
   deck,
@@ -8,6 +9,7 @@ export default function DeckSlotsSection({
   onSortMain,
   onCardClick,
   mainListRef,
+  typeEntries,
 }) {
   return (
     <div className="deck-slots border-t border-[#444] pt-3">
@@ -59,7 +61,12 @@ export default function DeckSlotsSection({
 
       <div className="deck-group mb-4">
         <div className="flex justify-between items-center mb-1.5">
-          <h3 className="text-cyan-400 font-semibold">主牌組 ({deck.main.length}/20)</h3>
+          <div className="min-w-0">
+            <h3 className="text-cyan-400 font-semibold">主牌組 ({deck.main.length}/20)</h3>
+            <div className="mt-1">
+              <DeckTypeStats entries={typeEntries} compact />
+            </div>
+          </div>
           <div className="flex items-center gap-1">
             <button
               type="button"

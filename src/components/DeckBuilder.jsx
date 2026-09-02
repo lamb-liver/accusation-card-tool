@@ -2,6 +2,7 @@ import { useState, useMemo, useRef, useEffect, useLayoutEffect, useCallback } fr
 import { filterCardsByRule, sortCardsForRuleDisplay } from '../rules/deckPoolDisplay.js';
 import { sortMainDeck } from '../deck/sortMainDeck.js';
 import { collectDeckSymbolCounts } from '../deck/deckSymbolStats.js';
+import { collectMainDeckTypeCounts } from '../deck/deckTypeStats.js';
 import DeckListPanel from './deckBuilder/DeckListPanel.jsx';
 import DeckPoolSection from './deckBuilder/DeckPoolSection.jsx';
 
@@ -181,6 +182,7 @@ function DeckBuilder({
   );
 
   const symbolEntries = useMemo(() => collectDeckSymbolCounts(deck), [deck]);
+  const typeEntries = useMemo(() => collectMainDeckTypeCounts(deck), [deck]);
 
   const clearCategory = useCallback(
     async (category) => {
@@ -240,6 +242,7 @@ function DeckBuilder({
         secondaryCount={secondaryCount}
         exileCount={exileCount}
         symbolEntries={symbolEntries}
+        typeEntries={typeEntries}
         savedDecks={savedDecks}
         onSaveDeck={onSaveDeck}
         onLoadDeck={onLoadDeck}

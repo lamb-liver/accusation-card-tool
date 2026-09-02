@@ -3,6 +3,7 @@ import DeckRuleConfigurator from './DeckRuleConfigurator.jsx';
 import DeckSlotsSection from './DeckSlotsSection.jsx';
 import DeckManagerSection from './DeckManagerSection.jsx';
 import DeckSymbolStats from './DeckSymbolStats.jsx';
+import DeckTypeStats from './DeckTypeStats.jsx';
 import DeckTransferActions, { DeckExportMenu } from './DeckTransferActions.jsx';
 
 export default function DeckListPanel({
@@ -30,6 +31,7 @@ export default function DeckListPanel({
   secondaryCount,
   exileCount,
   symbolEntries,
+  typeEntries,
   savedDecks,
   onSaveDeck,
   onLoadDeck,
@@ -74,6 +76,7 @@ export default function DeckListPanel({
             <span className={`text-xs font-semibold ${totalCards > 24 ? 'text-red-400' : 'text-brand-gold'}`}>
               {totalCards}/24
             </span>
+            <DeckTypeStats entries={typeEntries} compact />
             <div className="w-20 h-1.5 bg-neutral-700 rounded-full overflow-hidden">
               <div
                 className={`h-full rounded-full transition-all duration-500 ${
@@ -138,6 +141,8 @@ export default function DeckListPanel({
           exileCount={exileCount}
         />
 
+        <DeckTypeStats entries={typeEntries} />
+
         <DeckSymbolStats entries={symbolEntries} />
 
         <DeckSlotsSection
@@ -147,6 +152,7 @@ export default function DeckListPanel({
           onSortMain={onSortMain}
           onCardClick={onCardClick}
           mainListRef={mainListRef}
+          typeEntries={typeEntries}
         />
 
         <DeckManagerSection

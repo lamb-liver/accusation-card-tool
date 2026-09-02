@@ -21,6 +21,7 @@ import { STORAGE_KEY, SAVED_DECKS_KEY, RULE_STATE_KEY } from '../src/deck/consta
 import { createDeckController } from '../src/deck/createDeckController.js';
 import { loadShareWallDeckIntoBuilder } from '../src/deck/shareWallHandlers.js';
 import { sortMainDeck } from '../src/deck/sortMainDeck.js';
+import { collectMainDeckTypeCounts } from '../src/deck/deckTypeStats.js';
 
 const fail = (message) => assert.fail(message);
 
@@ -544,6 +545,28 @@ if (!savedWithRule?.rule || savedWithRule.rule.type !== 'rule1') {
   const noRuleExpected = ['fox05', 'cro02', 'cro10', 'exi09', 'cro16', 'fox20', 'cro21'];
   if (noRule.join(',') !== noRuleExpected.join(',')) {
     fail(`sortMainDeck no-rule order: expected ${noRuleExpected.join(',')}, got ${noRule.join(',')}`);
+  }
+}
+
+
+{
+  const empty = collectMainDeckTypeCounts({ leader: [{ type: '教主' }], rituals: [{ type: '儀式' }], main: [] });
+  if (empty.map((e) => `${e.type}:${e.count}`).join(',') !== '地點:0,信徒:0,魔法:0') {
+    fail(`empty main type counts: ${JSON.stringify(empty)}`);
+  }
+  const mixed = collectMainDeckTypeCounts({
+    leader: [],
+    rituals: [],
+    main: [
+      { type: '信徒' },
+      { type: '地點' },
+      { type: '信徒' },
+      { type: '魔法' },
+      { type: '教主' },
+    ],
+  });
+  if (mixed.map((e) => `${e.type}:${e.count}`).join(',') !== '地點:1,信徒:2,魔法:1') {
+    fail(`mixed main type counts: ${JSON.stringify(mixed)}`);
   }
 }
 
