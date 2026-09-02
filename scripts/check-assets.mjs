@@ -21,6 +21,12 @@ function checkIndexHtmlPreloads() {
   if (!html.includes('href="/cards.json"')) {
     failures.push('index.html 缺少卡牌目錄 preload：/cards.json');
   }
+  if (!html.includes('href="/icons/apple-touch-icon.png"')) {
+    failures.push('index.html 缺少 apple-touch-icon：/icons/apple-touch-icon.png');
+  }
+  if (!html.includes('/og-share.jpg')) {
+    failures.push('index.html 缺少 OG 圖：/og-share.jpg');
+  }
   const lcpPath = `/${getCardImageAvifSrc(LCP_CARD_ID, 'main', LCP_IMAGE_WIDTH)}`;
   if (!html.includes(lcpPath)) {
     failures.push(

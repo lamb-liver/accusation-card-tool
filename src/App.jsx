@@ -1,4 +1,4 @@
-import { lazy, Suspense, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { lazy, Suspense, useCallback, useEffect, useMemo, useState } from 'react';
 import { TriangleAlert } from 'lucide-react';
 import { useCardData }    from './hooks/useCardData.js';
 import { useCardFilters, FILTER_KEYS } from './hooks/useCardFilters.js';
@@ -9,7 +9,7 @@ import { useToast }       from './hooks/useToast.js';
 import { useDialog }      from './hooks/useDialog.js';
 import { useHashRoute } from './hooks/useHashRoute.js';
 import { useCommunityDeckFlow } from './hooks/useCommunityDeckFlow.js';
-import { filterCardsByRule } from './rules/deckPoolDisplay.js';
+import { findCardById } from './utils/cardCatalog.js';
 import DeckSubmitModal from './components/shareWall/DeckSubmitModal.jsx';
 
 import FilterToolbar       from './components/FilterToolbar.jsx';
@@ -52,12 +52,13 @@ function resolveModeFromRoute(route) {
  * 網址 query ←→ 篩選狀態的對應。
  * 搜尋詞用 `q`（比 searchTerm 短且是慣例），其餘篩選維度同名。
  */
-function filtersToQuery(searchTerm, filters) {
+function filtersToQuery(searchTerm, filters, cardId) {
   const query = {};
   if (searchTerm.trim()) query.q = searchTerm;
   for (const key of FILTER_KEYS) {
     if (filters[key]) query[key] = filters[key];
   }
+  if (cardId) query.card = cardId;
   return query;
 }
 
@@ -74,15 +75,6 @@ function App() {
    */
   const [initialQuery] = useState(query);
 
-  const handleModeChange = useCallback((mode) => {
-    if (mode === 'community') navigate('community');
-    else if (mode === 'admin') navigate('admin');
-    else if (mode === 'deck') navigate('deck');
-    else if (mode === 'qa') navigate('qa');
-    else if (mode === 'clock') navigate('clock');
-    else navigate('');
-  }, [navigate]);
-
   const showDeckDetail = route.kind === 'deck-detail';
   const detailShareId = route.kind === 'deck-detail' ? route.shareId : null;
   const communityScrollTarget =
@@ -98,6 +90,16 @@ function App() {
           });
   const { setCurrentPage, perPage, isPaginationMode,
           totalPages, safePage, paginatedCards, handlePerPageChange }   = usePagination(filteredCards);
+
+  const handleModeChange = useCallback((mode) => {
+    if (mode !== currentMode) resetFilters();
+    if (mode === 'community') navigate('community');
+    else if (mode === 'admin') navigate('admin');
+    else if (mode === 'deck') navigate('deck');
+    else if (mode === 'qa') navigate('qa');
+    else if (mode === 'clock') navigate('clock');
+    else navigate('');
+  }, [currentMode, navigate, resetFilters]);
 
   // ── Toast & Dialog ────────────────────────────────────────────────────────
   const { toasts, showToast }                     = useToast();
@@ -148,12 +150,6 @@ function App() {
     showToast,
   });
 
-  // ── 組牌模式：套用規則後的卡牌數量（供 FilterToolbar 顯示）────────────────
-  const deckFilteredCount = useMemo(() => {
-    if (currentMode !== 'deck' || !currentRule.isActive) return filteredCards.length;
-    return filterCardsByRule(filteredCards, currentRule).length;
-  }, [currentMode, filteredCards, currentRule]);
-
   // ── Modal 層 ──────────────────────────────────────────────────────────────
   const {
     selectedCard,
@@ -171,47 +167,42 @@ function App() {
   );
 
   /**
-   * 篩選與卡片彈窗只在查卡／組牌有意義，其餘頁面不把它們寫進網址。
+   * 篩選只寫進查卡網址。組牌只保留 card=（若有彈窗），避免查卡篩選跟著組牌走。
    *
    * 存「模式名或 null」而非布林：gallery↔deck 互切時 navigate 會清掉網址
-   * query，若依賴布林（兩模式下都是 true、值不變），同步 effect 不會重跑，
-   * 篩選仍在 state 裡生效、網址上卻消失了——此時重新整理就會丟失篩選。
-   * 模式名在互切時必然變化，能觸發 effect 把 query 補寫回新路徑。
+   * query，若依賴布林（兩模式下都是 true、值不變），同步 effect 不會重跑。
    */
   const querySyncMode =
     currentMode === 'gallery' || currentMode === 'deck' ? currentMode : null;
 
   /**
-   * 還原網址帶進來的卡片彈窗。只執行一次：之後彈窗的開關由使用者操作決定，
-   * 再次比對網址會在關閉當下又把它重新打開。
-   * 需等卡牌資料載入才找得到卡，故以 allCards 為觸發條件。
+   * URL `card=` → 彈窗。首次載入與後來的 hashchange（分享連結、靜態卡頁
+   * 「在工具中開啟」）走同一條路。
+   *
+   * 關閉不從這裡推：query-sync 若在 selectedCard 還是 null 時把 card= 清掉，
+   * 深層連結會在卡表載入前就斷掉。關閉改由 handleCloseModal 自己寫網址。
    */
-  const restoredCardRef = useRef(false);
   useEffect(() => {
-    if (restoredCardRef.current) return;
-    const cardId = initialQuery.card;
-    if (!cardId) {
-      restoredCardRef.current = true;
-      return;
-    }
-    if (allCards.length === 0) return;
-
-    restoredCardRef.current = true;
-    const card = allCards.find((item) => item.id === cardId);
-    // 找不到（網址帶了不存在的 id）就當作沒有彈窗，不打擾使用者
-    if (card) handleCardClick(card, filteredCards);
-  }, [allCards, filteredCards, handleCardClick, initialQuery]);
+    const cardId = query.card;
+    if (!cardId || allCards.length === 0) return;
+    if (selectedCard?.id === cardId) return;
+    const card = findCardById(allCards, cardId);
+    if (card) handleCardClick(card, allCards);
+  }, [query.card, allCards, selectedCard, handleCardClick]);
 
   /**
-   * 篩選／彈窗 → 網址。單向投影：state 是真相源，網址只反映它，
-   * 因此不需要反向監看 query，也就不會有兩邊互相覆寫的迴圈。
+   * 篩選／彈窗 → 網址。selectedCard 尚未對上 URL 的 card 時先保留網址上的 id，
+   * 避免卡表載入前把深層連結清掉。
    */
   useEffect(() => {
     if (!querySyncMode) return;
-    const nextQuery = filtersToQuery(searchTerm, filters);
-    if (selectedCard) nextQuery.card = selectedCard.id;
-    setQuery(nextQuery);
-  }, [querySyncMode, searchTerm, filters, selectedCard, setQuery]);
+    const cardId = selectedCard?.id ?? query.card;
+    if (querySyncMode === 'deck') {
+      setQuery(cardId ? { card: cardId } : {});
+      return;
+    }
+    setQuery(filtersToQuery(searchTerm, filters, cardId));
+  }, [querySyncMode, searchTerm, filters, selectedCard, query.card, setQuery]);
 
   /** 換頁／改每頁張數後回到頁首，避免使用者停留在新頁面的底部 */
   const handlePageChange = useCallback(
@@ -228,6 +219,13 @@ function App() {
     },
     [handlePerPageChange],
   );
+
+  /** 關閉彈窗並從網址拿掉 card=（保留查卡篩選） */
+  const handleCloseModal = useCallback(() => {
+    closeModal();
+    if (querySyncMode === 'deck') setQuery({});
+    else if (querySyncMode === 'gallery') setQuery(filtersToQuery(searchTerm, filters));
+  }, [closeModal, querySyncMode, searchTerm, filters, setQuery]);
 
   /** 卡片彈窗 →「查看此教團常見問題」：關閉彈窗並開在該教團分類 */
   const handleViewFactionQA = useCallback(
@@ -285,7 +283,7 @@ function App() {
             onSearchChange={setSearchTerm}
             filters={filters}
             onFilterChange={handleFilterChangeAndScroll}
-            resultCount={deckFilteredCount}
+            resultCount={filteredCards.length}
             activeFilterCount={activeFilterCount}
             onClearFilters={handleClearFilters}
           />
@@ -295,8 +293,8 @@ function App() {
       <MobileFilterDrawer
         searchTerm={searchTerm}
         filters={filters}
-        fabVisible={currentMode === 'gallery' || currentMode === 'deck'}
-        fabZIndex={currentMode === 'deck' ? 350 : 900}
+        fabVisible={currentMode === 'gallery'}
+        fabZIndex={900}
         activeFilterCount={activeFilterCount}
         onApply={handleDrawerApply}
       />
@@ -372,7 +370,7 @@ function App() {
           <Suspense fallback={<SectionFallback label="載入組牌工具…" />}>
           <DeckBuilder
             deck={deck}
-            filteredCards={filteredCards}
+            poolCards={allCards}
             onRemoveCard={removeFromDeck}
             onCardClick={handleCardClick}
             onAddCard={addToDeck}
@@ -445,7 +443,7 @@ function App() {
           <CardModal
             card={selectedCard}
             cardList={selectedCardList}
-            onClose={closeModal}
+            onClose={handleCloseModal}
             onAdd={addToDeck}
             onPrev={handleModalPrev}
             onNext={handleModalNext}

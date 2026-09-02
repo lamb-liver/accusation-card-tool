@@ -72,6 +72,11 @@ assertDeepEqual(parseHashRoute('#/?q=夜'), { kind: 'home' }, 'home route with q
 // ── hash query 解析與組裝 ──────────────────────────────────────────────────
 assertDeepEqual(parseHashQuery('#/'), {}, 'no query yields an empty object');
 assertDeepEqual(
+  parseHashQuery('#/?card=cro01'),
+  { card: 'cro01' },
+  'card-only deep link keeps the card id',
+);
+assertDeepEqual(
   parseHashQuery('#/?q=夜幕&faction=鴉教團&card=cro01'),
   { q: '夜幕', faction: '鴉教團', card: 'cro01' },
   'query params are decoded into an object',

@@ -9,7 +9,7 @@ const HIDE_IMAGES_KEY = 'accusation-deck-hide-images';
 
 function DeckBuilder({
   deck,
-  filteredCards,
+  poolCards,
   onRemoveCard,
   onCardClick,
   onAddCard,
@@ -122,8 +122,8 @@ function DeckBuilder({
 
   const displayCards = useMemo(() => {
     let available = currentRule.isActive
-      ? filterCardsByRule(filteredCards, currentRule)
-      : filteredCards;
+      ? filterCardsByRule(poolCards, currentRule)
+      : poolCards;
 
     if (currentRule.isActive && currentRule.type === 'rule2') {
       available = sortCardsForRuleDisplay(available, currentRule);
@@ -134,7 +134,7 @@ function DeckBuilder({
     }
 
     return available;
-  }, [currentRule, filteredCards, hideSelected, inDeckIds]);
+  }, [currentRule, poolCards, hideSelected, inDeckIds]);
 
   const limitedCardIds = useMemo(
     () => getPoolBlockedCardIds(displayCards),

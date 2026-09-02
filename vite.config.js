@@ -42,7 +42,14 @@ function ensurePwaSwOutput(pwaPlugins) {
 function createPwaPlugins(viteMode) {
   return VitePWA({
   registerType: 'autoUpdate',
-  includeAssets: ['favicon.svg'],
+  includeAssets: [
+    'favicon.svg',
+    'og-share.jpg',
+    'icons/apple-touch-icon.png',
+    'icons/icon-192.png',
+    'icons/icon-512.png',
+    'icons/icon-512-maskable.png',
+  ],
   manifest: {
     name: '控訴 - 查卡＆組牌工具',
     short_name: '控訴',
@@ -56,10 +63,22 @@ function createPwaPlugins(viteMode) {
     scope: '/',
     icons: [
       {
-        src: '/favicon.svg',
-        sizes: '512x512',
-        type: 'image/svg+xml',
+        src: '/icons/icon-192.png',
+        sizes: '192x192',
+        type: 'image/png',
         purpose: 'any',
+      },
+      {
+        src: '/icons/icon-512.png',
+        sizes: '512x512',
+        type: 'image/png',
+        purpose: 'any',
+      },
+      {
+        src: '/icons/icon-512-maskable.png',
+        sizes: '512x512',
+        type: 'image/png',
+        purpose: 'maskable',
       },
     ],
   },

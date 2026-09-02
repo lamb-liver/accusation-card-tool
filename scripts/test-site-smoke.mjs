@@ -114,6 +114,13 @@ async function run() {
           await page.getByRole('dialog').waitFor();
           await assertPage(page, `${label}-card-modal`);
           await page.getByRole('button', { name: '關閉', exact: true }).click();
+
+          if (viewport.width >= 1280) {
+            await page.goto(`${url}/#/?card=cro01`, { waitUntil: 'domcontentloaded', timeout: 60_000 });
+            await page.getByRole('dialog').waitFor({ timeout: 30_000 });
+            await assertPage(page, `${label}-card-deeplink`);
+            await page.getByRole('button', { name: '關閉', exact: true }).click();
+          }
         }
       }
 

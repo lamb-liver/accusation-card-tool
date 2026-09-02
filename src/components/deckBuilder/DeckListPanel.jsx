@@ -3,7 +3,7 @@ import DeckRuleConfigurator from './DeckRuleConfigurator.jsx';
 import DeckSlotsSection from './DeckSlotsSection.jsx';
 import DeckManagerSection from './DeckManagerSection.jsx';
 import DeckSymbolStats from './DeckSymbolStats.jsx';
-import DeckTransferActions from './DeckTransferActions.jsx';
+import DeckTransferActions, { DeckExportMenu } from './DeckTransferActions.jsx';
 
 export default function DeckListPanel({
   bottomSheetOpen,
@@ -50,45 +50,63 @@ export default function DeckListPanel({
         lg:relative lg:z-auto lg:w-[280px] lg:shrink-0 lg:rounded-lg deck-builder-column-lg
       `}
     >
-      <button
-        type="button"
-        onClick={onToggleBottomSheet}
-        className="lg:hidden shrink-0 flex items-center justify-between px-4 h-14 w-full border-b border-[#333]"
-        aria-expanded={bottomSheetOpen}
-        aria-label={bottomSheetOpen ? '收合牌組清單' : '展開牌組清單'}
-      >
-        <div className="flex items-center gap-2.5">
-          <span className="text-brand-gold font-bold text-sm">我的牌組</span>
-          <span className={`text-xs font-semibold ${totalCards > 24 ? 'text-red-400' : 'text-brand-gold'}`}>
-            {totalCards}/24
-          </span>
-          <div className="w-20 h-1.5 bg-neutral-700 rounded-full overflow-hidden">
-            <div
-              className={`h-full rounded-full transition-all duration-500 ${
-                totalCards > 24
-                  ? 'bg-red-500'
-                  : totalCards === 24
-                    ? 'bg-brand-gold'
-                    : 'bg-brand-gold/70'
-              }`}
-              style={{ width: `${Math.min((totalCards / 24) * 100, 100)}%` }}
-            />
-          </div>
-        </div>
-        <ChevronUp
-          className={`h-4 w-4 text-gray-400 transition-transform duration-300 ${
-            bottomSheetOpen ? '' : 'rotate-180'
-          }`}
-          aria-hidden
-          strokeWidth={2.25}
-        />
-      </button>
-
-      <div className="deck-list-scroll flex min-h-0 min-w-0 flex-1 flex-col gap-4 overflow-x-hidden overflow-y-auto overscroll-y-contain p-4">
-        <h2 className="hidden lg:block font-display text-brand-gold font-bold text-xl">
+      <div className="hidden lg:flex shrink-0 items-center justify-between gap-2 border-b border-[#333] px-4 pb-2 pt-4">
+        <h2 className="font-display text-brand-gold font-bold text-xl">
           我的牌組 (<span className={totalCards > 24 ? 'text-red-400' : 'text-brand-gold'}>{totalCards}</span>/24)
         </h2>
+        <DeckExportMenu
+          onExportText={onExportText}
+          onExportJson={onExportJson}
+          onExportImage={onExportImage}
+        />
+      </div>
 
+      <div className="lg:hidden shrink-0 flex h-14 items-center border-b border-[#333]">
+        <button
+          type="button"
+          onClick={onToggleBottomSheet}
+          className="flex h-14 min-w-0 flex-1 items-center justify-between px-4"
+          aria-expanded={bottomSheetOpen}
+          aria-label={bottomSheetOpen ? '收合牌組清單' : '展開牌組清單'}
+        >
+          <div className="flex items-center gap-2.5">
+            <span className="text-brand-gold font-bold text-sm">我的牌組</span>
+            <span className={`text-xs font-semibold ${totalCards > 24 ? 'text-red-400' : 'text-brand-gold'}`}>
+              {totalCards}/24
+            </span>
+            <div className="w-20 h-1.5 bg-neutral-700 rounded-full overflow-hidden">
+              <div
+                className={`h-full rounded-full transition-all duration-500 ${
+                  totalCards > 24
+                    ? 'bg-red-500'
+                    : totalCards === 24
+                      ? 'bg-brand-gold'
+                      : 'bg-brand-gold/70'
+                }`}
+                style={{ width: `${Math.min((totalCards / 24) * 100, 100)}%` }}
+              />
+            </div>
+          </div>
+          <ChevronUp
+            className={`h-4 w-4 text-gray-400 transition-transform duration-300 ${
+              bottomSheetOpen ? '' : 'rotate-180'
+            }`}
+            aria-hidden
+            strokeWidth={2.25}
+          />
+        </button>
+        {bottomSheetOpen && (
+          <div className="pr-3">
+            <DeckExportMenu
+              onExportText={onExportText}
+              onExportJson={onExportJson}
+              onExportImage={onExportImage}
+            />
+          </div>
+        )}
+      </div>
+
+      <div className="deck-list-scroll flex min-h-0 min-w-0 flex-1 flex-col gap-4 overflow-x-hidden overflow-y-auto overscroll-y-contain p-4">
         {totalCards > 24 && (
           <div className="limit-warning warning-over flex items-start gap-2 bg-[#8b0000] border-2 border-red-600 text-red-200 p-3 rounded text-sm font-semibold">
             <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0" aria-hidden strokeWidth={2.5} />
@@ -139,9 +157,6 @@ export default function DeckListPanel({
         />
 
         <DeckTransferActions
-          onExportText={onExportText}
-          onExportJson={onExportJson}
-          onExportImage={onExportImage}
           onImportDeck={onImportDeck}
           onSubmitToShareWall={onSubmitToShareWall}
         />

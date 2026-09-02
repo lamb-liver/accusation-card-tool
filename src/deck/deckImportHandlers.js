@@ -4,6 +4,7 @@ import {
   buildDeckTextExport,
   createDeckFromJsonIds,
   createDeckFromText,
+  downloadTextFile,
   exportDeckAsImage,
   validateImportedJson,
 } from './importExport.js';
@@ -150,10 +151,8 @@ export function createDeckImportHandlers({ getState, ctx, commit }) {
     }
 
     const data = buildDeckJsonExport(deck, currentRule);
-    navigator.clipboard
-      .writeText(JSON.stringify(data, null, 2))
-      .then(() => ctx.showToast('JSON 備份已複製到剪貼簿'))
-      .catch(() => ctx.showToast('複製失敗，請手動複製', 'error'));
+    downloadTextFile('accusation_deck.json', JSON.stringify(data, null, 2));
+    ctx.showToast('JSON 備份已下載');
   }
 
   async function exportDeckAsImageHandler() {

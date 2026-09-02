@@ -1,6 +1,6 @@
 import { readFileSync } from 'node:fs';
 import assert from 'node:assert/strict';
-import { loadCardCatalog, CARD_CATALOG_PATH } from '../src/utils/cardCatalog.js';
+import { loadCardCatalog, CARD_CATALOG_PATH, findCardById } from '../src/utils/cardCatalog.js';
 
 const expectedCards = JSON.parse(
   readFileSync(new URL('../public/cards.json', import.meta.url), 'utf8'),
@@ -18,4 +18,7 @@ const cards = await loadCardCatalog({ fetch: mockFetch });
 
 assert.equal(cards.length, expectedCards.length, 'card count');
 assert.equal(cards[0]?.id, expectedCards[0]?.id, 'card order');
+assert.equal(findCardById(cards, 'cro01')?.id, 'cro01', 'findCardById hits catalog id');
+assert.equal(findCardById(cards, 'missing'), null, 'findCardById misses unknown id');
+assert.equal(findCardById(cards, ''), null, 'findCardById ignores blank id');
 console.log('OK: card catalog tests passed');

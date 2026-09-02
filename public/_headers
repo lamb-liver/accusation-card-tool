@@ -1,0 +1,28 @@
+# hashed Vite chunks — filename changes on content change
+/assets/*
+  Cache-Control: public, max-age=31536000, immutable
+
+/workbox-*.js
+  Cache-Control: public, max-age=31536000, immutable
+
+/fonts/*
+  Cache-Control: public, max-age=31536000, immutable
+
+/icons/*
+  Cache-Control: public, max-age=31536000, immutable
+
+# unhashed card art: short-ish browser cache; SW still CacheFirst
+/images/*
+  Cache-Control: public, max-age=604800
+
+/og-share.jpg
+  Cache-Control: public, max-age=604800
+
+/cards.json
+  Cache-Control: public, max-age=300, must-revalidate
+
+/sw.js
+  Cache-Control: public, max-age=0, must-revalidate
+
+/index.html
+  Cache-Control: public, max-age=0, must-revalidate

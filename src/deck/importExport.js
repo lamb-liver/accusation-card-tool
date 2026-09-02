@@ -155,6 +155,20 @@ export function buildDeckJsonExport(deck, currentRule) {
   };
 }
 
+/** 觸發瀏覽器下載文字檔（JSON 備份與圖片匯出同一條「下載檔案」路徑） */
+export function downloadTextFile(filename, text, mimeType = 'application/json') {
+  const blob = new Blob([text], { type: `${mimeType};charset=utf-8` });
+  const url = URL.createObjectURL(blob);
+  try {
+    const link = document.createElement('a');
+    link.download = filename;
+    link.href = url;
+    link.click();
+  } finally {
+    URL.revokeObjectURL(url);
+  }
+}
+
 export async function exportDeckAsImage(deck, _currentRule, showToast) {
   const allDeckCards = [...deck.leader, ...deck.rituals, ...deck.main];
   if (allDeckCards.length === 0) {
