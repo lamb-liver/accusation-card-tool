@@ -176,8 +176,9 @@ function App() {
     currentMode === 'gallery' || currentMode === 'deck' ? currentMode : null;
 
   /**
-   * URL `card=` → 彈窗。首次載入與後來的 hashchange（分享連結、靜態卡頁
-   * 「在工具中開啟」）走同一條路。
+   * URL `card=` → 彈窗。只在彈窗尚未開啟時 hydrate（深層連結、靜態卡頁）。
+   * 彈窗內左右切換會先改 selectedCard、再由下方 sync 寫回 hash；若這裡
+   * 用舊的 query.card 覆寫，會把卡拽回去並重掛卡圖。
    *
    * 關閉不從這裡推：query-sync 若在 selectedCard 還是 null 時把 card= 清掉，
    * 深層連結會在卡表載入前就斷掉。關閉改由 handleCloseModal 自己寫網址。
@@ -186,6 +187,10 @@ function App() {
     const cardId = query.card;
     if (!cardId || allCards.length === 0) return;
     if (selectedCard?.id === cardId) return;
+    // Modal already open: arrow prev/next updates selectedCard before the hash.
+    // Hydrating from a stale query.card would yank back a card and remount art.
+    // Deep links / share URLs open when selectedCard is still null.
+    if (selectedCard) return;
     const card = findCardById(allCards, cardId);
     if (card) handleCardClick(card, allCards);
   }, [query.card, allCards, selectedCard, handleCardClick]);

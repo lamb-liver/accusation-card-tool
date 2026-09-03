@@ -29,6 +29,16 @@ function OptimizedImage({
     setUsePlainImg(false);
   }, [src, imgKey, webpSrcSet, avifSrcSet]);
 
+  const imgRefCallback = useCallback(
+    (img) => {
+      if (!img || !onLoad) return;
+      if (img.complete && img.naturalWidth > 0) {
+        onLoad({ currentTarget: img });
+      }
+    },
+    [onLoad, src, imgKey],
+  );
+
   const handleLoad = useCallback(
     async (e) => {
       const img = e.currentTarget;
@@ -65,6 +75,7 @@ function OptimizedImage({
   if (!hasError) {
     const img = (
       <img
+        ref={imgRefCallback}
         src={src}
         alt={alt}
         loading={priority ? 'eager' : 'lazy'}
