@@ -10,6 +10,7 @@ import { CSRF_HEADER_NAME, CSRF_HEADER_VALUE } from '../src/api/csrfHeader.gener
 import {
   CARD_ART_CHANGED_EVENT,
   cardHasAlternateArt,
+  cardArtPreloadUrls,
   getCardImageFullSrc,
   getCardImageSrc,
   getCardPictureSources,
@@ -211,6 +212,16 @@ assert(getCardImageFullSrc('cro01', 'main') === 'images/cro01-w640.webp', 'full 
 assert(
   getCardPictureSources('cro01', 'alt').avifSrcSet.includes('images/cro01alt-w640.avif 640w'),
   'picture sources include modal width avif',
+);
+assert.deepEqual(
+  cardArtPreloadUrls('cro01', 'main'),
+  { avif: 'images/cro01-w640.avif', webp: 'images/cro01-w640.webp' },
+  'modal preload uses 640w avif and webp',
+);
+assert.deepEqual(
+  cardArtPreloadUrls('cro01', 'alt'),
+  { avif: 'images/cro01alt-w640.avif', webp: 'images/cro01alt-w640.webp' },
+  'modal preload follows alt variant',
 );
 assert(factionIconPath('鴉教團', '右') === 'images/icons/鴉教團右.webp', 'faction icon path');
 
