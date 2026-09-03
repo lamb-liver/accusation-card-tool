@@ -105,6 +105,23 @@ export function getCardPictureSources(cardId, variant) {
   };
 }
 
+/** Modal 用的 640w；gallery 通常只快取到 320w */
+export function cardArtPreloadUrls(cardId, variant = 'main') {
+  return {
+    avif: getCardImageAvifSrc(cardId, variant, CARD_IMAGE_MODAL_WIDTH),
+    webp: getCardImageFullSrc(cardId, variant),
+  };
+}
+
+export function preloadCardArt(cardId, variant = 'main') {
+  if (typeof Image === 'undefined') return;
+  const { avif, webp } = cardArtPreloadUrls(cardId, variant);
+  const a = new Image();
+  a.src = avif;
+  const b = new Image();
+  b.src = webp;
+}
+
 /** gallery 每張卡每次 render 都會讀取，快取解析結果避免重複 JSON.parse（raw 變動時自動失效） */
 let cachedRaw = null;
 let cachedMap = {};

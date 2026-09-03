@@ -4,7 +4,6 @@ import {
   ChevronLeft,
   ChevronRight,
   HelpCircle,
-  Image as ImageIcon,
   List,
   Plus,
   X,
@@ -16,10 +15,13 @@ import { getMechanicNotes } from '../constants/mechanicGlossary.js';
 import { factionHasQA } from '../utils/qaLookup.js';
 import {
   CARD_ART_CHANGED_EVENT,
+  CARD_IMAGE_DEFAULT_WIDTH,
   CARD_MODAL_SIZES,
   cardHasAlternateArt,
   getCardArtVariants,
+  getCardImageSrc,
   getCardPictureSources,
+  preloadCardArt,
   getStoredArtVariant,
   getVariantSource,
   setStoredArtVariant,
@@ -64,6 +66,20 @@ export default function CardModal({
   useEffect(() => {
     setImgLoaded(false);
   }, [card?.id, artVariant, artRev]);
+
+  useEffect(() => {
+    if (!card) return;
+    const idx = cardList.findIndex((c) => c.id === card.id);
+    if (idx < 0) return;
+    for (const neighbor of [cardList[idx - 1], cardList[idx + 1]]) {
+      if (!neighbor) continue;
+      const variants = getCardArtVariants(neighbor);
+      const variant = cardHasAlternateArt(neighbor)
+        ? getStoredArtVariant(neighbor.id, variants)
+        : 'main';
+      preloadCardArt(neighbor.id, variant);
+    }
+  }, [card, cardList]);
 
   // 開啟時自動聚焦到對話框，並儲存原本焦點以供關閉後還原
   useEffect(() => {
@@ -225,11 +241,13 @@ export default function CardModal({
               </div>
             )}
             <div className="card-image-slot card-image-slot--contain relative mx-auto w-full max-w-sm shadow-[0_24px_70px_rgba(0,0,0,0.62),0_0_28px_rgba(209,179,95,0.08)]">
-              {!imgLoaded && (
-                <div className="absolute inset-0 flex items-center justify-center rounded bg-neutral-700 animate-pulse" aria-hidden>
-                  <ImageIcon className="h-12 w-12 text-neutral-500" strokeWidth={2.25} />
-                </div>
-              )}
+              <img
+                src={getCardImageSrc(card.id, artVariant, CARD_IMAGE_DEFAULT_WIDTH)}
+                alt=""
+                aria-hidden
+                draggable={false}
+                className="card-image-media pointer-events-none select-none rounded-sm"
+              />
               {picture && (
                 <OptimizedImage
                   src={picture.fallbackSrc}
