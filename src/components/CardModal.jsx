@@ -41,7 +41,6 @@ export default function CardModal({
   isInDeck = false,
   onViewFactionQA = () => {},
 }) {
-  const [imgLoaded, setImgLoaded] = useState(false);
   const [artRev, setArtRev] = useState(0);
   const dialogRef = useRef(null);
   const touchStartRef = useRef({ x: 0, y: 0, ignore: false });
@@ -58,14 +57,13 @@ export default function CardModal({
   const displaySource = getVariantSource(card, artVariant);
 
   useEffect(() => {
-    const onArtChange = () => setArtRev((n) => n + 1);
+    if (!card) return undefined;
+    const onArtChange = (e) => {
+      if (e.detail?.cardId === card.id) setArtRev((n) => n + 1);
+    };
     window.addEventListener(CARD_ART_CHANGED_EVENT, onArtChange);
     return () => window.removeEventListener(CARD_ART_CHANGED_EVENT, onArtChange);
-  }, []);
-
-  useEffect(() => {
-    setImgLoaded(false);
-  }, [card?.id, artVariant, artRev]);
+  }, [card]);
 
   useEffect(() => {
     if (!card) return;
@@ -256,15 +254,12 @@ export default function CardModal({
                   sizes={CARD_MODAL_SIZES}
                   imgKey={`${card.id}-${artVariant}-${artRev}`}
                   priority
-                  awaitDecode
                   alt={
                     artVariant !== 'main' && hasAlt
                       ? `卡牌「${card.name}」異畫（WebP，${card.faction}，${card.type}）`
                       : `卡牌「${card.name}」大圖（WebP，${card.faction}，${card.type}）`
                   }
-                  onLoad={() => setImgLoaded(true)}
-                  onError={() => setImgLoaded(true)}
-                  className={`card-image-media touch-manipulation select-none rounded-sm object-contain transition-opacity duration-300 ${imgLoaded ? 'opacity-100' : 'opacity-0'}`}
+                  className="card-image-media touch-manipulation select-none rounded-sm object-contain"
                 />
               )}
             </div>
