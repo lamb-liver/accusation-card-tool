@@ -105,9 +105,10 @@ export function getCardPictureSources(cardId, variant) {
   };
 }
 
-/** Modal 用的 640w；gallery 通常只快取到 320w */
+/** Modal 翻牌：先暖 320w 底圖，再暖 640w；gallery 外的下一張才不會黑一下 */
 export function cardArtPreloadUrls(cardId, variant = 'main') {
   return {
+    preview: getCardImageSrc(cardId, variant, CARD_IMAGE_DEFAULT_WIDTH),
     avif: getCardImageAvifSrc(cardId, variant, CARD_IMAGE_MODAL_WIDTH),
     webp: getCardImageFullSrc(cardId, variant),
   };
@@ -115,11 +116,11 @@ export function cardArtPreloadUrls(cardId, variant = 'main') {
 
 export function preloadCardArt(cardId, variant = 'main') {
   if (typeof Image === 'undefined') return;
-  const { avif, webp } = cardArtPreloadUrls(cardId, variant);
-  const a = new Image();
-  a.src = avif;
-  const b = new Image();
-  b.src = webp;
+  const urls = cardArtPreloadUrls(cardId, variant);
+  for (const src of [urls.preview, urls.avif, urls.webp]) {
+    const img = new Image();
+    img.src = src;
+  }
 }
 
 /** gallery 每張卡每次 render 都會讀取，快取解析結果避免重複 JSON.parse（raw 變動時自動失效） */

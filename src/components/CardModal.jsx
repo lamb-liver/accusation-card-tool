@@ -77,13 +77,17 @@ export default function CardModal({
     if (!card) return;
     const idx = cardList.findIndex((c) => c.id === card.id);
     if (idx < 0) return;
-    for (const neighbor of [cardList[idx - 1], cardList[idx + 1]]) {
-      if (!neighbor) continue;
-      const variants = getCardArtVariants(neighbor);
-      const variant = cardHasAlternateArt(neighbor)
-        ? getStoredArtVariant(neighbor.id, variants)
+    const targets = [card];
+    for (const offset of [-2, -1, 1, 2]) {
+      const neighbor = cardList[idx + offset];
+      if (neighbor) targets.push(neighbor);
+    }
+    for (const target of targets) {
+      const variants = getCardArtVariants(target);
+      const variant = cardHasAlternateArt(target)
+        ? getStoredArtVariant(target.id, variants)
         : 'main';
-      preloadCardArt(neighbor.id, variant);
+      preloadCardArt(target.id, variant);
     }
   }, [card, cardList]);
 
@@ -254,6 +258,9 @@ export default function CardModal({
                   alt=""
                   aria-hidden
                   draggable={false}
+                  ref={(img) => {
+                    if (img?.complete && img.naturalWidth > 0) setPreviewReady(true);
+                  }}
                   onLoad={() => setPreviewReady(true)}
                   className={`card-image-media pointer-events-none select-none rounded-sm ${previewReady ? '' : 'opacity-0'}`}
                 />
