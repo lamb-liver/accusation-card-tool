@@ -42,6 +42,7 @@ export default function CardModal({
   onViewFactionQA = () => {},
 }) {
   const [artRev, setArtRev] = useState(0);
+  const [previewReady, setPreviewReady] = useState(false);
   const dialogRef = useRef(null);
   const touchStartRef = useRef({ x: 0, y: 0, ignore: false });
   const titleId = 'card-modal-title';
@@ -55,6 +56,13 @@ export default function CardModal({
     [card, artVariant],
   );
   const displaySource = getVariantSource(card, artVariant);
+  const previewSrc = card
+    ? getCardImageSrc(card.id, artVariant, CARD_IMAGE_DEFAULT_WIDTH)
+    : null;
+
+  useEffect(() => {
+    setPreviewReady(false);
+  }, [previewSrc]);
 
   useEffect(() => {
     if (!card) return undefined;
@@ -239,13 +247,17 @@ export default function CardModal({
               </div>
             )}
             <div className="card-image-slot card-image-slot--contain relative mx-auto w-full max-w-sm shadow-[0_24px_70px_rgba(0,0,0,0.62),0_0_28px_rgba(209,179,95,0.08)]">
-              <img
-                src={getCardImageSrc(card.id, artVariant, CARD_IMAGE_DEFAULT_WIDTH)}
-                alt=""
-                aria-hidden
-                draggable={false}
-                className="card-image-media pointer-events-none select-none rounded-sm"
-              />
+              {previewSrc ? (
+                <img
+                  key={previewSrc}
+                  src={previewSrc}
+                  alt=""
+                  aria-hidden
+                  draggable={false}
+                  onLoad={() => setPreviewReady(true)}
+                  className={`card-image-media pointer-events-none select-none rounded-sm ${previewReady ? '' : 'opacity-0'}`}
+                />
+              ) : null}
               {picture && (
                 <OptimizedImage
                   src={picture.fallbackSrc}

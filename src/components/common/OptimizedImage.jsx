@@ -36,7 +36,7 @@ function OptimizedImage({
         onLoad({ currentTarget: img });
       }
     },
-    [onLoad, src, imgKey],
+    [onLoad],
   );
 
   const handleLoad = useCallback(
