@@ -51,7 +51,10 @@ export function getCardStats(card) {
     if (card.calamity !== undefined) stats.push({ label: '災厄', value: card.calamity });
   } else if (card.type === '信徒') {
     if (card.volume !== undefined) stats.push({ label: '聲量', value: card.volume });
-    if (card.calamity !== undefined) stats.push({ label: '災厄', value: card.calamity });
+    // 非詠頌信徒不應有災厄；calamity:0 視為缺欄（與地點一致）
+    if (card.calamity !== undefined && card.calamity !== 0) {
+      stats.push({ label: '災厄', value: card.calamity });
+    }
   } else if (card.type === '地點') {
     if (card.guard !== undefined) stats.push({ label: '守護', value: card.guard });
     if (card.calamity !== undefined && card.calamity !== 0) {
