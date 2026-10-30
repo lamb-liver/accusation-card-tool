@@ -92,12 +92,12 @@ export default function GuestbookSection({ showToast, embedded = false }) {
     <section className={embedded ? 'space-y-8' : 'mx-auto max-w-3xl space-y-8'}>
       {embedded ? (
         <header>
-          <h3 className="text-center text-lg font-bold text-brand-gold">留言板</h3>
+          <h3 className="font-display text-center text-lg font-bold text-brand-gold">留言板</h3>
           <p className="mt-1 text-center text-sm text-gray-400">留言需經審核後才會公開顯示</p>
         </header>
       ) : (
         <header className="text-center">
-          <h2 className="text-xl font-bold text-brand-gold">留言板</h2>
+          <h2 className="font-display text-xl font-bold text-brand-gold">留言板</h2>
           <p className="mt-1 text-sm text-gray-400">留言需經審核後才會公開顯示</p>
         </header>
       )}

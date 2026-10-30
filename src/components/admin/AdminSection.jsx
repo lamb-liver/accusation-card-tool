@@ -165,7 +165,7 @@ export default function AdminSection({ showToast, showConfirm }) {
       <section className="mx-auto max-w-md">
         <header className="mb-6 text-center">
           <Shield className="mx-auto mb-2 h-10 w-10 text-brand-gold" aria-hidden strokeWidth={2} />
-          <h2 className="text-xl font-bold text-brand-gold">管理後台</h2>
+          <h2 className="font-display text-xl font-bold text-brand-gold">管理後台</h2>
         </header>
         {authProbeError && (
           <div className="mb-4 rounded-lg border border-red-500/60 bg-red-950/40 px-4 py-3 text-sm text-red-200" role="alert">
@@ -215,7 +215,7 @@ export default function AdminSection({ showToast, showConfirm }) {
   return (
     <section className="mx-auto max-w-4xl space-y-6">
       <header className="flex flex-wrap items-center justify-between gap-3">
-        <h2 className="text-xl font-bold text-brand-gold">管理後台</h2>
+        <h2 className="font-display text-xl font-bold text-brand-gold">管理後台</h2>
         <button
           type="button"
           onClick={handleLogout}

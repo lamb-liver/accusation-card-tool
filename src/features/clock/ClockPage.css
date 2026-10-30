@@ -245,7 +245,7 @@
 .clock-coin__mark {
   position: relative;
   z-index: 1;
-  font-family: "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", "Heiti TC", "Arial Black", sans-serif;
+  font-family: var(--font-sans);
   font-size: 1.45rem;
   font-weight: 900;
   line-height: 1;

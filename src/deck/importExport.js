@@ -184,7 +184,7 @@ export async function exportDeckAsImage(deck, _currentRule, showToast) {
     width: '840px',
     padding: '24px',
     backgroundColor: '#1a1a1a',
-    fontFamily: 'sans-serif',
+    fontFamily: getComputedStyle(document.body).fontFamily || 'sans-serif',
   });
 
   const grid = document.createElement('div');

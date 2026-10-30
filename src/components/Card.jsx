@@ -196,9 +196,9 @@ function Card({
                 />
               )}
               <p
-                className={`line-clamp-2 min-w-0 font-bold text-white transition group-hover:text-amber-300 ${
+                className={`line-clamp-2 min-w-0 font-display font-bold text-white transition group-hover:text-amber-300 ${
                   minimalMeta
-                    ? 'font-display text-sm leading-snug'
+                    ? 'text-sm leading-snug'
                     : compact
                       ? 'text-xs leading-tight'
                       : 'text-sm leading-snug'

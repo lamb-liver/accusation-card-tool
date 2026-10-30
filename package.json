@@ -13,6 +13,7 @@
     "build:ci": "node scripts/project-cli.mjs build:ci",
     "check:assets": "node scripts/check-assets.mjs",
     "check:content": "node scripts/check-content.mjs",
+    "check:display-glyphs": "node scripts/check-display-glyphs.mjs",
     "check:generated": "node scripts/check-generated.mjs",
     "check:lockfile": "node scripts/check-lockfile.mjs",
     "check:public-orphans": "node scripts/check-public-orphans.mjs",

@@ -28,7 +28,7 @@ export default function CommunitySection({ showToast, onOpenDeck, initialSection
   return (
     <div className="mx-auto max-w-3xl">
       <header className="mb-4 text-center">
-        <h2 className="text-xl font-bold text-brand-gold">交流區</h2>
+        <h2 className="font-display text-xl font-bold text-brand-gold">交流區</h2>
         <p className="mt-1 text-sm text-gray-400">留言與公開牌組分享</p>
       </header>
 

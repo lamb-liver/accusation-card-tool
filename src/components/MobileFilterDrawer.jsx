@@ -121,7 +121,7 @@ export default function MobileFilterDrawer({
         {...(!open ? { inert: true } : {})}
       >
         <div className="mb-4 flex items-center justify-between">
-          <h2 className="text-lg font-bold text-brand-gold">篩選條件</h2>
+          <h2 className="font-display text-lg font-bold text-brand-gold">篩選條件</h2>
           <button
             type="button"
             id="closeDrawer"
