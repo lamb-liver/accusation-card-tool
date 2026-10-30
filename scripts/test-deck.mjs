@@ -335,6 +335,32 @@ if (!savedWithRule?.rule || savedWithRule.rule.type !== 'rule1') {
   if (saveCtl.getSnapshot().savedDecks.length > 0) fail('saveDeckAs should not persist invalid saved deck');
 }
 
+// saveDeckAs：同名存檔須先確認，取消時不覆蓋
+{
+  const confirms = [];
+  let answer = false;
+  const owCtl = createDeckController({
+    allCards: [sampleCard],
+    showToast: () => {},
+    showConfirm: async (message, opts) => { confirms.push({ message, opts }); return answer; },
+    showPrompt: async () => null,
+  });
+  owCtl.setDeck({ leader: [], rituals: [], main: [sampleCard] });
+  await owCtl.saveDeckAs('同名');
+  if (confirms.length !== 0) fail('first save of a new name should not confirm');
+  const savedBefore = JSON.stringify(owCtl.getSnapshot().savedDecks);
+  owCtl.setDeck({ leader: [], rituals: [], main: [sampleCard, { ...sampleCard, id: 'ow2' }] });
+  await owCtl.saveDeckAs(' 同名 ');
+  if (confirms.length !== 1 || !confirms[0].message.includes('覆蓋牌組「同名」') || confirms[0].opts?.title !== '覆蓋牌組') {
+    fail('saving under an existing name should ask for overwrite confirmation');
+  }
+  if (JSON.stringify(owCtl.getSnapshot().savedDecks) !== savedBefore) fail('cancelled overwrite must keep saved deck');
+  answer = true;
+  await owCtl.saveDeckAs('同名');
+  if (JSON.stringify(owCtl.getSnapshot().savedDecks) === savedBefore) fail('confirmed overwrite should update saved deck');
+  if (owCtl.getSnapshot().savedDecks.length !== 1) fail('overwrite should not add a second entry');
+}
+
 // loadSavedDeckByName：損壞的已存牌組不應覆蓋現有牌組
 {
   const store = new Map();

@@ -39,7 +39,7 @@ export function createDeckAddHandlers({ getState, ctx, patchDeck, commit, commit
 
     if (card.faction === '放逐者') {
       if (!patchDeck((prev) => ({ ...prev, main: [...prev.main, card] }))) return false;
-      ctx.showToast(`已加入 ${card.name}`);
+      ctx.showToast(`已加入 ${card.name}`, 'success', { group: 'deck-add' });
       return true;
     }
 
@@ -51,7 +51,7 @@ export function createDeckAddHandlers({ getState, ctx, patchDeck, commit, commit
       }
       const slot = card.type === '教主' ? 'leader' : 'rituals';
       if (!patchDeck((prev) => ({ ...prev, [slot]: [...prev[slot], card] }))) return false;
-      ctx.showToast(`已加入 ${card.name}`);
+      ctx.showToast(`已加入 ${card.name}`, 'success', { group: 'deck-add' });
       return true;
     }
 
@@ -76,7 +76,7 @@ export function createDeckAddHandlers({ getState, ctx, patchDeck, commit, commit
     }
 
     if (!patchDeck((prev) => ({ ...prev, main: [...prev.main, card] }))) return false;
-    ctx.showToast(`已加入 ${card.name}`);
+    ctx.showToast(`已加入 ${card.name}`, 'success', { group: 'deck-add' });
     return true;
   }
 

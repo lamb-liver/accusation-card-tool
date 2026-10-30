@@ -71,13 +71,13 @@ export default function DeckListPanel({
           aria-expanded={bottomSheetOpen}
           aria-label={bottomSheetOpen ? '收合牌組清單' : '展開牌組清單'}
         >
-          <div className="flex items-center gap-2.5">
-            <span className="text-brand-gold font-bold text-sm">我的牌組</span>
-            <span className={`text-xs font-semibold ${totalCards > 24 ? 'text-red-400' : 'text-brand-gold'}`}>
+          <div className="flex min-w-0 items-center gap-2 overflow-hidden">
+            <span className="shrink-0 whitespace-nowrap text-brand-gold font-bold text-sm">我的牌組</span>
+            <span className={`shrink-0 whitespace-nowrap text-xs font-semibold ${totalCards > 24 ? 'text-red-400' : 'text-brand-gold'}`}>
               {totalCards}/24
             </span>
-            <DeckTypeStats entries={typeEntries} compact />
-            <div className="w-20 h-1.5 bg-neutral-700 rounded-full overflow-hidden">
+            <DeckTypeStats entries={typeEntries} compact nowrap />
+            <div className="hidden min-[400px]:block w-14 shrink-0 h-1.5 bg-neutral-700 rounded-full overflow-hidden">
               <div
                 className={`h-full rounded-full transition-all duration-500 ${
                   totalCards > 24
@@ -91,7 +91,7 @@ export default function DeckListPanel({
             </div>
           </div>
           <ChevronUp
-            className={`h-4 w-4 text-gray-400 transition-transform duration-300 ${
+            className={`ml-2 h-4 w-4 shrink-0 text-gray-400 transition-transform duration-300 ${
               bottomSheetOpen ? '' : 'rotate-180'
             }`}
             aria-hidden
