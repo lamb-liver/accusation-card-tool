@@ -5,6 +5,8 @@ const FACTION_COLORS = {
   '門教團': 'border-blue-400 bg-blue-950/45 text-blue-100',
   '逐光者': 'border-amber-400 bg-amber-950/45 text-amber-100',
   '禁忌廚房': 'border-rose-400 bg-rose-950/45 text-rose-100',
+  '疫病中心': 'border-slate-300 bg-slate-800/70 text-slate-100',
+  '紫靈山': 'border-violet-400 bg-violet-950/45 text-violet-100',
   '放逐者': 'border-neutral-400 bg-neutral-800/90 text-neutral-100',
 };
 
@@ -15,6 +17,8 @@ const FACTION_DOT_COLORS = {
   '門教團': 'bg-blue-400',
   '逐光者': 'bg-amber-400',
   '禁忌廚房': 'bg-rose-400',
+  '疫病中心': 'bg-slate-300',
+  '紫靈山': 'bg-violet-400',
   '放逐者': 'bg-neutral-400',
 };
 
