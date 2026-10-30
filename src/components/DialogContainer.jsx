@@ -55,7 +55,7 @@ export default function DialogContainer({ dialogState, resolve }) {
       >
         {/* 標題列 */}
         <div className={`px-5 pt-4 pb-3 border-b ${danger ? 'border-red-800' : 'border-neutral-700'}`}>
-          <h3 id="dialog-title" className={`text-base font-bold ${danger ? 'text-red-400' : 'text-brand-gold'}`}>
+          <h3 id="dialog-title" className={`font-display text-base font-bold ${danger ? 'text-red-400' : 'text-brand-gold'}`}>
             {title}
           </h3>
         </div>

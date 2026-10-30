@@ -47,7 +47,7 @@ export default function DeckShareDetail({ shareId, onBack, onLoadDeck, isLoading
         {data && (
           <article className="share-detail-card rounded-lg border border-brand-gold/60 bg-[#252525] p-6">
             <header className="mb-4 border-b border-[#444] pb-4">
-              <h2 className="text-2xl font-bold text-brand-gold">{data.title}</h2>
+              <h2 className="font-display text-2xl font-bold text-brand-gold">{data.title}</h2>
               <p className="mt-1 text-gray-400">作者：{data.author_name}</p>
               {data.description && <p className="mt-3 text-gray-300">{data.description}</p>}
             </header>

@@ -277,7 +277,7 @@ export default function AdminSection({ showToast, showConfirm }) {
         <div className="space-y-8">
           {(typeFilter === 'all' || typeFilter === 'deck') && decks.length > 0 && (
             <div>
-              <h3 className="mb-3 font-semibold text-gray-300">牌組（{decks.length}）</h3>
+              <h3 className="mb-3 font-display font-bold text-gray-300">牌組（{decks.length}）</h3>
               <ul className="space-y-3">
                 {decks.map((deck) => (
                   <AdminItem
@@ -311,7 +311,7 @@ export default function AdminSection({ showToast, showConfirm }) {
 
           {(typeFilter === 'all' || typeFilter === 'guestbook') && messages.length > 0 && (
             <div>
-              <h3 className="mb-3 font-semibold text-gray-300">留言（{messages.length}）</h3>
+              <h3 className="mb-3 font-display font-bold text-gray-300">留言（{messages.length}）</h3>
               <ul className="space-y-3">
                 {messages.map((msg) => (
                   <AdminItem
@@ -368,7 +368,7 @@ function DeckPreviewModal({ deck, onClose }) {
         aria-labelledby="deck-preview-title"
       >
         <div className="sticky top-0 flex items-center justify-between border-b border-neutral-700 bg-neutral-900 px-5 py-4">
-          <h3 id="deck-preview-title" className="text-base font-bold text-brand-gold">
+          <h3 id="deck-preview-title" className="font-display text-base font-bold text-brand-gold">
             牌組預覽
           </h3>
           <button
@@ -451,7 +451,7 @@ function AdminItem({
   return (
     <li className="rounded-lg border border-[#444] bg-[#252525] p-4">
       <div className="mb-2">
-        <h4 className="font-bold text-brand-gold">{title}</h4>
+        <h4 className="font-display font-bold text-brand-gold">{title}</h4>
         <p className="text-sm text-gray-400">{meta}</p>
         {shareId && <p className="mt-1 font-mono text-xs text-gray-500">#{shareId}</p>}
         {sub && <p className="mt-2 line-clamp-3 text-sm text-gray-300">{sub}</p>}

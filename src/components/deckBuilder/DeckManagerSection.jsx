@@ -16,7 +16,7 @@ export default function DeckManagerSection({
 
   return (
     <div className="deck-manager border-t border-[#444] pt-3 flex flex-col gap-2">
-      <h3 className="text-brand-gold font-semibold text-sm">牌組管理</h3>
+      <h3 className="font-display text-brand-gold font-bold text-sm">牌組管理</h3>
 
       <div className="flex gap-2">
         <input

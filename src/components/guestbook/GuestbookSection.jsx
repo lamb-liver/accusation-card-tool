@@ -151,7 +151,7 @@ export default function GuestbookSection({ showToast, embedded = false }) {
       </form>
 
       <div>
-        <h3 className="mb-4 text-center font-semibold text-gray-300">公開留言</h3>
+        <h3 className="mb-4 text-center font-display text-lg font-bold text-brand-gold">公開留言</h3>
         <AsyncPanel
           isLoading={isLoading}
           isRetrying={isRetrying}

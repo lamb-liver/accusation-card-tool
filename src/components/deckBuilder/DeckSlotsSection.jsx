@@ -15,7 +15,7 @@ export default function DeckSlotsSection({
     <div className="deck-slots border-t border-[#444] pt-3">
       <div className="deck-group mb-4">
         <div className="flex justify-between items-center mb-2">
-          <h3 className="text-yellow-400 font-semibold">教主 ({deck.leader.length}/1)</h3>
+          <h3 className="text-yellow-400 font-display font-bold">教主 ({deck.leader.length}/1)</h3>
           <button
             type="button"
             onClick={() => onClearCategory('leader')}
@@ -38,7 +38,7 @@ export default function DeckSlotsSection({
 
       <div className="deck-group mb-4">
         <div className="flex justify-between items-center mb-2">
-          <h3 className="text-purple-400 font-semibold">儀式 ({deck.rituals.length}/3)</h3>
+          <h3 className="text-purple-400 font-display font-bold">儀式 ({deck.rituals.length}/3)</h3>
           <button
             type="button"
             onClick={() => onClearCategory('rituals')}
@@ -62,7 +62,7 @@ export default function DeckSlotsSection({
       <div className="deck-group mb-4">
         <div className="flex justify-between items-center mb-1.5">
           <div className="min-w-0">
-            <h3 className="text-cyan-400 font-semibold">主牌組 ({deck.main.length}/20)</h3>
+            <h3 className="text-cyan-400 font-display font-bold">主牌組 ({deck.main.length}/20)</h3>
             <div className="mt-1">
               <DeckTypeStats entries={typeEntries} compact />
             </div>

@@ -69,7 +69,7 @@ export default function ShareWallSection({
             >
               <div className="flex items-start justify-between gap-3">
                 <div className="min-w-0">
-                  <h3 className="truncate font-bold text-brand-gold">{deck.title}</h3>
+                  <h3 className="truncate font-display font-bold text-brand-gold">{deck.title}</h3>
                   <p className="mt-1 text-sm text-gray-400">作者：{deck.author_name}</p>
                   {deck.description && (
                     <p className="mt-2 line-clamp-2 text-sm text-gray-300">{deck.description}</p>
