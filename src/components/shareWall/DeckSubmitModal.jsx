@@ -81,7 +81,7 @@ export default function DeckSubmitModal({ open, onClose, onSubmit, isSubmitting 
         aria-labelledby="deck-submit-title"
       >
         <div className="border-b border-neutral-700 px-5 py-4">
-          <h3 id="deck-submit-title" className="text-base font-bold text-brand-gold">
+          <h3 id="deck-submit-title" className="font-display text-base font-bold text-brand-gold">
             投稿到分享牆
           </h3>
           <p className="mt-1 text-sm text-gray-400">投稿後需等待管理員審核才會公開</p>

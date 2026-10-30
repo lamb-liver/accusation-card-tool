@@ -142,7 +142,7 @@ export default function ClockPage() {
       </p>
 
       <header className="clock-page__header">
-        <h2 className="clock-page__title">對局計時器</h2>
+        <h2 className="clock-page__title font-display">對局計時器</h2>
         <p className="clock-page__hint">
           每方 {INITIAL_MINUTES} 分鐘 · 點擊目前玩家區塊結束回合
         </p>
@@ -223,7 +223,7 @@ export default function ClockPage() {
                   <Coins strokeWidth={2.25} />
                 </span>
                 <div>
-                  <h3 id="clock-coin-title" className="clock-coin-panel__title">
+                  <h3 id="clock-coin-title" className="clock-coin-panel__title font-display">
                     擲硬幣決定先後手
                   </h3>
                   <p className="clock-coin-panel__rule">規則：擲硬幣贏的人可以選擇先手或後手。</p>
