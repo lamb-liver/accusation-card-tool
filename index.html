@@ -53,6 +53,8 @@
       }
     </script>
     <link rel="preload" href="/cards.json" as="fetch" crossorigin />
+    <!-- 品牌題字在首屏：提早取得展示字體子集，縮短 swap 換字（FOUT）時間 -->
+    <link rel="preload" href="/fonts/NotoSerifTC-display-subset.woff2" as="font" type="font/woff2" crossorigin />
     <!-- 首屏 LCP：HTML 階段即可發現，不必等 React mount -->
     <link
       rel="preload"

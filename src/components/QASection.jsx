@@ -194,7 +194,7 @@ export default function QASection({ initialCategory = '' }) {
       ) : (
         visibleCategories.map((cat) => (
           <div key={cat.category} className="qa-category mb-9">
-            <h2 className="qa-category-title mb-4 flex items-center justify-center gap-4 text-center text-xl font-bold text-brand-gold">
+            <h2 className="font-display qa-category-title mb-4 flex items-center justify-center gap-4 text-center text-xl font-bold text-brand-gold">
               <CategoryFlourish side="left" />
               {cat.category !== '通用規則' && (
                 <img

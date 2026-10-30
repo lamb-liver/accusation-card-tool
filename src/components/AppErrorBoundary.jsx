@@ -26,7 +26,7 @@ export default class AppErrorBoundary extends Component {
     if (!this.state.error) return this.props.children;
     return (
       <div className="flex min-h-screen flex-col items-center justify-center gap-4 bg-neutral-900 px-6 text-center text-gray-200">
-        <h1 className="text-xl font-bold text-brand-gold">頁面發生錯誤</h1>
+        <h1 className="font-display text-xl font-bold text-brand-gold">頁面發生錯誤</h1>
         <p className="max-w-md text-sm text-gray-400">
           很抱歉，畫面渲染時發生問題。重新載入通常可以解決；若持續發生，請回報給我們。
         </p>

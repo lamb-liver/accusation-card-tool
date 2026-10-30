@@ -81,7 +81,7 @@ export default function DeckCardRow({ card, onRemove, onCardClick, sortMain = fa
           className="min-w-0 flex-1 cursor-pointer text-left focus-visible:outline-2 focus-visible:outline-brand-gold rounded"
           aria-label={`查看 ${card.name} 詳情`}
         >
-          <p className="deck-card-name text-[#e0e0e0] font-medium truncate">{card.name}</p>
+          <p className="deck-card-name font-display text-[#e0e0e0] font-bold truncate">{card.name}</p>
           <p className="text-xs text-[#888]">
             {card.faction} / {card.type}
           </p>

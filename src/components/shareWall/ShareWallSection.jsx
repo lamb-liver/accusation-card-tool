@@ -102,12 +102,12 @@ export default function ShareWallSection({
     <section className={embedded ? undefined : 'mx-auto max-w-3xl'}>
       {embedded ? (
         <header className="mb-6 text-center">
-          <h3 className="text-lg font-bold text-brand-gold">分享牌組</h3>
+          <h3 className="font-display text-lg font-bold text-brand-gold">分享牌組</h3>
           <p className="mt-1 text-sm text-gray-400">已核准的牌組，依最後核准時間排序</p>
         </header>
       ) : (
         <header className="mb-6 text-center">
-          <h2 className="text-xl font-bold text-brand-gold">分享牆</h2>
+          <h2 className="font-display text-xl font-bold text-brand-gold">分享牆</h2>
           <p className="mt-1 text-sm text-gray-400">已核准的牌組，依最後核准時間排序</p>
         </header>
       )}

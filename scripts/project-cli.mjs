@@ -134,6 +134,7 @@ async function runValidateRepo() {
   const checks = [
     ['check:assets', () => runNodeScript('check-assets.mjs')],
     ['check:content', () => runNodeScript('check-content.mjs')],
+    ['check:display-glyphs', () => runNodeScript('check-display-glyphs.mjs')],
     ['check:generated', () => runNodeScript('check-generated.mjs')],
     ['check:lockfile', () => runNodeScript('check-lockfile.mjs')],
     ['check:deploy-flow', () => runNodeScript('check-deploy-flow.mjs')],

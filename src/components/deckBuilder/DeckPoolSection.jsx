@@ -55,7 +55,7 @@ export default function DeckPoolSection({
   return (
     <div className="deck-pool-section deck-builder-column-lg flex min-w-0 w-full flex-col overflow-hidden rounded-lg border border-brand-gold/60 bg-[#252525] px-0 py-3 sm:px-4 sm:py-4 lg:min-w-0 lg:flex-1 lg:px-4 lg:py-4 lg:pb-4">
       <div className="deck-pool-header mb-3 flex shrink-0 flex-col items-center gap-2 px-2 sm:px-0">
-        <h2 className="text-lg font-bold text-brand-gold">可選卡牌池</h2>
+        <h2 className="font-display text-lg font-bold text-brand-gold">可選卡牌池</h2>
         <div className="flex flex-wrap items-center justify-center gap-x-5 gap-y-2">
           <PoolToggle checked={hideSelected} onChange={onHideSelectedChange} label="隱藏已選" />
           <PoolToggle checked={hideImages} onChange={onHideImagesChange} label="隱藏圖片" />

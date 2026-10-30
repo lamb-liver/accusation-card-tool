@@ -165,8 +165,11 @@ accusation-card-tool/
 3. **構築規則**  
    修改 `src/rules/` 後執行 `npm run test:rule-engine`
 
-   > 展示字體子集只涵蓋現有卡名與標題文案；新增卡牌後可執行 `npm run fonts:display`
-   > 重建 `public/fonts/*.woff2` 並一併 commit（缺字會逐字回退，不會破版）。
+   > 字體只有三種角色：**展示**（`font-display`：品牌題字、區段標題、卡名，自托管 Noto Serif TC 700 子集）、
+   > **正文**（`--font-sans` 系統繁中無襯線）、**等寬**（編號）。展示字體子集的字元由
+   > `scripts/lib/display-glyphs.mjs` 自動蒐集（卡名／教團／QA 分類／帶 `font-display` 的 JSX 文字／SEO 標題）；
+   > 新增卡牌或標題後執行 `npm run fonts:display`，並 commit `public/fonts/` 下的 woff2 與 `.glyphs.txt`。
+   > `validate:repo` 的 `check:display-glyphs` 會擋下缺字。
 
 4. **常見問題**  
    執行 `npm run sync:qa` 從 Google Sheets 更新；`src/data/qaData.js` 是 generated output，不應手動編輯。若輸出格式有問題，修正 `scripts/sync-qa.mjs`／`scripts/lib/qa-module.mjs`，並以 `npm run check:content` 確認 production 資料沒有洩漏 template 或 parser 訊息

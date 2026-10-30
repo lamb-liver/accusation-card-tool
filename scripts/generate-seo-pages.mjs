@@ -53,14 +53,17 @@ function pageShell({ title, description, canonical, image, structuredData, body,
     <meta name="twitter:description" content="${safeDescription}" />
     <script type="application/ld+json">${jsonLd(structuredData)}</script>
     <title>${safeTitle}</title>
+    <link rel="preload" href="/fonts/NotoSerifTC-display-subset.woff2" as="font" type="font/woff2" crossorigin />
     <style>
-      :root { color-scheme: dark; font-family: system-ui, sans-serif; background: #171511; color: #e7e1d6; }
+      @font-face { font-family: 'Noto Serif TC Subset'; font-weight: 700; font-display: swap; src: url('/fonts/NotoSerifTC-display-subset.woff2') format('woff2'); }
+      :root { color-scheme: dark; font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'PingFang TC', 'Noto Sans TC', 'Noto Sans CJK TC', 'Microsoft JhengHei', 'Heiti TC', sans-serif; background: #171511; color: #e7e1d6; }
       * { box-sizing: border-box; }
       body { margin: 0; background: radial-gradient(circle at top, #29231a, #12100d 48rem); }
       a { color: #e4c65a; }
       .wrap { width: min(68rem, 100% - 2rem); margin: 0 auto; }
       header, footer { padding: 1.25rem 0; }
       main { min-height: 70vh; padding: 1rem 0 3rem; }
+      h1, h2 { font-family: 'Noto Serif TC Subset', 'Noto Serif TC', 'Songti TC', 'Source Han Serif TC', 'PMingLiU', serif; font-weight: 700; }
       h1 { color: #f2cf4a; line-height: 1.25; }
       .card-detail { display: grid; grid-template-columns: minmax(14rem, 22rem) 1fr; gap: 2rem; align-items: start; }
       .card-detail img { width: 100%; height: auto; border-radius: .75rem; box-shadow: 0 1rem 3rem #0009; }
