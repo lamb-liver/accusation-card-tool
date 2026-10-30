@@ -280,6 +280,15 @@ export function createDeckController(deps) {
         return;
       }
 
+      if (findSavedDeckByName(state.savedDecks, trimmed)) {
+        const ok = await ctx.showConfirm(`覆蓋牌組「${trimmed}」？原本儲存的內容將被取代。`, {
+          title: '覆蓋牌組',
+          confirmLabel: '覆蓋',
+          danger: true,
+        });
+        if (!ok) return;
+      }
+
       const { kind, next } = upsertSavedDeck(
         state.savedDecks,
         trimmed,

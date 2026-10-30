@@ -1,29 +1,34 @@
 import { useState, useCallback, useEffect, useRef } from 'react';
 
 let _id = 0;
-const TOAST_DURATION_MS = 2500;
+export const TOAST_DURATION_MS = 2000;
 
 /**
- * 輕量 Toast 通知系統。
- * 回傳 showToast(message, type?) 與 <ToastList /> 元件所需的 toasts。
+ * 輕量 Toast 通知系統：同一時間只顯示一則，新訊息取代舊訊息。
+ * 同 group 的訊息在顯示期間連續出現時會合併計數（例如「已加入 X（連續 3 張）」）。
+ * 回傳 showToast(message, type?, opts?) 與 <ToastList /> 元件所需的 toasts。
  */
 export function useToast() {
   const [toasts, setToasts] = useState([]);
-  const timersRef = useRef(/** @type {Map<number, ReturnType<typeof setTimeout>>} */ (new Map()));
+  const timerRef = useRef(/** @type {ReturnType<typeof setTimeout> | null} */ (null));
+  const lastRef = useRef(/** @type {{ group?: string, count: number } | null} */ (null));
 
-  useEffect(() => {
-    const timers = timersRef.current;
-    return () => { timers.forEach(clearTimeout); timers.clear(); };
-  }, []);
+  useEffect(() => () => { if (timerRef.current) clearTimeout(timerRef.current); }, []);
 
-  const showToast = useCallback((message, type = 'success') => {
+  const showToast = useCallback((message, type = 'success', opts = {}) => {
+    const group = opts?.group;
+    const prev = lastRef.current;
+    const count = group && prev && prev.group === group ? prev.count + 1 : 1;
+    lastRef.current = { group, count };
     const id = ++_id;
-    setToasts(prev => [...prev, { id, message, type }]);
-    const timerId = setTimeout(() => {
-      setToasts(prev => prev.filter(t => t.id !== id));
-      timersRef.current.delete(id);
+    const shown = count > 1 ? `${message}（連續 ${count} 張）` : message;
+    setToasts([{ id, message: shown, type }]);
+    if (timerRef.current) clearTimeout(timerRef.current);
+    timerRef.current = setTimeout(() => {
+      setToasts([]);
+      lastRef.current = null;
+      timerRef.current = null;
     }, TOAST_DURATION_MS);
-    timersRef.current.set(id, timerId);
   }, []);
 
   return { toasts, showToast };
