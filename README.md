@@ -2,6 +2,12 @@
 
 《控訴》Living Card Game 的**卡牌查詢、篩選與牌組構築**輔助 Web App（PWA）。可在瀏覽器使用，安裝後支援離線查卡與組牌。
 
+正式站：<https://accusation-card-tool.pages.dev/>
+
+作者：羊肝（<https://lambliver.dev>）
+
+目前收錄 **213 張卡、9 個教團**，最新系列為「疫與飛升」。
+
 > 本工具為玩家社群輔助用途，卡牌圖像與遊戲內容版權屬原權利人所有。
 
 ## 功能概覽
@@ -18,8 +24,8 @@
 
 ### 進階能力
 
-- **卡牌目錄**：單一 `public/cards.json`（目前約 51 KB／gzip 約 7 KB）；瀏覽器與 Workbox 快取重複請求
-- **篩選效能**：156 張卡直接同步篩選；查卡列表以分頁控制渲染量
+- **卡牌目錄**：單一 `public/cards.json`（目前 213 張，約 72 KB／gzip 約 9 KB）；瀏覽器與 Workbox 快取重複請求
+- **篩選效能**：213 張卡直接同步篩選；查卡列表以分頁控制渲染量
 - **組牌卡池**：單一卡池 scroll 容器，避免整頁與卡池雙層搶捲動
 - **圖片**：AVIF / WebP 響應式 `srcset`（160 / 320 / 640）；首屏 LCP 卡圖 HTML preload
 - **PWA**：Workbox 快取靜態資源、卡牌 JSON 與圖片；`autoUpdate` Service Worker
@@ -40,7 +46,7 @@
 ## 快速開始
 
 ```bash
-git clone <repo-url>
+git clone https://github.com/lamb-liver/accusation-card-tool.git
 cd accusation-card-tool
 
 npm install
@@ -88,9 +94,22 @@ npm run cf:dev       # 建置後以 Wrangler 啟動完整站點
 | `npm run audit:deck-layout` | 組牌版面詳細 dump（除錯用） |
 | `npm run optimize:images` | 由 master WebP 產生 `-w160` / `-w320` / `-w640` 的 WebP、AVIF |
 | `npm run fonts:display` | 由卡名＋標題文案重建展示用襯線字體子集 `public/fonts/*.woff2` |
+| `npm run check:display-glyphs` | 檢查展示字體子集是否涵蓋所有卡名與標題字元（`validate:repo` 會執行） |
 | `npm run check:pwa-sw` | 檢查 `dist/sw.js` 是否存在 |
 | `npm run cf:dev` | 建置並啟動 Cloudflare Pages Functions + 本機 D1 |
 | `npm run d1:migrations:apply:local` | 套用 D1 migrations 至本機資料庫 |
+
+## 字體
+
+全站只用三種字體角色：
+
+| 角色 | 用途 | 來源 |
+|------|------|------|
+| **展示**（`font-display`） | 品牌題字、區段標題、卡名、牌組標題 | 自托管 Noto Serif TC 700 子集（`public/fonts/`，SIL OFL） |
+| **正文**（`--font-sans`） | 內文、說明、控制項 | 系統繁中無襯線 |
+| **等寬** | 卡牌編號、ID | 系統等寬字體 |
+
+展示字體子集的字元由 `scripts/lib/display-glyphs.mjs` 自動蒐集。新增卡牌或標題後執行 `npm run fonts:display`，並 commit 重產的 woff2 與 `.glyphs.txt`；`npm run check:display-glyphs`（含在 `validate:repo`）會擋下缺字。
 
 ## 專案結構
 
