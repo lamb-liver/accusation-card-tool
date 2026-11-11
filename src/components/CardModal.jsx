@@ -15,11 +15,10 @@ import { getMechanicNotes } from '../constants/mechanicGlossary.js';
 import { factionHasQA } from '../utils/qaLookup.js';
 import {
   CARD_ART_CHANGED_EVENT,
-  CARD_IMAGE_DEFAULT_WIDTH,
   CARD_MODAL_SIZES,
   cardHasAlternateArt,
   getCardArtVariants,
-  getCardImageSrc,
+  getModalPreviewSrc,
   getCardPictureSources,
   preloadCardArt,
   getStoredArtVariant,
@@ -56,9 +55,8 @@ export default function CardModal({
     [card, artVariant],
   );
   const displaySource = getVariantSource(card, artVariant);
-  const previewSrc = card
-    ? getCardImageSrc(card.id, artVariant, CARD_IMAGE_DEFAULT_WIDTH)
-    : null;
+  /** 已知支援 AVIF 時，底圖用查卡格子已載入的同一個 320w AVIF，不再多抓一份 WebP */
+  const previewSrc = card ? getModalPreviewSrc(card.id, artVariant) : null;
 
   useEffect(() => {
     setPreviewReady(false);
