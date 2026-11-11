@@ -356,7 +356,7 @@ function App() {
       <button
         type="button"
         onClick={() => document.getElementById('main-content')?.focus()}
-        className="sr-only z-[2000] rounded bg-brand-gold px-4 py-2 font-bold text-neutral-900 focus:not-sr-only focus:fixed focus:left-3 focus:top-3"
+        className="sr-only z-[2000] rounded bg-brand-gold font-bold text-neutral-900 focus:not-sr-only focus:fixed focus:left-3 focus:top-3 focus:px-4 focus:py-2"
       >
         跳到主要內容
       </button>
