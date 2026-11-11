@@ -105,6 +105,30 @@ export function getCardPictureSources(cardId, variant) {
   };
 }
 
+/**
+ * 瀏覽器在 <picture> 實際選了 AVIF 還是 WebP（看第一張載入完成的響應式圖）。
+ * null 表示還不知道。用來讓預載只抓會用到的格式，不要 AVIF、WebP 各抓一份。
+ * @type {boolean | null}
+ */
+let avifSupport = null;
+
+/** 由 <picture> 的 img.currentSrc 推斷格式；只看響應式檔（-wNNN），原圖 fallback 不算 */
+export function noteLoadedImageFormat(currentSrc) {
+  if (avifSupport !== null || typeof currentSrc !== 'string') return;
+  if (/-w\d+\.avif(?:[?#]|$)/.test(currentSrc)) avifSupport = true;
+  else if (/-w\d+\.webp(?:[?#]|$)/.test(currentSrc)) avifSupport = false;
+}
+
+/** @returns {boolean | null} */
+export function getAvifSupport() {
+  return avifSupport;
+}
+
+/** 測試用：還原成「還不知道」 */
+export function resetAvifSupport() {
+  avifSupport = null;
+}
+
 /** Modal 翻牌：先暖 320w 底圖，再暖 640w；gallery 外的下一張才不會黑一下 */
 export function cardArtPreloadUrls(cardId, variant = 'main') {
   return {
@@ -114,10 +138,30 @@ export function cardArtPreloadUrls(cardId, variant = 'main') {
   };
 }
 
+/**
+ * Modal 底圖（320w）：已知支援 AVIF 時用 AVIF，和查卡格子用的是同一個檔，直接命中快取。
+ * @param {boolean | null} [support]
+ */
+export function getModalPreviewSrc(cardId, variant = 'main', support = avifSupport) {
+  return support === true
+    ? getCardImageAvifSrc(cardId, variant, CARD_IMAGE_DEFAULT_WIDTH)
+    : getCardImageSrc(cardId, variant, CARD_IMAGE_DEFAULT_WIDTH);
+}
+
+/**
+ * 要預載的檔案。知道格式後只抓那一種（320w 底圖＋640w 大圖）；還不知道時維持舊行為。
+ * @param {boolean | null} [support]
+ */
+export function cardArtPreloadList(cardId, variant = 'main', support = avifSupport) {
+  const urls = cardArtPreloadUrls(cardId, variant);
+  if (support === true) return [getModalPreviewSrc(cardId, variant, true), urls.avif];
+  if (support === false) return [urls.preview, urls.webp];
+  return [urls.preview, urls.avif, urls.webp];
+}
+
 export function preloadCardArt(cardId, variant = 'main') {
   if (typeof Image === 'undefined') return;
-  const urls = cardArtPreloadUrls(cardId, variant);
-  for (const src of [urls.preview, urls.avif, urls.webp]) {
+  for (const src of cardArtPreloadList(cardId, variant)) {
     const img = new Image();
     img.src = src;
   }
