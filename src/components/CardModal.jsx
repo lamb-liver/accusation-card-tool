@@ -275,8 +275,8 @@ export default function CardModal({
                   priority
                   alt={
                     artVariant !== 'main' && hasAlt
-                      ? `卡牌「${card.name}」異畫（WebP，${card.faction}，${card.type}）`
-                      : `卡牌「${card.name}」大圖（WebP，${card.faction}，${card.type}）`
+                      ? `卡牌「${card.name}」異畫，${card.faction}${card.type}`
+                      : `卡牌「${card.name}」，${card.faction}${card.type}`
                   }
                   className="card-image-media touch-manipulation select-none rounded-sm object-contain"
                 />

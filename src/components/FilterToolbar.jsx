@@ -71,7 +71,7 @@ export default function FilterToolbar({
           </div>
 
           {showCardFilters && (
-            <div className="search-wrapper relative w-full max-w-[500px]">
+            <div role="search" className="search-wrapper relative w-full max-w-[500px]">
               <input
                 type="text"
                 value={searchTerm}
@@ -96,8 +96,9 @@ export default function FilterToolbar({
       </div>
 
       {showCardFilters && (
-        <div
+        <section
           id="galleryControls"
+          aria-label="篩選條件"
           className="controls mx-auto mb-4 mt-2 hidden w-full max-w-[1000px] grid-cols-2 gap-2.5 px-4 pb-1 md:grid xl:grid-cols-4"
         >
           {dropdowns.map(({ key, fallbackLabel }) => {
@@ -123,7 +124,7 @@ export default function FilterToolbar({
           })}
 
           <div className="filter-stats col-span-full mt-1 flex items-center justify-center gap-3 text-center text-[13px] font-medium text-stone-400">
-            <span className="flex items-center gap-1">
+            <span className="flex items-center gap-1" aria-live="polite">
               <BarChart3 aria-hidden className="h-[13px] w-[13px] shrink-0" strokeWidth={2.25} />
               <span>
                 共 <span className="font-bold text-brand-gold">{resultCount}</span> 張卡牌
@@ -140,7 +141,7 @@ export default function FilterToolbar({
               </button>
             )}
           </div>
-        </div>
+        </section>
       )}
     </>
   );

@@ -59,7 +59,7 @@ export default function DeckRuleConfigurator({
             <span className="block">規則一</span>
             <span
               className={`block text-[10px] font-normal mt-0.5 ${
-                ruleSelect === 'rule1' ? 'text-black/60' : 'text-gray-400'
+                ruleSelect === 'rule1' ? 'text-black/75' : 'text-gray-400'
               }`}
             >
               單一教團
@@ -78,7 +78,7 @@ export default function DeckRuleConfigurator({
             <span className="block">規則二</span>
             <span
               className={`block text-[10px] font-normal mt-0.5 ${
-                ruleSelect === 'rule2' ? 'text-black/60' : 'text-gray-400'
+                ruleSelect === 'rule2' ? 'text-black/75' : 'text-gray-400'
               }`}
             >
               主＋次教團

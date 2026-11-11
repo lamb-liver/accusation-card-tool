@@ -63,6 +63,8 @@ export default function DeckListPanel({
         />
       </div>
 
+      {/* 手機版標題列是按鈕；補一個只給讀屏的 h2，教主等 h3 才不會跳級 */}
+      <h2 className="sr-only lg:hidden">我的牌組</h2>
       <div className="lg:hidden shrink-0 flex h-14 items-center border-b border-[#333]">
         <button
           type="button"
