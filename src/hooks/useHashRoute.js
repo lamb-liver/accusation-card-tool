@@ -75,18 +75,27 @@ export function buildHash(path, query) {
   return search ? `${base}?${search}` : base;
 }
 
-export function useHashRoute() {
+/**
+ * @param {{ current: ((query: Record<string, string>) => void) | null }} [onHashChangeRef]
+ *   上一頁／下一頁等 hash 導航時，與 route／query 在同一個 listener 內呼叫，
+ *   讓呼叫端的 state 更新與網址更新合併成同一次 render（例如關閉卡片彈窗）。
+ *   分開掛 listener 不行：兩個 listener 之間會先跑一次 render，
+ *   網址同步 effect 會在彈窗關閉前把 card= 寫回去。
+ */
+export function useHashRoute(onHashChangeRef) {
   const [route, setRoute] = useState(() => parseHashRoute());
   const [query, setQueryState] = useState(() => parseHashQuery());
 
   useEffect(() => {
     const onHashChange = () => {
+      const nextQuery = parseHashQuery();
+      onHashChangeRef?.current?.(nextQuery);
       setRoute(parseHashRoute());
-      setQueryState(parseHashQuery());
+      setQueryState(nextQuery);
     };
     window.addEventListener('hashchange', onHashChange);
     return () => window.removeEventListener('hashchange', onHashChange);
-  }, []);
+  }, [onHashChangeRef]);
 
   /** 切換畫面：推入歷史，並清掉上一個畫面的 query（篩選不該跟著跨頁殘留） */
   const navigate = useCallback((path) => {
@@ -108,19 +117,38 @@ export function useHashRoute() {
    * 會塞爆上一頁；replaceState 也不觸發 hashchange，因此不會回頭再觸發一次
    * 本 hook 的 listener 而形成迴圈。
    *
+   * 預設保留目前歷史紀錄的 state：卡片彈窗用 state 標記「這筆是開彈窗時推入的」，
+   * 彈窗內左右切換只改網址上的 card=，不能把標記洗掉。
+   *
    * @param {Record<string, string>} nextQuery 完整取代，不與現有 query 合併
+   * @param {{ clearState?: boolean }} [options] clearState：一併清掉歷史 state
    */
-  const setQuery = useCallback((nextQuery) => {
+  const setQuery = useCallback((nextQuery, { clearState = false } = {}) => {
     const path = splitHash(window.location.hash).path;
     const nextHash = buildHash(path, nextQuery);
     // '' 與 '#/' 都是首頁：首次載入裸網址時空 query 會組出 '#/'，
     // 若不視為相等就會無故 replaceState、把乾淨的網址改寫成「site/#/」
     const currentHash = window.location.hash || '#/';
-    if (currentHash !== nextHash) {
-      window.history.replaceState(null, '', nextHash);
+    const nextState = clearState ? null : window.history.state;
+    if (currentHash !== nextHash || nextState !== window.history.state) {
+      window.history.replaceState(nextState, '', nextHash);
     }
     setQueryState(parseHashQuery(nextHash));
   }, []);
 
-  return { route, query, navigate, setQuery };
+  /**
+   * 推入一筆新的歷史紀錄（同畫面、不同 query），不觸發 hashchange。
+   * 只給「上一頁應該能退回來」的狀態用，例如開啟卡片彈窗。
+   *
+   * @param {Record<string, string>} nextQuery
+   * @param {unknown} historyState
+   */
+  const pushQuery = useCallback((nextQuery, historyState) => {
+    const path = splitHash(window.location.hash).path;
+    const nextHash = buildHash(path, nextQuery);
+    window.history.pushState(historyState, '', nextHash);
+    setQueryState(parseHashQuery(nextHash));
+  }, []);
+
+  return { route, query, navigate, setQuery, pushQuery };
 }
