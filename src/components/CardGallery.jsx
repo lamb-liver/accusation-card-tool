@@ -1,5 +1,5 @@
 import { memo, useCallback } from 'react';
-import { Search } from 'lucide-react';
+import { FilterX, Search } from 'lucide-react';
 import Card from './Card.jsx';
 
 /** 僅 LCP 候選需 high priority；其餘 lazy 避免與首圖搶頻寬 */
@@ -17,6 +17,8 @@ function CardGallery({
   footer = null,
   hideImage = false,
   minimalMeta = false,
+  activeFilterLabels = [],
+  onClearFilters,
 }) {
   const handleClick = useCallback(
     (card) => onCardClick(card),
@@ -31,8 +33,22 @@ function CardGallery({
       >
         <div className="max-w-md rounded-lg border border-dashed border-brand-gold/30 p-12 text-center">
           <Search className="mx-auto mb-4 h-12 w-12 text-gray-400" aria-hidden strokeWidth={1.75} />
-          <p className="text-gray-400 text-lg font-medium">找不到符合條件的卡片...</p>
-          <p className="text-gray-400 text-sm mt-2">請嘗試調整篩選條件或搜尋關鍵字</p>
+          <p className="text-gray-400 text-lg font-medium">找不到符合條件的卡牌</p>
+          {activeFilterLabels.length > 0 ? (
+            <p className="text-gray-400 text-sm mt-2">目前條件：{activeFilterLabels.join('、')}</p>
+          ) : (
+            <p className="text-gray-400 text-sm mt-2">請調整篩選條件或搜尋關鍵字</p>
+          )}
+          {onClearFilters && activeFilterLabels.length > 0 && (
+            <button
+              type="button"
+              onClick={onClearFilters}
+              className="mt-4 inline-flex min-h-11 items-center gap-1.5 rounded border border-brand-gold/60 px-4 py-2 text-sm text-brand-gold transition hover:bg-brand-gold hover:text-neutral-900"
+            >
+              <FilterX aria-hidden className="h-4 w-4 shrink-0" strokeWidth={2.25} />
+              清除篩選
+            </button>
+          )}
         </div>
       </div>
     );

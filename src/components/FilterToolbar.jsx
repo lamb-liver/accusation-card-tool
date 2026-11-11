@@ -77,7 +77,7 @@ export default function FilterToolbar({
                 value={searchTerm}
                 onChange={(event) => onSearchChange(event.target.value)}
                 placeholder="搜尋卡名或效果..."
-                aria-label="搜尋卡片"
+                aria-label="搜尋卡牌"
                 className="toolbar-search-input w-full rounded-md border-none bg-[#222] py-2.5 pl-3 pr-10 text-base text-white placeholder-gray-400 outline-none ring-0"
               />
               {searchTerm && (

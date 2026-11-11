@@ -2,7 +2,7 @@ import { FACTION_ORDER } from './factionOrder.js';
 
 /** 篩選下拉顯示名稱（與卡牌 faction 值不同時在此覆寫） */
 const FACTION_FILTER_LABELS = {
-  放逐者: '放逐者 (中立)',
+  放逐者: '放逐者（中立）',
 };
 
 /**

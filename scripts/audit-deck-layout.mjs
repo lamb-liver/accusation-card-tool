@@ -28,7 +28,7 @@ async function audit() {
     [
       'desktop-gallery-search-cleared-on-deck',
       { width: 1280, height: 800 },
-      async (p) => p.getByRole('textbox', { name: '搜尋卡片' }).fill('zzznomatchzzz'),
+      async (p) => p.getByRole('textbox', { name: '搜尋卡牌' }).fill('zzznomatchzzz'),
     ],
     ['mobile-full-pool', { width: 390, height: 844 }, null],
   ];
