@@ -94,7 +94,7 @@ accusation-card-tool/
 ├── public/
 │   ├── cards.json          # single source of truth for the card catalog
 │   ├── images/             # card art + symbol icons (responsive -w* variants)
-│   └── favicon.svg
+│   └── favicon-32.png / favicon-48.png
 ├── functions/              # Cloudflare Pages Functions API
 ├── migrations/             # D1 schema and indexes
 ├── shared/                 # deck rules shared by frontend and backend

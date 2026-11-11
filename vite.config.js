@@ -43,7 +43,8 @@ function createPwaPlugins(viteMode) {
   return VitePWA({
   registerType: 'autoUpdate',
   includeAssets: [
-    'favicon.svg',
+    'favicon-32.png',
+    'favicon-48.png',
     'og-share.jpg',
     'icons/apple-touch-icon.png',
     'icons/icon-192.png',

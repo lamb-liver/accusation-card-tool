@@ -41,7 +41,8 @@ function pageShell({ title, description, canonical, image, structuredData, body,
     <meta name="description" content="${safeDescription}" />
     <meta name="robots" content="${robots}, max-image-preview:large" />
     <link rel="canonical" href="${safeCanonical}" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png" />
+    <link rel="icon" type="image/png" sizes="48x48" href="/favicon-48.png" />
     <meta property="og:type" content="website" />
     <meta property="og:locale" content="zh_TW" />
     <meta property="og:site_name" content="《控訴》LCG 查卡工具" />
