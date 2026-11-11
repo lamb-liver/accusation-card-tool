@@ -6,6 +6,7 @@ import {
   reduceTick,
   reduceToggleRun,
 } from './clockEngine.js';
+import { loadClockFromStorage, saveClockToStorage } from './clockPersistence.js';
 
 /**
  * @param {import('./clockUtils.js').ClockStatus} status
@@ -15,13 +16,45 @@ function syncStatusRef(status, statusRef) {
   statusRef.current = status;
 }
 
+/** 首次載入：有存檔就接續（計時中會扣掉離開期間的真實時間），否則從頭開始 */
+function createRestoredState() {
+  return loadClockFromStorage() ?? createInitialState();
+}
+
 /**
  * 以 performance.now() 追蹤實際經過時間；rAF 僅用於刷新 UI。
  */
 export function useGameClock() {
-  const [state, setState] = useState(createInitialState);
+  const [state, setState] = useState(createRestoredState);
   const lastTickRef = useRef(0);
   const statusRef = useRef(state.status);
+  const stateRef = useRef(state);
+
+  useLayoutEffect(() => {
+    stateRef.current = state;
+  });
+
+  /**
+   * 存檔只在「狀態轉換」時寫：開始、暫停、換手、結束、重設。
+   * 計時中每幀的剩餘時間不必寫——還原時以 savedAt 推算經過時間即可，
+   * 避免每秒數十次寫 localStorage。離開頁面前再補存一次最新值。
+   */
+  useEffect(() => {
+    saveClockToStorage(stateRef.current);
+  }, [state.status, state.activePlayer, state.playerA.moves, state.playerB.moves, state.winner]);
+
+  useEffect(() => {
+    const flush = () => saveClockToStorage(stateRef.current);
+    const onVisibilityChange = () => {
+      if (document.visibilityState === 'hidden') flush();
+    };
+    window.addEventListener('pagehide', flush);
+    document.addEventListener('visibilitychange', onVisibilityChange);
+    return () => {
+      window.removeEventListener('pagehide', flush);
+      document.removeEventListener('visibilitychange', onVisibilityChange);
+    };
+  }, []);
 
   /**
    * statusRef 雙層同步：
