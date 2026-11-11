@@ -54,7 +54,7 @@ export default function FilterToolbar({
                 type="button"
                 onClick={() => onModeChange(id)}
                 aria-pressed={currentMode === id}
-                className={`mode-btn flex min-w-0 flex-1 items-center justify-center gap-1 rounded-md border px-1 py-1.5 text-xs font-bold transition sm:min-w-[5rem] sm:gap-1.5 sm:px-2 sm:py-2 sm:text-sm ${
+                className={`mode-btn flex min-h-10 min-w-0 flex-1 items-center justify-center gap-1 rounded-md border px-1 py-1.5 text-xs font-bold transition sm:min-w-[5rem] sm:gap-1.5 sm:px-2 sm:py-2 sm:text-sm ${
                   currentMode === id
                     ? 'border-brand-gold-bright bg-brand-gold-bright text-neutral-900 shadow-[0_0_8px_rgba(242,207,74,0.25)]'
                     : 'border-[#444] bg-[#2a2a2a] text-[#e0e0e0] hover:border-brand-gold hover:bg-[#333]'

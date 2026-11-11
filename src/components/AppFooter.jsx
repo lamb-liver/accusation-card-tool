@@ -3,9 +3,18 @@ import { FileText } from 'lucide-react';
 const iconClass = 'h-4 w-4 shrink-0';
 
 /** LINE／Discord／Facebook 為官方常見向量形狀（內嵌 SVG）；規則書連結維持 Lucide。 */
-export default function AppFooter() {
+/**
+ * @param {{ reserveDeckBar?: boolean, reserveFab?: boolean }} props
+ *   reserveDeckBar：手機組牌底部固定「我的牌組」列（h-14），頁尾留出同高空間才點得到。
+ *   reserveFab：手機查卡右下角有篩選鈕與回頁首鈕，頁尾多留底部空間，捲到底時不會壓住連結。
+ */
+export default function AppFooter({ reserveDeckBar = false, reserveFab = false }) {
   return (
-    <footer className="app-footer mt-8 border-t border-[#2a2a2a] bg-[#111] py-8 text-center">
+    <footer
+      className={`app-footer mt-8 border-t border-[#2a2a2a] bg-[#111] py-8 text-center ${
+        reserveDeckBar ? 'max-lg:pb-[calc(2rem+3.5rem+env(safe-area-inset-bottom))]' : ''
+      } ${reserveFab ? 'max-md:pb-28' : ''}`}
+    >
       <div className="mx-auto max-w-2xl px-4">
         <div className="flex flex-col items-center gap-3">
           <div className="flex gap-3">
@@ -60,9 +69,11 @@ export default function AppFooter() {
             href="https://lambliver.dev/"
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex rounded-full border border-white/10 bg-white/5 px-2.5 py-1 text-[11px] transition hover:border-white/20 hover:bg-white/10 hover:text-gray-300 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-gold"
+            className="group inline-flex min-h-10 items-center rounded-full px-1 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-gold"
           >
-            Site by 羊肝
+            <span className="rounded-full border border-white/10 bg-white/5 px-2.5 py-1 text-[11px] transition group-hover:border-white/20 group-hover:bg-white/10 group-hover:text-gray-300">
+              Site by 羊肝
+            </span>
           </a>
         </p>
       </div>
