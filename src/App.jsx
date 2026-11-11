@@ -220,6 +220,8 @@ function App() {
    * 深層連結會在卡表載入前就斷掉。關閉改由 handleCloseModal 自己寫網址。
    */
   const pendingDeepLinkRef = useRef(Boolean(initialQuery.card));
+  /** 已提示過「找不到這張卡牌」的卡號，避免同一個連結重複跳 toast */
+  const missingCardNoticeRef = useRef(null);
   useEffect(() => {
     const cardId = query.card;
     if (!cardId || allCards.length === 0) return;
@@ -229,7 +231,15 @@ function App() {
     // Deep links / share URLs open when selectedCard is still null.
     if (selectedCard) return;
     const card = findCardById(allCards, cardId);
-    if (!card) return;
+    if (!card) {
+      // 舊連結或打錯的卡號：提示一次；card= 由下方網址同步拿掉
+      pendingDeepLinkRef.current = false;
+      if (missingCardNoticeRef.current !== cardId) {
+        missingCardNoticeRef.current = cardId;
+        showToast('找不到這張卡牌，連結可能已失效', 'warning');
+      }
+      return;
+    }
 
     // 直接開卡片網址（分享連結、靜態卡頁「在工具中開啟」）：在彈窗底下墊一筆
     // 不帶 card= 的紀錄，上一頁先回到列表，再按一次才離開網站。
@@ -244,7 +254,7 @@ function App() {
       }
     }
     handleCardClick(card, allCards);
-  }, [query.card, allCards, selectedCard, handleCardClick, setQuery, pushQuery]);
+  }, [query.card, allCards, selectedCard, handleCardClick, setQuery, pushQuery, showToast]);
 
   /**
    * 上一頁／下一頁（或其他 hash 導航）把 card= 拿掉時關閉彈窗。
@@ -266,13 +276,18 @@ function App() {
    */
   useEffect(() => {
     if (!querySyncMode) return;
-    const cardId = selectedCard?.id ?? query.card;
+    // 卡表載入後，網址上不存在的卡號就不再保留（載入前先留著，避免深層連結斷掉）
+    const urlCardId =
+      query.card && (allCards.length === 0 || findCardById(allCards, query.card))
+        ? query.card
+        : undefined;
+    const cardId = selectedCard?.id ?? urlCardId;
     if (querySyncMode === 'deck') {
       setQuery(cardId ? { card: cardId } : {});
       return;
     }
     setQuery(filtersToQuery(searchTerm, filters, cardId));
-  }, [querySyncMode, searchTerm, filters, selectedCard, query.card, setQuery]);
+  }, [querySyncMode, searchTerm, filters, selectedCard, query.card, allCards, setQuery]);
 
   /** 換頁／改每頁張數後回到頁首，避免使用者停留在新頁面的底部 */
   const handlePageChange = useCallback(
@@ -527,6 +542,7 @@ function App() {
             onNext={handleModalNext}
             isInDeck={deckCardIds.has(selectedCard.id)}
             onViewFactionQA={handleViewFactionQA}
+            onShowToast={showToast}
           />
         </Suspense>
       )}
