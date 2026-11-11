@@ -71,7 +71,6 @@ export default function DeckListPanel({
           onClick={onToggleBottomSheet}
           className="flex h-14 min-w-0 flex-1 items-center justify-between px-4"
           aria-expanded={bottomSheetOpen}
-          aria-label={bottomSheetOpen ? '收合牌組清單' : '展開牌組清單'}
         >
           <div className="flex min-w-0 items-center gap-2 overflow-hidden">
             <span className="shrink-0 whitespace-nowrap text-brand-gold font-bold text-sm">我的牌組</span>

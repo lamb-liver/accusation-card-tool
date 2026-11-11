@@ -15,7 +15,7 @@ const ROUTES = [
   { name: 'community', hash: '#/community', ready: 'h2:text-is("交流區")' },
   { name: 'qa', hash: '#/qa', ready: '[aria-label="搜尋常見問題"]' },
   { name: 'clock', hash: '#/clock', ready: '[aria-label="對局計時器"]' },
-  { name: 'admin', hash: '#/admin', ready: 'h2:text-is("管理後台")' },
+  { name: 'admin', hash: '#/admin', ready: 'h1:text-is("管理後台")' },
 ];
 
 function baseUrl() {
@@ -110,13 +110,13 @@ async function run() {
             await page.getByRole('button', { name: '關閉抽屜' }).click();
           }
 
-          await page.locator('[aria-label^="查看卡牌："]').first().click();
+          await page.locator('button[data-card-open]').first().click();
           await page.getByRole('dialog').waitFor();
           await assertPage(page, `${label}-card-modal`);
           await page.getByRole('button', { name: '關閉', exact: true }).click();
 
           // 上一頁應關閉彈窗、留在列表，而不是離開網站
-          await page.locator('[aria-label^="查看卡牌："]').first().click();
+          await page.locator('button[data-card-open]').first().click();
           await page.getByRole('dialog').waitFor();
           await page.goBack();
           await page.getByRole('dialog').waitFor({ state: 'detached' });

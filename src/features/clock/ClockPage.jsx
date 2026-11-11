@@ -49,12 +49,8 @@ function PlayerPanel({ playerId, label, player, isActive, isRunning, onEndTurn }
       onClick={onEndTurn}
       disabled={!canTap}
       aria-current={isActive ? 'true' : undefined}
-      aria-label={
-        canTap
-          ? `${label}，剩餘 ${formatTime(player.remainingMs)}，點擊結束回合`
-          : `${label}，剩餘 ${formatTime(player.remainingMs)}`
-      }
     >
+      {/* 名稱由可見文字組成（WCAG 2.5.3），只用 sr-only 補上讀屏需要的連接詞 */}
       <span className="clock-player__face">
         {isActive && isRunning && (
           <span className="clock-player__turn-badge" aria-hidden>
@@ -62,8 +58,11 @@ function PlayerPanel({ playerId, label, player, isActive, isRunning, onEndTurn }
           </span>
         )}
         <span className="clock-player__label">{label}</span>
+        <span className="clock-sr-only">，剩餘 </span>
         <span className="clock-player__time">{formatTime(player.remainingMs)}</span>
+        <span className="clock-sr-only">，</span>
         <span className="clock-player__meta">回合 {player.moves}</span>
+        {canTap && <span className="clock-sr-only">，點擊結束回合</span>}
       </span>
     </button>
   );
