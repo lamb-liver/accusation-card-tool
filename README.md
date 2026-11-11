@@ -119,7 +119,7 @@ accusation-card-tool/
 │   ├── cards.json          # 唯一卡牌目錄來源
 │   ├── images/             # 卡圖與符號圖示（含響應式 -w* 變體）
 │   ├── fonts/              # 展示用襯線字體子集（Noto Serif TC，SIL OFL）＋ OFL.txt
-│   └── favicon.svg
+│   └── favicon-32.png／favicon-48.png
 ├── functions/              # Cloudflare Pages Functions API
 ├── migrations/             # D1 schema 與索引
 ├── shared/                 # 前後端共用構築規則核心

@@ -12,7 +12,8 @@ import { LCP_CARD_ID, LCP_IMAGE_WIDTH } from '../../src/utils/galleryLayout.js';
 
 export const CARD_JSON_PATH = 'public/cards.json';
 export const STATIC_PUBLIC_ASSETS = [
-  'public/favicon.svg',
+  'public/favicon-32.png',
+  'public/favicon-48.png',
   'public/manifest.webmanifest',
   'public/robots.txt',
   'public/sitemap.xml',
