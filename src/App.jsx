@@ -10,6 +10,7 @@ import { useDialog }      from './hooks/useDialog.js';
 import { parseHashQuery, useHashRoute } from './hooks/useHashRoute.js';
 import { useCommunityDeckFlow } from './hooks/useCommunityDeckFlow.js';
 import { findCardById } from './utils/cardCatalog.js';
+import { FILTER_OPTIONS } from './constants/filterOptions.js';
 import DeckSubmitModal from './components/shareWall/DeckSubmitModal.jsx';
 
 import FilterToolbar       from './components/FilterToolbar.jsx';
@@ -338,6 +339,19 @@ function App() {
     scrollToTop();
   }, [resetFilters]);
 
+  /** 查無結果時列出目前條件，讓使用者知道是哪個條件擋掉 */
+  const activeFilterLabels = useMemo(() => {
+    const labels = [];
+    if (searchTerm.trim()) labels.push(`搜尋「${searchTerm.trim()}」`);
+    for (const key of FILTER_KEYS) {
+      const value = filters[key];
+      if (!value) continue;
+      const option = FILTER_OPTIONS[key]?.find((item) => item.value === value);
+      labels.push(option?.label ?? value);
+    }
+    return labels;
+  }, [searchTerm, filters]);
+
   const handleDrawerApply = useCallback(
     ({ searchTerm: nextSearch, filters: nextFilters }) => {
       setSearchTerm(nextSearch);
@@ -405,7 +419,7 @@ function App() {
                 <p className="text-sm text-gray-400">載入卡牌資料中…</p>
               ) : (
                 <p className="text-sm font-medium text-stone-400">
-                  找到 <span className="font-bold text-brand-gold">{filteredCards.length}</span> 張卡片
+                  找到 <span className="font-bold text-brand-gold">{filteredCards.length}</span> 張卡牌
                 </p>
               )}
             </div>
@@ -427,6 +441,8 @@ function App() {
                     cards={paginatedCards}
                     onCardClick={handleGalleryCardClick}
                     minimalMeta
+                    activeFilterLabels={activeFilterLabels}
+                    onClearFilters={handleClearFilters}
                   />
 
                   <PaginationControls

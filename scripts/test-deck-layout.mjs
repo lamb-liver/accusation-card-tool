@@ -72,7 +72,7 @@ async function run() {
       const page = await browser.newPage({ viewport: { width: 1280, height: 800 } });
       const m = await openDeckMode(page, baseUrl, {
         beforeDeck: async (p) => {
-          await p.getByRole('textbox', { name: '搜尋卡片' }).fill('zzznomatchzzz');
+          await p.getByRole('textbox', { name: '搜尋卡牌' }).fill('zzznomatchzzz');
         },
       });
       assertDeckLayout(m, 'desktop-gallery-search-cleared-on-deck');

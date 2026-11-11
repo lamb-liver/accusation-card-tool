@@ -96,7 +96,7 @@ function pageShell({ title, description, canonical, image, structuredData, body,
   <body>
     <header><nav class="wrap" aria-label="頁面導覽"><a href="/">《控訴》LCG 查卡工具</a></nav></header>
     <main class="wrap">${body}</main>
-    <footer><p class="wrap">© 愚人古堡工作室</p></footer>
+    <footer><p class="wrap">卡牌圖像與內容 © 愚人古堡工作室｜本站為玩家製作的非官方工具</p></footer>
   </body>
 </html>\n`;
 }

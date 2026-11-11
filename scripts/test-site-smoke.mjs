@@ -10,7 +10,7 @@ const VIEWPORTS = [
 ];
 
 const ROUTES = [
-  { name: 'gallery', hash: '#/', ready: '[aria-label="搜尋卡片"]' },
+  { name: 'gallery', hash: '#/', ready: '[aria-label="搜尋卡牌"]' },
   { name: 'deck', hash: '#/deck', ready: 'h2:text-is("可選卡牌池")' },
   { name: 'community', hash: '#/community', ready: 'h2:text-is("交流區")' },
   { name: 'qa', hash: '#/qa', ready: '[aria-label="搜尋常見問題"]' },

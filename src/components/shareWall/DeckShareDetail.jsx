@@ -1,13 +1,21 @@
 import { ArrowLeft, Hammer } from 'lucide-react';
 import { useCallback } from 'react';
-import { fetchPublicDeck } from '../../api/shareWallApi.js';
+import { fetchPublicDeck, ShareWallApiError } from '../../api/shareWallApi.js';
 import { useAsyncResource } from '../../hooks/useAsyncResource.js';
 import { usePageTitle } from '../../hooks/usePageTitle.js';
 import { formatApiDate } from '../../utils/formatApiDate.js';
 import AsyncPanel from '../common/AsyncPanel.jsx';
 
 export default function DeckShareDetail({ shareId, onBack, onLoadDeck, isLoadingCards }) {
-  const loadDeck = useCallback(() => fetchPublicDeck(shareId), [shareId]);
+  /** 404 當成「找不到」顯示空狀態，不顯示英文錯誤與沒用的重新載入 */
+  const loadDeck = useCallback(async () => {
+    try {
+      return await fetchPublicDeck(shareId);
+    } catch (error) {
+      if (error instanceof ShareWallApiError && error.status === 404) return null;
+      throw error;
+    }
+  }, [shareId]);
   const { data, isLoading, isRetrying, isError, errorMessage, reload } = useAsyncResource(loadDeck);
 
   usePageTitle(data?.title ? `控訴 - ${data.title}` : '控訴 - 牌組詳情');
@@ -41,8 +49,8 @@ export default function DeckShareDetail({ shareId, onBack, onLoadDeck, isLoading
         errorMessage={errorMessage}
         onRetry={reload}
         isEmpty={!data}
-        emptyTitle="找不到此牌組"
-        emptyHint="可能尚未核准或已被移除"
+        emptyTitle="找不到這副牌組"
+        emptyHint="可能已下架或網址有誤"
       >
         {data && (
           <article className="share-detail-card rounded-lg border border-brand-gold/60 bg-[#252525] p-6">

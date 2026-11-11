@@ -27,7 +27,7 @@ export default function DeckSlotsSection({
         </div>
         <ul className="slot-list space-y-1 bg-[#2a2a2a] rounded p-2 min-h-12 border border-[#444]">
           {deck.leader.length === 0 ? (
-            <li className="text-[#888] text-xs italic py-2">無卡片</li>
+            <li className="text-[#888] text-xs italic py-2">尚無卡牌</li>
           ) : (
             deck.leader.map((card) => (
               <DeckCardRow key={card.id} card={card} onRemove={onRemoveCard} onCardClick={onCardClick} />
@@ -50,7 +50,7 @@ export default function DeckSlotsSection({
         </div>
         <ul className="slot-list space-y-1 bg-[#2a2a2a] rounded p-2 min-h-12 border border-[#444]">
           {deck.rituals.length === 0 ? (
-            <li className="text-[#888] text-xs italic py-2">無卡片</li>
+            <li className="text-[#888] text-xs italic py-2">尚無卡牌</li>
           ) : (
             deck.rituals.map((card) => (
               <DeckCardRow key={card.id} card={card} onRemove={onRemoveCard} onCardClick={onCardClick} />
@@ -108,7 +108,7 @@ export default function DeckSlotsSection({
             className="slot-list space-y-1 bg-[#2a2a2a] rounded p-2 min-h-20 border border-[#444]"
           >
             {deck.main.length === 0 ? (
-              <li className="text-[#888] text-xs italic py-2">無卡片</li>
+              <li className="text-[#888] text-xs italic py-2">尚無卡牌</li>
             ) : (
               deck.main.map((card) => (
                 <DeckCardRow key={card.id} card={card} onRemove={onRemoveCard} onCardClick={onCardClick} sortMain />
