@@ -59,6 +59,39 @@ assert(
   'mechanic-only filter',
 );
 
+// 灰燼皇后（mot01）曾把「一」誤植成注音「ㄧ」，搜「限一次」會漏掉
+assert(
+  filterAndRankCards(cards, '限一次', noFilters).some((card) => card.id === 'mot01'),
+  '限一次 finds mot01',
+);
+
+// 直接打教團名：整個教團都要列出，且卡名命中的卡仍排在前面
+for (const [query, faction] of [
+  ['鴉教團', '鴉教團'],
+  ['疫病中心', '疫病中心'],
+  ['疫病', '疫病中心'],
+  ['紫靈山', '紫靈山'],
+]) {
+  const result = filterAndRankCards(cards, query, noFilters);
+  const factionCount = cards.filter((card) => card.faction === faction).length;
+  assert.equal(
+    result.filter((card) => card.faction === faction).length,
+    factionCount,
+    `${query} lists every ${faction} card`,
+  );
+}
+assert.equal(filterAndRankCards(cards, '黑色葬禮', noFilters)[0]?.id, 'cro02', 'name match still ranks first');
+assert(
+  filterAndRankCards(cards, '門', noFilters).length < cards.filter((card) => card.faction === '門教團').length,
+  'single-character query does not pull in a whole faction',
+);
+
+for (const mechanic of ['附著', '飛升']) {
+  const result = filterAndRankCards(cards, '', { ...noFilters, mechanic });
+  assert(result.length > 0, `${mechanic} filter has results`);
+  assert(result.every((card) => card.effect?.includes(mechanic)), `${mechanic} filter matches effect`);
+}
+
 const originalOrder = cards.slice(0, 5).map((card) => card.id);
 assert.deepEqual(
   filterAndRankCards(cards, '', noFilters).slice(0, 5).map((card) => card.id),
@@ -66,4 +99,4 @@ assert.deepEqual(
   'blank query preserves catalog order',
 );
 
-console.log(`OK: ${firstCases.length + 6} golden search cases passed`);
+console.log(`OK: ${firstCases.length + 14} golden search cases passed`);

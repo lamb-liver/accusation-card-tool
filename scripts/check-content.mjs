@@ -3,6 +3,7 @@ import { readFileSync } from 'node:fs';
 
 import { MECHANIC_GLOSSARY } from '../src/constants/mechanicGlossary.js';
 import { parseQaModule } from './lib/qa-module.mjs';
+import { findLookalikeIssues } from './lib/text-lint.mjs';
 
 const cards = JSON.parse(readFileSync(new URL('../public/cards.json', import.meta.url), 'utf8'));
 const qaSource = readFileSync(new URL('../src/data/qaData.js', import.meta.url), 'utf8');
@@ -34,6 +35,9 @@ function scan(value, path) {
   if (typeof value === 'string') {
     for (const [label, pattern] of suspicious) {
       if (pattern.test(value)) failures.push(`${path}: ${label} (${JSON.stringify(value)})`);
+    }
+    for (const label of findLookalikeIssues(value)) {
+      failures.push(`${path}: ${label} (${JSON.stringify(value)})`);
     }
     return;
   }

@@ -36,6 +36,7 @@ import {
   getTotalSymbolCount,
   SYMBOL_ORDER,
 } from '../src/deck/deckSymbolStats.js';
+import { findLookalikeIssues, fixLookalikeText } from './lib/text-lint.mjs';
 
 const fail = (message) => assert.fail(message);
 const assertDeepEqual = assert.deepEqual;
@@ -430,5 +431,12 @@ assert(formatShareWallError(null, 'fallback') === 'fallback', 'format unknown er
 assert(formatApiDate(null) === '—', 'empty api date placeholder');
 assert(formatApiDate('not a date') === 'not a date', 'invalid api date preserved');
 assert(formatApiDate('2026-01-01 00:00:00').includes('2026'), 'sqlite datetime formats as local display string');
+
+assert.equal(fixLookalikeText('限ㄧ次'), '限一次', 'zhuyin yi becomes 一');
+assert.equal(fixLookalikeText('抽\u200B1張\u00A0牌'), '抽1張 牌', 'zero-width removed, nbsp to space');
+assert.deepEqual(findLookalikeIssues('你的每個回合限一次。'), [], 'clean text has no issues');
+assert(findLookalikeIssues('限ㄧ次').includes('注音符號'), 'zhuyin flagged');
+assert(findLookalikeIssues('\u2F00').length > 0, 'kangxi radical flagged');
+assert(findLookalikeIssues('ＣＲＯ').length > 0, 'fullwidth latin flagged');
 
 console.log('OK: utility tests passed');

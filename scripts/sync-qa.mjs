@@ -3,6 +3,7 @@ import { resolve, dirname } from 'path';
 import { fileURLToPath } from 'url';
 
 import { formatQaModule, parseQaModule } from './lib/qa-module.mjs';
+import { fixLookalikeText } from './lib/text-lint.mjs';
 import { QA_PLACEHOLDER, isPlaceholderOnlyCategory } from '../src/constants/qaPlaceholder.js';
 import { FACTION_ORDER } from '../src/constants/factionOrder.js';
 
@@ -73,7 +74,8 @@ function parseCSV(text) {
 
 function rowsToQuestions(rows) {
   return rows
-    .map(row => ({ q: row[1]?.trim(), a: row[2]?.trim() }))
+    // 試算表誤植的「ㄧ」、零寬字元等在這裡修正，避免每週同步把修好的字蓋回
+    .map(row => ({ q: fixLookalikeText(row[1] ?? '').trim(), a: fixLookalikeText(row[2] ?? '').trim() }))
     .filter(({ q, a }) => q && a);
 }
 
