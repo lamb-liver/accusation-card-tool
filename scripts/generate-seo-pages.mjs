@@ -2,10 +2,12 @@
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { CARD_OG_HEIGHT, CARD_OG_WIDTH, cardOgPath, generateCardOgImages } from './lib/card-og-images.mjs';
 
 const SITE_URL = 'https://accusation-card-tool.pages.dev';
 const projectRoot = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const outputRoot = resolve(projectRoot, 'dist');
+const publicRoot = resolve(projectRoot, 'public');
 const cards = JSON.parse(await readFile(resolve(projectRoot, 'public/cards.json'), 'utf8'));
 
 function escapeHtml(value) {
@@ -26,11 +28,24 @@ function summary(value, maxLength = 150) {
   return text.length > maxLength ? `${text.slice(0, maxLength - 1)}…` : text;
 }
 
+const SITE_OG_IMAGE = { url: `${SITE_URL}/og-share.jpg`, width: 1200, height: 630 };
+
 function pageShell({ title, description, canonical, image, structuredData, body, robots = 'index, follow' }) {
   const safeTitle = escapeHtml(title);
   const safeDescription = escapeHtml(description);
   const safeCanonical = escapeHtml(canonical);
-  const safeImage = image ? escapeHtml(image) : '';
+  const safeImage = image ? escapeHtml(image.url) : '';
+  const imageMeta = image
+    ? [
+        `<meta property="og:image" content="${safeImage}" />`,
+        '<meta property="og:image:type" content="image/jpeg" />',
+        `<meta property="og:image:width" content="${image.width}" />`,
+        `<meta property="og:image:height" content="${image.height}" />`,
+        `<meta property="og:image:alt" content="${escapeHtml(image.alt ?? title)}" />`,
+        '<meta name="twitter:card" content="summary_large_image" />',
+        `<meta name="twitter:image" content="${safeImage}" />`,
+      ].join('\n    ')
+    : '<meta name="twitter:card" content="summary_large_image" />';
 
   return `<!doctype html>
 <html lang="zh-TW">
@@ -49,7 +64,7 @@ function pageShell({ title, description, canonical, image, structuredData, body,
     <meta property="og:title" content="${safeTitle}" />
     <meta property="og:description" content="${safeDescription}" />
     <meta property="og:url" content="${safeCanonical}" />
-    ${image ? `<meta property="og:image" content="${safeImage}" />\n    <meta property="og:image:type" content="image/jpeg" />\n    <meta property="og:image:alt" content="${safeTitle}" />\n    <meta name="twitter:card" content="summary_large_image" />\n    <meta name="twitter:image" content="${safeImage}" />` : '<meta name="twitter:card" content="summary_large_image" />'}
+    ${imageMeta}
     <meta name="twitter:title" content="${safeTitle}" />
     <meta name="twitter:description" content="${safeDescription}" />
     <script type="application/ld+json">${jsonLd(structuredData)}</script>
@@ -89,7 +104,9 @@ function pageShell({ title, description, canonical, image, structuredData, body,
 function cardPage(card) {
   const canonical = `${SITE_URL}/card/${encodeURIComponent(card.id)}/`;
   const cardImage = `${SITE_URL}/images/${encodeURIComponent(card.id)}-w640.webp`;
-  const image = `${SITE_URL}/og-share.jpg`;
+  const image = cardOgIds.has(card.id)
+    ? { url: `${SITE_URL}${cardOgPath(card.id)}`, width: CARD_OG_WIDTH, height: CARD_OG_HEIGHT, alt: `《控訴》卡牌「${card.name}」` }
+    : SITE_OG_IMAGE;
   const title = `${card.name}（${card.faction}）卡牌資料｜《控訴》LCG`;
   const description = summary(`《控訴》LCG ${card.faction}${card.type}「${card.name}」：${card.effect}`);
   const symbols = Array.isArray(card.symbols) && card.symbols.length > 0
@@ -140,7 +157,7 @@ function indexPage() {
     title: '《控訴》LCG 卡牌索引｜卡名、教團與種類',
     description: `瀏覽《控訴》LCG 全部 ${cards.length} 張卡牌，依教團查找卡名、種類、符號與卡牌效果。`,
     canonical: `${SITE_URL}/card/`,
-    image: `${SITE_URL}/og-share.jpg`,
+    image: SITE_OG_IMAGE,
     structuredData: {
       '@context': 'https://schema.org',
       '@type': 'CollectionPage',
@@ -156,6 +173,13 @@ function indexPage() {
 
 if (!Array.isArray(cards) || cards.length === 0) throw new Error('SEO pages: cards.json must be a non-empty array');
 if (cards.some((card) => !/^[a-z0-9-]+$/.test(card.id))) throw new Error('SEO pages: invalid card id');
+
+const cardOgIds = await generateCardOgImages({ cards, publicRoot, outputRoot });
+if (cardOgIds.size === 0) throw new Error('SEO pages: no card share images generated (check sharp and public/images)');
+if (cardOgIds.size !== cards.length) {
+  const missing = cards.filter((card) => !cardOgIds.has(card.id)).map((card) => card.id);
+  console.warn(`SEO pages: ${missing.length} card(s) have no art, using site share image: ${missing.join(', ')}`);
+}
 
 await mkdir(resolve(outputRoot, 'card'), { recursive: true });
 await writeFile(resolve(outputRoot, 'card/index.html'), indexPage());
@@ -183,4 +207,4 @@ const notFound = pageShell({
 await writeFile(resolve(outputRoot, '404.html'), notFound);
 
 if (sitemapUrls.length !== cards.length + 2) throw new Error('SEO pages: sitemap count mismatch');
-console.log(`SEO pages: generated ${cards.length} card pages and ${sitemapUrls.length} sitemap URLs`);
+console.log(`SEO pages: generated ${cards.length} card pages, ${cardOgIds.size} card share images and ${sitemapUrls.length} sitemap URLs`);
