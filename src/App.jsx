@@ -10,6 +10,7 @@ import { useDialog }      from './hooks/useDialog.js';
 import { parseHashQuery, useHashRoute } from './hooks/useHashRoute.js';
 import { useCommunityDeckFlow } from './hooks/useCommunityDeckFlow.js';
 import { findCardById } from './utils/cardCatalog.js';
+import { FILTER_OPTIONS } from './constants/filterOptions.js';
 import DeckSubmitModal from './components/shareWall/DeckSubmitModal.jsx';
 
 import FilterToolbar       from './components/FilterToolbar.jsx';
@@ -220,6 +221,8 @@ function App() {
    * 深層連結會在卡表載入前就斷掉。關閉改由 handleCloseModal 自己寫網址。
    */
   const pendingDeepLinkRef = useRef(Boolean(initialQuery.card));
+  /** 已提示過「找不到這張卡牌」的卡號，避免同一個連結重複跳 toast */
+  const missingCardNoticeRef = useRef(null);
   useEffect(() => {
     const cardId = query.card;
     if (!cardId || allCards.length === 0) return;
@@ -229,7 +232,15 @@ function App() {
     // Deep links / share URLs open when selectedCard is still null.
     if (selectedCard) return;
     const card = findCardById(allCards, cardId);
-    if (!card) return;
+    if (!card) {
+      // 舊連結或打錯的卡號：提示一次；card= 由下方網址同步拿掉
+      pendingDeepLinkRef.current = false;
+      if (missingCardNoticeRef.current !== cardId) {
+        missingCardNoticeRef.current = cardId;
+        showToast('找不到這張卡牌，連結可能已失效', 'warning');
+      }
+      return;
+    }
 
     // 直接開卡片網址（分享連結、靜態卡頁「在工具中開啟」）：在彈窗底下墊一筆
     // 不帶 card= 的紀錄，上一頁先回到列表，再按一次才離開網站。
@@ -244,7 +255,7 @@ function App() {
       }
     }
     handleCardClick(card, allCards);
-  }, [query.card, allCards, selectedCard, handleCardClick, setQuery, pushQuery]);
+  }, [query.card, allCards, selectedCard, handleCardClick, setQuery, pushQuery, showToast]);
 
   /**
    * 上一頁／下一頁（或其他 hash 導航）把 card= 拿掉時關閉彈窗。
@@ -266,13 +277,18 @@ function App() {
    */
   useEffect(() => {
     if (!querySyncMode) return;
-    const cardId = selectedCard?.id ?? query.card;
+    // 卡表載入後，網址上不存在的卡號就不再保留（載入前先留著，避免深層連結斷掉）
+    const urlCardId =
+      query.card && (allCards.length === 0 || findCardById(allCards, query.card))
+        ? query.card
+        : undefined;
+    const cardId = selectedCard?.id ?? urlCardId;
     if (querySyncMode === 'deck') {
       setQuery(cardId ? { card: cardId } : {});
       return;
     }
     setQuery(filtersToQuery(searchTerm, filters, cardId));
-  }, [querySyncMode, searchTerm, filters, selectedCard, query.card, setQuery]);
+  }, [querySyncMode, searchTerm, filters, selectedCard, query.card, allCards, setQuery]);
 
   /** 換頁／改每頁張數後回到頁首，避免使用者停留在新頁面的底部 */
   const handlePageChange = useCallback(
@@ -338,6 +354,19 @@ function App() {
     scrollToTop();
   }, [resetFilters]);
 
+  /** 查無結果時列出目前條件，讓使用者知道是哪個條件擋掉 */
+  const activeFilterLabels = useMemo(() => {
+    const labels = [];
+    if (searchTerm.trim()) labels.push(`搜尋「${searchTerm.trim()}」`);
+    for (const key of FILTER_KEYS) {
+      const value = filters[key];
+      if (!value) continue;
+      const option = FILTER_OPTIONS[key]?.find((item) => item.value === value);
+      labels.push(option?.label ?? value);
+    }
+    return labels;
+  }, [searchTerm, filters]);
+
   const handleDrawerApply = useCallback(
     ({ searchTerm: nextSearch, filters: nextFilters }) => {
       setSearchTerm(nextSearch);
@@ -352,6 +381,14 @@ function App() {
     <div className="app-shell min-h-screen text-gray-200 font-sans">
       <AppPageBackground />
       <div className="app-shell-content flex min-h-screen flex-col">
+      {/* 鍵盤使用者跳過主選單與篩選列。hash 路由不能用 #id 錨點，改用按鈕移動焦點 */}
+      <button
+        type="button"
+        onClick={() => document.getElementById('main-content')?.focus()}
+        className="sr-only z-[2000] rounded bg-brand-gold font-bold text-neutral-900 focus:not-sr-only focus:fixed focus:left-3 focus:top-3 focus:px-4 focus:py-2"
+      >
+        跳到主要內容
+      </button>
       {currentMode !== 'admin' && (
         <div className={currentMode === 'deck' ? 'shrink-0' : undefined}>
           <FilterToolbar
@@ -378,7 +415,9 @@ function App() {
       />
 
       <main
-        className={`mx-auto w-full max-w-7xl ${
+        id="main-content"
+        tabIndex={-1}
+        className={`mx-auto w-full max-w-7xl outline-none ${
           currentMode === 'deck' ? 'px-2 py-3 sm:px-4 lg:p-4' : 'mt-4 p-4'
         }`}
       >
@@ -400,12 +439,12 @@ function App() {
         {currentMode === 'gallery' && (
           <>
             <BackToTopButton />
-            <div className="mb-4 text-center md:hidden">
+            <div className="mb-4 text-center md:hidden" aria-live="polite">
               {isLoading ? (
                 <p className="text-sm text-gray-400">載入卡牌資料中…</p>
               ) : (
                 <p className="text-sm font-medium text-stone-400">
-                  找到 <span className="font-bold text-brand-gold">{filteredCards.length}</span> 張卡片
+                  找到 <span className="font-bold text-brand-gold">{filteredCards.length}</span> 張卡牌
                 </p>
               )}
             </div>
@@ -427,6 +466,8 @@ function App() {
                     cards={paginatedCards}
                     onCardClick={handleGalleryCardClick}
                     minimalMeta
+                    activeFilterLabels={activeFilterLabels}
+                    onClearFilters={handleClearFilters}
                   />
 
                   <PaginationControls
@@ -527,11 +568,12 @@ function App() {
             onNext={handleModalNext}
             isInDeck={deckCardIds.has(selectedCard.id)}
             onViewFactionQA={handleViewFactionQA}
+            onShowToast={showToast}
           />
         </Suspense>
       )}
 
-      <AppFooter />
+      <AppFooter reserveDeckBar={currentMode === 'deck'} reserveFab={currentMode === 'gallery'} />
       <ToastList toasts={toasts} />
       <DialogContainer dialogState={dialogState} resolve={resolve} />
       <DeckSubmitModal

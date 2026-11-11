@@ -56,7 +56,7 @@ export default function FilterToolbar({
                 type="button"
                 onClick={() => onModeChange(id)}
                 aria-pressed={currentMode === id}
-                className={`mode-btn flex min-w-0 flex-1 items-center justify-center gap-1 rounded-md border px-1 py-1.5 text-xs font-bold transition sm:min-w-[5rem] sm:gap-1.5 sm:px-2 sm:py-2 sm:text-sm ${
+                className={`mode-btn flex min-h-10 min-w-0 flex-1 items-center justify-center gap-1 rounded-md border px-1 py-1.5 text-xs font-bold transition sm:min-w-[5rem] sm:gap-1.5 sm:px-2 sm:py-2 sm:text-sm ${
                   currentMode === id
                     ? 'border-brand-gold-bright bg-brand-gold-bright text-neutral-900 shadow-[0_0_8px_rgba(242,207,74,0.25)]'
                     : 'border-[#444] bg-[#2a2a2a] text-[#e0e0e0] hover:border-brand-gold hover:bg-[#333]'
@@ -73,13 +73,13 @@ export default function FilterToolbar({
           </div>
 
           {showCardFilters && (
-            <div className="search-wrapper relative w-full max-w-[500px]">
+            <div role="search" className="search-wrapper relative w-full max-w-[500px]">
               <input
                 type="text"
                 value={searchTerm}
                 onChange={(event) => onSearchChange(event.target.value)}
                 placeholder="搜尋卡名或效果..."
-                aria-label="搜尋卡片"
+                aria-label="搜尋卡牌"
                 className="toolbar-search-input w-full rounded-md border-none bg-[#222] py-2.5 pl-3 pr-10 text-base text-white placeholder-gray-400 outline-none ring-0"
               />
               {searchTerm && (
@@ -98,8 +98,9 @@ export default function FilterToolbar({
       </div>
 
       {showCardFilters && (
-        <div
+        <section
           id="galleryControls"
+          aria-label="篩選條件"
           className="controls mx-auto mb-4 mt-2 hidden w-full max-w-[1000px] grid-cols-2 gap-2.5 px-4 pb-1 md:grid md:grid-cols-3 xl:grid-cols-5"
         >
           {dropdowns.map(({ key, fallbackLabel }) => {
@@ -125,7 +126,7 @@ export default function FilterToolbar({
           })}
 
           <div className="filter-stats col-span-full mt-1 flex items-center justify-center gap-3 text-center text-[13px] font-medium text-stone-400">
-            <span className="flex items-center gap-1">
+            <span className="flex items-center gap-1" aria-live="polite">
               <BarChart3 aria-hidden className="h-[13px] w-[13px] shrink-0" strokeWidth={2.25} />
               <span>
                 共 <span className="font-bold text-brand-gold">{resultCount}</span> 張卡牌
@@ -142,7 +143,7 @@ export default function FilterToolbar({
               </button>
             )}
           </div>
-        </div>
+        </section>
       )}
     </>
   );

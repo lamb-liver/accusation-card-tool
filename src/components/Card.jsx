@@ -108,8 +108,8 @@ function Card({
 
   const cardImageAlt =
     artVariant !== 'main' && hasAlt
-      ? `卡牌「${card.name}」異畫（WebP，${card.faction}，${card.type}）`
-      : `卡牌「${card.name}」封面圖（WebP，${card.faction}，${card.type}）`;
+      ? `卡牌「${card.name}」異畫，${card.faction}${card.type}`
+      : `卡牌「${card.name}」，${card.faction}${card.type}`;
 
   const handleArtPrev = useCallback(
     (e) => {

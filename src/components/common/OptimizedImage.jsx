@@ -1,5 +1,6 @@
 import { memo, useCallback, useEffect, useState } from 'react';
 import { ImageOff } from 'lucide-react';
+import { noteLoadedImageFormat } from '../../utils/cardAlternateArt.js';
 
 /**
  * 響應式 picture；原生 loading 屬性處理延遲載入。
@@ -31,17 +32,19 @@ function OptimizedImage({
 
   const imgRefCallback = useCallback(
     (img) => {
-      if (!img || !onLoad) return;
+      if (!img) return;
       if (img.complete && img.naturalWidth > 0) {
-        onLoad({ currentTarget: img });
+        if (usePicture) noteLoadedImageFormat(img.currentSrc);
+        onLoad?.({ currentTarget: img });
       }
     },
-    [onLoad],
+    [onLoad, usePicture],
   );
 
   const handleLoad = useCallback(
     async (e) => {
       const img = e.currentTarget;
+      if (usePicture) noteLoadedImageFormat(img.currentSrc);
       if (awaitDecode && typeof img.decode === 'function') {
         try {
           await img.decode();
@@ -51,7 +54,7 @@ function OptimizedImage({
       }
       onLoad?.(e);
     },
-    [awaitDecode, onLoad],
+    [awaitDecode, onLoad, usePicture],
   );
 
   const handleError = useCallback(

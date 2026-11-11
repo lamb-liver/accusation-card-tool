@@ -4,6 +4,7 @@ import {
   ChevronLeft,
   ChevronRight,
   HelpCircle,
+  Link2,
   List,
   Plus,
   X,
@@ -15,11 +16,10 @@ import { getMechanicNotes } from '../constants/mechanicGlossary.js';
 import { factionHasQA } from '../utils/qaLookup.js';
 import {
   CARD_ART_CHANGED_EVENT,
-  CARD_IMAGE_DEFAULT_WIDTH,
   CARD_MODAL_SIZES,
   cardHasAlternateArt,
   getCardArtVariants,
-  getCardImageSrc,
+  getModalPreviewSrc,
   getCardPictureSources,
   preloadCardArt,
   getStoredArtVariant,
@@ -40,6 +40,7 @@ export default function CardModal({
   onNext = () => {},
   isInDeck = false,
   onViewFactionQA = () => {},
+  onShowToast = () => {},
 }) {
   const [artRev, setArtRev] = useState(0);
   const [previewReady, setPreviewReady] = useState(false);
@@ -56,9 +57,8 @@ export default function CardModal({
     [card, artVariant],
   );
   const displaySource = getVariantSource(card, artVariant);
-  const previewSrc = card
-    ? getCardImageSrc(card.id, artVariant, CARD_IMAGE_DEFAULT_WIDTH)
-    : null;
+  /** 已知支援 AVIF 時，底圖用查卡格子已載入的同一個 320w AVIF，不再多抓一份 WebP */
+  const previewSrc = card ? getModalPreviewSrc(card.id, artVariant) : null;
 
   useEffect(() => {
     setPreviewReady(false);
@@ -188,6 +188,20 @@ export default function CardModal({
     }
   };
 
+  /**
+   * 複製這張卡的靜態頁網址（/card/<id>/）。app 內網址是 hash，聊天軟體只看得到首頁預覽；
+   * 靜態頁有該卡的標題與分享圖，點開後也能一鍵回到工具。
+   */
+  const handleCopyLink = async () => {
+    const url = `${window.location.origin}/card/${encodeURIComponent(card.id)}/`;
+    try {
+      await navigator.clipboard.writeText(url);
+      onShowToast('已複製卡牌連結');
+    } catch {
+      onShowToast(`無法自動複製，請手動複製：${url}`, 'warning');
+    }
+  };
+
   const handleBackdropClick = (e) => {
     if (e.target === e.currentTarget) onClose();
   };
@@ -275,8 +289,8 @@ export default function CardModal({
                   priority
                   alt={
                     artVariant !== 'main' && hasAlt
-                      ? `卡牌「${card.name}」異畫（WebP，${card.faction}，${card.type}）`
-                      : `卡牌「${card.name}」大圖（WebP，${card.faction}，${card.type}）`
+                      ? `卡牌「${card.name}」異畫，${card.faction}${card.type}`
+                      : `卡牌「${card.name}」，${card.faction}${card.type}`
                   }
                   className="card-image-media touch-manipulation select-none rounded-sm object-contain"
                 />
@@ -293,6 +307,14 @@ export default function CardModal({
                 <span className="font-mono text-xs text-stone-500" aria-label={`卡牌編號 ${formatCardNumber(card.id)}`}>
                   {formatCardNumber(card.id)}
                 </span>
+                <button
+                  type="button"
+                  onClick={handleCopyLink}
+                  className="inline-flex min-h-8 items-center gap-1 self-center rounded-full border border-white/15 px-2.5 text-xs text-stone-300 transition hover:border-brand-gold hover:text-brand-gold"
+                >
+                  <Link2 className="h-3.5 w-3.5 shrink-0" aria-hidden strokeWidth={2.25} />
+                  複製連結
+                </button>
               </div>
               <div className="mt-3 flex flex-wrap gap-x-4 gap-y-2 text-xs tracking-[0.08em]">
                 {metadata.map(([label, value]) => (

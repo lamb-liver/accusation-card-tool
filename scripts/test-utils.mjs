@@ -11,6 +11,11 @@ import {
   CARD_ART_CHANGED_EVENT,
   cardHasAlternateArt,
   cardArtPreloadUrls,
+  cardArtPreloadList,
+  getModalPreviewSrc,
+  getAvifSupport,
+  noteLoadedImageFormat,
+  resetAvifSupport,
   getCardImageFullSrc,
   getCardImageSrc,
   getCardPictureSources,
@@ -232,6 +237,35 @@ assert.deepEqual(
   },
   'modal preload follows alt variant',
 );
+// 預載格式：知道支援 AVIF 後只抓 AVIF，不支援時只抓 WebP，還不知道時維持舊行為
+assert.deepEqual(
+  cardArtPreloadList('cro01', 'main', true),
+  ['images/cro01-w320.avif', 'images/cro01-w640.avif'],
+  'avif browsers preload avif only',
+);
+assert.deepEqual(
+  cardArtPreloadList('cro01', 'main', false),
+  ['images/cro01-w320.webp', 'images/cro01-w640.webp'],
+  'non-avif browsers preload webp only',
+);
+assert.deepEqual(
+  cardArtPreloadList('cro01', 'main', null),
+  ['images/cro01-w320.webp', 'images/cro01-w640.avif', 'images/cro01-w640.webp'],
+  'unknown support keeps previous preload set',
+);
+assert(getModalPreviewSrc('cro01', 'alt', true) === 'images/cro01alt-w320.avif', 'modal preview reuses gallery avif');
+assert(getModalPreviewSrc('cro01', 'alt', null) === 'images/cro01alt-w320.webp', 'modal preview falls back to webp');
+resetAvifSupport();
+noteLoadedImageFormat('https://x/images/cro01.webp');
+assert(getAvifSupport() === null, 'original fallback webp does not decide format');
+noteLoadedImageFormat('https://x/images/cro01-w320.avif');
+assert(getAvifSupport() === true, 'responsive avif marks support');
+noteLoadedImageFormat('https://x/images/cro02-w320.webp');
+assert(getAvifSupport() === true, 'first decision sticks');
+resetAvifSupport();
+noteLoadedImageFormat('https://x/images/cro02-w640.webp');
+assert(getAvifSupport() === false, 'responsive webp marks no avif');
+resetAvifSupport();
 assert(factionIconPath('鴉教團', '右') === 'images/icons/鴉教團右.webp', 'faction icon path');
 
 {

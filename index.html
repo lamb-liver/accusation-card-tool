@@ -56,16 +56,25 @@
     <link rel="preload" href="/cards.json" as="fetch" crossorigin />
     <!-- 品牌題字在首屏：提早取得展示字體子集，縮短 swap 換字（FOUT）時間 -->
     <link rel="preload" href="/fonts/NotoSerifTC-display-subset.woff2" as="font" type="font/woff2" crossorigin />
-    <!-- 首屏 LCP：HTML 階段即可發現，不必等 React mount -->
-    <link
-      rel="preload"
-      as="image"
-      type="image/avif"
-      href="/images/cro01-w320.avif"
-      imagesrcset="/images/cro01-w160.avif 160w, /images/cro01-w320.avif 320w, /images/cro01-w640.avif 640w"
-      imagesizes="(max-width: 640px) 42vw, (max-width: 1024px) 180px, 200px"
-      fetchpriority="high"
-    />
+    <!--
+      首屏 LCP：在 head 同步加入預載，不必等 React mount。
+      只在查卡頁（#/、#/?…）預載；QA、計時、組牌等頁不會顯示第一張卡，預載只會浪費流量並讓主控台警告。
+    -->
+    <script>
+      (function () {
+        var hash = location.hash;
+        if (hash && hash !== '#' && hash !== '#/' && hash.indexOf('#/?') !== 0) return;
+        var link = document.createElement('link');
+        link.rel = 'preload';
+        link.as = 'image';
+        link.type = 'image/avif';
+        link.href = '/images/cro01-w320.avif';
+        link.setAttribute('imagesrcset', '/images/cro01-w160.avif 160w, /images/cro01-w320.avif 320w, /images/cro01-w640.avif 640w');
+        link.setAttribute('imagesizes', '(max-width: 640px) 42vw, (max-width: 1024px) 180px, 200px');
+        link.setAttribute('fetchpriority', 'high');
+        document.head.appendChild(link);
+      })();
+    </script>
     <title>《控訴》LCG 查卡、組牌與規則 QA</title>
   </head>
   <body>
