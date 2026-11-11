@@ -1,4 +1,4 @@
-import { lazy, Suspense, useCallback, useEffect, useMemo, useState } from 'react';
+import { lazy, Suspense, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { TriangleAlert } from 'lucide-react';
 import { useCardData }    from './hooks/useCardData.js';
 import { useCardFilters, FILTER_KEYS } from './hooks/useCardFilters.js';
@@ -7,7 +7,7 @@ import { useDeck }        from './hooks/useDeck.js';
 import { useCardModal }   from './hooks/useCardModal.js';
 import { useToast }       from './hooks/useToast.js';
 import { useDialog }      from './hooks/useDialog.js';
-import { useHashRoute } from './hooks/useHashRoute.js';
+import { parseHashQuery, useHashRoute } from './hooks/useHashRoute.js';
 import { useCommunityDeckFlow } from './hooks/useCommunityDeckFlow.js';
 import { findCardById } from './utils/cardCatalog.js';
 import DeckSubmitModal from './components/shareWall/DeckSubmitModal.jsx';
@@ -62,8 +62,20 @@ function filtersToQuery(searchTerm, filters, cardId) {
   return query;
 }
 
+/**
+ * 歷史紀錄 state 標記：這一筆是「開啟卡片彈窗」時推入的。
+ * 關閉彈窗時若目前紀錄帶有此標記，就退回上一筆，讓上一頁鍵等同關閉彈窗。
+ */
+const CARD_MODAL_HISTORY_STATE = { cardModal: true };
+
+function isCardModalHistoryEntry() {
+  return window.history.state?.cardModal === true;
+}
+
 function App() {
-  const { route, query, navigate, setQuery } = useHashRoute();
+  /** 由下方彈窗層填入：hash 導航拿掉 card= 時關閉彈窗（見 useHashRoute 說明） */
+  const hashChangeHandlerRef = useRef(null);
+  const { route, query, navigate, setQuery, pushQuery } = useHashRoute(hashChangeHandlerRef);
   const currentMode = resolveModeFromRoute(route);
 
   /**
@@ -160,12 +172,6 @@ function App() {
     closeModal,
   } = useCardModal();
 
-  /** 穩定識別：inline 箭頭會在每次 render 打破 CardGallery/Card 的 memo */
-  const handleGalleryCardClick = useCallback(
-    (card) => handleCardClick(card, filteredCards),
-    [handleCardClick, filteredCards],
-  );
-
   /**
    * 篩選只寫進查卡網址。組牌只保留 card=（若有彈窗），避免查卡篩選跟著組牌走。
    *
@@ -175,6 +181,36 @@ function App() {
   const querySyncMode =
     currentMode === 'gallery' || currentMode === 'deck' ? currentMode : null;
 
+  /** 給點卡 handler 讀最新篩選，又不讓 handler 識別跟著篩選變動（Card memo 依賴它） */
+  const urlSnapshotRef = useRef({ querySyncMode, searchTerm, filters });
+  useEffect(() => {
+    urlSnapshotRef.current = { querySyncMode, searchTerm, filters };
+  }, [querySyncMode, searchTerm, filters]);
+
+  /**
+   * 使用者點卡開啟彈窗：先推入一筆帶 card= 的歷史紀錄，上一頁鍵才會關掉彈窗，
+   * 而不是直接離開網站。網址已經有 card=（彈窗開著時從牌組清單再點）就不重複推。
+   */
+  const openCardFromClick = useCallback(
+    (card, list) => {
+      const { querySyncMode: mode, searchTerm: term, filters: currentFilters } = urlSnapshotRef.current;
+      if (mode && !parseHashQuery().card) {
+        pushQuery(
+          mode === 'deck' ? { card: card.id } : filtersToQuery(term, currentFilters, card.id),
+          CARD_MODAL_HISTORY_STATE,
+        );
+      }
+      handleCardClick(card, list);
+    },
+    [handleCardClick, pushQuery],
+  );
+
+  /** 穩定識別：inline 箭頭會在每次 render 打破 CardGallery/Card 的 memo */
+  const handleGalleryCardClick = useCallback(
+    (card) => openCardFromClick(card, filteredCards),
+    [openCardFromClick, filteredCards],
+  );
+
   /**
    * URL `card=` → 彈窗。只在彈窗尚未開啟時 hydrate（深層連結、靜態卡頁）。
    * 彈窗內左右切換會先改 selectedCard、再由下方 sync 寫回 hash；若這裡
@@ -183,6 +219,7 @@ function App() {
    * 關閉不從這裡推：query-sync 若在 selectedCard 還是 null 時把 card= 清掉，
    * 深層連結會在卡表載入前就斷掉。關閉改由 handleCloseModal 自己寫網址。
    */
+  const pendingDeepLinkRef = useRef(Boolean(initialQuery.card));
   useEffect(() => {
     const cardId = query.card;
     if (!cardId || allCards.length === 0) return;
@@ -192,8 +229,36 @@ function App() {
     // Deep links / share URLs open when selectedCard is still null.
     if (selectedCard) return;
     const card = findCardById(allCards, cardId);
-    if (card) handleCardClick(card, allCards);
-  }, [query.card, allCards, selectedCard, handleCardClick]);
+    if (!card) return;
+
+    // 直接開卡片網址（分享連結、靜態卡頁「在工具中開啟」）：在彈窗底下墊一筆
+    // 不帶 card= 的紀錄，上一頁先回到列表，再按一次才離開網站。
+    // 重新整理時目前紀錄已帶標記，不重複墊。
+    if (pendingDeepLinkRef.current) {
+      pendingDeepLinkRef.current = false;
+      if (!isCardModalHistoryEntry()) {
+        const rest = parseHashQuery();
+        delete rest.card;
+        setQuery(rest, { clearState: true });
+        pushQuery({ ...rest, card: cardId }, CARD_MODAL_HISTORY_STATE);
+      }
+    }
+    handleCardClick(card, allCards);
+  }, [query.card, allCards, selectedCard, handleCardClick, setQuery, pushQuery]);
+
+  /**
+   * 上一頁／下一頁（或其他 hash 導航）把 card= 拿掉時關閉彈窗。
+   * 由 useHashRoute 在更新 query 的同一個 listener 內呼叫，彈窗關閉與網址更新
+   * 合併成一次 render，網址同步 effect 不會把 card= 寫回去。
+   */
+  useEffect(() => {
+    hashChangeHandlerRef.current = (nextQuery) => {
+      if (!nextQuery.card) closeModal();
+    };
+    return () => {
+      hashChangeHandlerRef.current = null;
+    };
+  }, [closeModal]);
 
   /**
    * 篩選／彈窗 → 網址。selectedCard 尚未對上 URL 的 card 時先保留網址上的 id，
@@ -225,11 +290,19 @@ function App() {
     [handlePerPageChange],
   );
 
-  /** 關閉彈窗並從網址拿掉 card=（保留查卡篩選） */
+  /**
+   * 關閉彈窗並從網址拿掉 card=（保留查卡篩選）。
+   *
+   * 網址與 state 同步更新（不等 popstate），hydrate effect 才不會用舊的 card=
+   * 把彈窗重新打開。若目前紀錄是開彈窗時推入的，再退回上一筆，避免留下一筆
+   * 「上一頁會重開彈窗」的紀錄。
+   */
   const handleCloseModal = useCallback(() => {
+    const pushedByModal = isCardModalHistoryEntry();
     closeModal();
-    if (querySyncMode === 'deck') setQuery({});
-    else if (querySyncMode === 'gallery') setQuery(filtersToQuery(searchTerm, filters));
+    if (querySyncMode === 'deck') setQuery({}, { clearState: true });
+    else if (querySyncMode === 'gallery') setQuery(filtersToQuery(searchTerm, filters), { clearState: true });
+    if (pushedByModal) window.history.back();
   }, [closeModal, querySyncMode, searchTerm, filters, setQuery]);
 
   /** 卡片彈窗 →「查看此教團常見問題」：關閉彈窗並開在該教團分類 */
@@ -377,7 +450,7 @@ function App() {
             deck={deck}
             poolCards={allCards}
             onRemoveCard={removeFromDeck}
-            onCardClick={handleCardClick}
+            onCardClick={openCardFromClick}
             onAddCard={addToDeck}
             currentRule={currentRule}
             primaryFaction={primaryFaction}

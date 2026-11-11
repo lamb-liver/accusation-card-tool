@@ -115,11 +115,27 @@ async function run() {
           await assertPage(page, `${label}-card-modal`);
           await page.getByRole('button', { name: '關閉', exact: true }).click();
 
+          // 上一頁應關閉彈窗、留在列表，而不是離開網站
+          await page.locator('[aria-label^="查看卡牌："]').first().click();
+          await page.getByRole('dialog').waitFor();
+          await page.goBack();
+          await page.getByRole('dialog').waitFor({ state: 'detached' });
+          assert.ok(
+            page.url().startsWith(url) && !page.url().includes('card='),
+            `${label}: back button should close the card modal (${page.url()})`,
+          );
+
           if (viewport.width >= 1280) {
             await page.goto(`${url}/#/?card=cro01`, { waitUntil: 'domcontentloaded', timeout: 60_000 });
             await page.getByRole('dialog').waitFor({ timeout: 30_000 });
             await assertPage(page, `${label}-card-deeplink`);
-            await page.getByRole('button', { name: '關閉', exact: true }).click();
+            // 直接開卡片網址：第一次上一頁回到列表
+            await page.goBack();
+            await page.getByRole('dialog').waitFor({ state: 'detached' });
+            assert.ok(
+              page.url().startsWith(url) && !page.url().includes('card='),
+              `${label}: back from deep link should land on the gallery (${page.url()})`,
+            );
           }
         }
       }
