@@ -111,7 +111,9 @@ async function runBuildWithManifest(args) {
 async function runBuildCi(_commandName, args) {
   const buildCode = await runBuild('build', args);
   if (buildCode !== 0) return buildCode;
-  return runNodeScript('check-pwa-sw.mjs');
+  const swCode = await runNodeScript('check-pwa-sw.mjs');
+  if (swCode !== 0) return swCode;
+  return runNodeScript('check-csp.mjs');
 }
 
 async function runShareWallTests(_commandName, args) {

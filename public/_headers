@@ -1,3 +1,11 @@
+# 全站安全標頭（只作用在靜態檔；/api/* 由 Pages Functions 回應，不受 _headers 影響）
+# - frame-ancestors 'none'＋X-Frame-Options：不允許被其他網站用 iframe 嵌入（防點擊劫持）
+# - script-src 的 sha256 是 index.html 內聯預載腳本的雜湊；改那段腳本時要一起更新，build:ci 的 check-csp 會擋
+# - challenges.cloudflare.com：交流區 Turnstile 的腳本與 iframe
+/*
+  Content-Security-Policy: default-src 'self'; script-src 'self' 'sha256-z4780qPMBk63ZNvEBWlb9STO6c9IZmxhTrtqHEenr9I=' https://challenges.cloudflare.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:; connect-src 'self' https://challenges.cloudflare.com; frame-src https://challenges.cloudflare.com; worker-src 'self'; manifest-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'
+  X-Frame-Options: DENY
+
 # hashed Vite chunks — filename changes on content change
 /assets/*
   Cache-Control: public, max-age=31536000, immutable
