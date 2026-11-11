@@ -366,6 +366,14 @@ function App() {
     <div className="app-shell min-h-screen text-gray-200 font-sans">
       <AppPageBackground />
       <div className="app-shell-content flex min-h-screen flex-col">
+      {/* 鍵盤使用者跳過主選單與篩選列。hash 路由不能用 #id 錨點，改用按鈕移動焦點 */}
+      <button
+        type="button"
+        onClick={() => document.getElementById('main-content')?.focus()}
+        className="sr-only z-[2000] rounded bg-brand-gold font-bold text-neutral-900 focus:not-sr-only focus:fixed focus:left-3 focus:top-3 focus:px-4 focus:py-2"
+      >
+        跳到主要內容
+      </button>
       {currentMode !== 'admin' && (
         <div className={currentMode === 'deck' ? 'shrink-0' : undefined}>
           <FilterToolbar
@@ -392,7 +400,9 @@ function App() {
       />
 
       <main
-        className={`mx-auto w-full max-w-7xl ${
+        id="main-content"
+        tabIndex={-1}
+        className={`mx-auto w-full max-w-7xl outline-none ${
           currentMode === 'deck' ? 'px-2 py-3 sm:px-4 lg:p-4' : 'mt-4 p-4'
         }`}
       >
@@ -414,7 +424,7 @@ function App() {
         {currentMode === 'gallery' && (
           <>
             <BackToTopButton />
-            <div className="mb-4 text-center md:hidden">
+            <div className="mb-4 text-center md:hidden" aria-live="polite">
               {isLoading ? (
                 <p className="text-sm text-gray-400">載入卡牌資料中…</p>
               ) : (
