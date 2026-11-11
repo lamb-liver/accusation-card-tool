@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { Coins, Pause, Play, RotateCcw } from 'lucide-react';
 import { formatTime, INITIAL_MINUTES } from './clockUtils.js';
 import { useGameClock } from './useGameClock.js';
+import { useWakeLock } from './useWakeLock.js';
 import './ClockPage.css';
 
 const LOW_TIME_MS = 60_000;
@@ -76,6 +77,9 @@ export default function ClockPage() {
   const isFinished = status === 'finished';
   const isPrimaryControl = !isFinished;
   const runLabel = isRunning ? '暫停' : status === 'paused' ? '繼續' : '開始';
+
+  // 計時中讓螢幕保持開啟；不支援的瀏覽器安靜略過
+  useWakeLock(isRunning);
 
   const [turnAnnounce, setTurnAnnounce] = useState('');
   const [coinStatus, setCoinStatus] = useState('idle');

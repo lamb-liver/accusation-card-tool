@@ -14,6 +14,12 @@ import {
   reduceTick,
   reduceToggleRun,
 } from '../src/features/clock/clockEngine.js';
+import {
+  CLOCK_RESTORE_MAX_AGE_MS,
+  isPristineClock,
+  restoreClock,
+  serializeClock,
+} from '../src/features/clock/clockPersistence.js';
 
 const MS_PER_MINUTE = 60_000;
 const INITIAL_MS = INITIAL_MINUTES * MS_PER_MINUTE;
@@ -155,5 +161,37 @@ state = reducePauseFromRunning(state, 0);
 assert(state.status === 'paused', 'scenario start then pause');
 state = reduceToggleRun(state, 0);
 assert(state.status === 'running', 'scenario start-pause-resume');
+
+// ── clockPersistence：重新整理後還原 ───────────────────────────────────────
+
+const T0 = 1_800_000_000_000;
+assert(isPristineClock(createInitialState()), 'fresh clock is pristine');
+assert(!isPristineClock(reduceToggleRun(createInitialState(), 0)), 'started clock is not pristine');
+
+const runningSaved = reduceToggleRun(createInitialState(), 0);
+const restoredRunning = restoreClock(serializeClock(runningSaved, T0), T0 + 30_000);
+assert(restoredRunning?.status === 'running', 'running clock keeps running after restore');
+assert(restoredRunning.playerA.remainingMs === INITIAL_MS - 30_000, 'away time is charged to the active player');
+assert(restoredRunning.playerB.remainingMs === INITIAL_MS, 'inactive player time untouched');
+
+const timedOut = restoreClock(serializeClock(runningSaved, T0), T0 + INITIAL_MS + 1);
+assert(timedOut?.status === 'finished' && timedOut.winner === 'B', 'restore past zero finishes the game');
+
+const pausedSaved = reduceToggleRun(reduceToggleRun(createInitialState(), 0), 5_000);
+const restoredPaused = restoreClock(serializeClock(pausedSaved, T0), T0 + 600_000);
+assert(restoredPaused?.status === 'paused', 'paused clock restores paused');
+assert(restoredPaused.playerA.remainingMs === INITIAL_MS - 5_000, 'paused clock does not lose away time');
+
+const backwards = restoreClock(serializeClock(runningSaved, T0), T0 - 60_000);
+assert(backwards?.playerA.remainingMs === INITIAL_MS, 'device clock moved back does not add time');
+
+assert(restoreClock(serializeClock(runningSaved, T0), T0 + CLOCK_RESTORE_MAX_AGE_MS + 1) === null, 'stale save ignored');
+assert(restoreClock(null, T0) === null, 'missing save');
+assert(restoreClock('{not json', T0) === null, 'corrupt save');
+assert(restoreClock(JSON.stringify({ savedAt: T0, state: { status: 'running' } }), T0) === null, 'malformed save');
+assert(
+  restoreClock(JSON.stringify({ savedAt: T0, state: { ...runningSaved, status: 'finished', winner: null } }), T0) === null,
+  'finished without winner rejected',
+);
 
 console.log('OK: clock tests passed');
