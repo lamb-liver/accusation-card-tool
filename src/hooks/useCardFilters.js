@@ -10,6 +10,7 @@ const INITIAL_FILTERS = {
   type: '',
   symbol: '',
   mechanic: '',
+  source: '',
 };
 
 /** 篩選維度的唯一清單；URL 讀寫與 activeFilterCount 都由它推導 */

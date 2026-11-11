@@ -14,6 +14,7 @@ export default function FilterToolbar({
     type: 'all',
     symbol: 'all',
     mechanic: 'all',
+    source: 'all',
   },
   onFilterChange = () => {},
   resultCount = 0,
@@ -35,6 +36,7 @@ export default function FilterToolbar({
     { key: 'type', fallbackLabel: '所有種類' },
     { key: 'symbol', fallbackLabel: '所有符號' },
     { key: 'mechanic', fallbackLabel: '所有效果關鍵字' },
+    { key: 'source', fallbackLabel: '所有系列' },
   ];
 
   return (
@@ -98,7 +100,7 @@ export default function FilterToolbar({
       {showCardFilters && (
         <div
           id="galleryControls"
-          className="controls mx-auto mb-4 mt-2 hidden w-full max-w-[1000px] grid-cols-2 gap-2.5 px-4 pb-1 md:grid xl:grid-cols-4"
+          className="controls mx-auto mb-4 mt-2 hidden w-full max-w-[1000px] grid-cols-2 gap-2.5 px-4 pb-1 md:grid md:grid-cols-3 xl:grid-cols-5"
         >
           {dropdowns.map(({ key, fallbackLabel }) => {
             const isActive = Boolean(filters[key] && filters[key] !== 'all');

@@ -38,6 +38,15 @@ export const FILTER_OPTIONS = {
     { value: '禁忌', label: '禁忌' },
     { value: '灰燼', label: '灰燼' },
   ],
+  /** 系列（卡牌 source 欄位）；新系列上市時在此加一項，test-search 會檢查所有卡的 source 都在清單內 */
+  source: [
+    { value: 'all', label: '所有系列' },
+    { value: '夜與序幕', label: '夜與序幕' },
+    { value: '知與癲狂', label: '知與癲狂' },
+    { value: '光與盛宴', label: '光與盛宴' },
+    { value: '疫與飛升', label: '疫與飛升' },
+    { value: '比賽積分兌換', label: '比賽積分兌換' },
+  ],
   mechanic: [
     { value: 'all', label: '所有效果關鍵字' },
     { value: '詠頌', label: '詠頌' },

@@ -99,20 +99,20 @@ assertDeepEqual(
 // 網址由使用者任意編輯，不可整包展開進 state
 assertDeepEqual(
   pickFilters({ faction: '鴉教團', evil: 'x', q: '夜' }),
-  { faction: '鴉教團', type: '', symbol: '', mechanic: '' },
+  { faction: '鴉教團', type: '', symbol: '', mechanic: '', source: '' },
   'only whitelisted filter keys are picked',
 );
 assertDeepEqual(
   pickFilters({ faction: 123, type: null }),
-  { faction: '', type: '', symbol: '', mechanic: '' },
+  { faction: '', type: '', symbol: '', mechanic: '', source: '' },
   'non-string filter values fall back to empty',
 );
 assertDeepEqual(
   pickFilters(undefined),
-  { faction: '', type: '', symbol: '', mechanic: '' },
+  { faction: '', type: '', symbol: '', mechanic: '', source: '' },
   'missing source yields all-empty filters',
 );
-assert(FILTER_KEYS.length === 4, 'filter key list covers the four dimensions');
+assert(FILTER_KEYS.length === 5, 'filter key list covers the five dimensions');
 
 // ── card filter pure logic ─────────────────────────────────────────────────
 const cards = [
@@ -140,8 +140,8 @@ const cards = [
   },
 ];
 
-assert(cardMatchesFilters(cards[0], '第十三', { faction: '', type: '', symbol: '', mechanic: '' }), 'search matches name');
-assert(cardMatchesFilters(cards[0], '放逐', { faction: '', type: '', symbol: '', mechanic: '' }), 'search matches effect');
+assert(cardMatchesFilters(cards[0], '第十三', { faction: '', type: '', symbol: '', mechanic: '', source: '' }), 'search matches name');
+assert(cardMatchesFilters(cards[0], '放逐', { faction: '', type: '', symbol: '', mechanic: '', source: '' }), 'search matches effect');
 assert(
   cardMatchesFilters(cards[0], '', { faction: '鴉教團', type: '教主', symbol: '知識', mechanic: '抽' }),
   'combined filters should match',
@@ -151,7 +151,7 @@ assert(
   'symbol filter should fail when symbols are missing',
 );
 // 卡面編號搜尋：CRO-01 / cro01 / CRO01 皆應命中 id 'cro01'
-const noFilters = { faction: '', type: '', symbol: '', mechanic: '' };
+const noFilters = { faction: '', type: '', symbol: '', mechanic: '', source: '' };
 assert(cardMatchesFilters(cards[0], 'CRO-01', noFilters), 'search matches printed number CRO-01');
 assert(cardMatchesFilters(cards[0], 'cro01', noFilters), 'search matches raw id cro01');
 assert(cardMatchesFilters(cards[0], 'CRO01', noFilters), 'search matches CRO01 without hyphen');
