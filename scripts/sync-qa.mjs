@@ -17,6 +17,9 @@ const SHEETS = [
   { label: '門教團', url: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSPgmF_9uiGkG5t_1GxEnEBD3GSVFvj1MYTaXtKjLjIEa_XqIQcwrWpY9DHELim8zOhVkKcKCxIpSh8/pub?gid=2076037145&single=true&output=csv' },
   { label: '逐光者', url: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSPgmF_9uiGkG5t_1GxEnEBD3GSVFvj1MYTaXtKjLjIEa_XqIQcwrWpY9DHELim8zOhVkKcKCxIpSh8/pub?gid=719906907&single=true&output=csv' },
   { label: '禁忌廚房', url: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSPgmF_9uiGkG5t_1GxEnEBD3GSVFvj1MYTaXtKjLjIEa_XqIQcwrWpY9DHELim8zOhVkKcKCxIpSh8/pub?gid=1316542157&single=true&output=csv' },
+  // VIR／CEN 分頁：卡號前綴 vir = 疫病中心、cen = 紫靈山（對照 public/cards.json）
+  { label: '疫病中心', url: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSPgmF_9uiGkG5t_1GxEnEBD3GSVFvj1MYTaXtKjLjIEa_XqIQcwrWpY9DHELim8zOhVkKcKCxIpSh8/pub?gid=444439601&single=true&output=csv' },
+  { label: '紫靈山', url: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSPgmF_9uiGkG5t_1GxEnEBD3GSVFvj1MYTaXtKjLjIEa_XqIQcwrWpY9DHELim8zOhVkKcKCxIpSh8/pub?gid=703670617&single=true&output=csv' },
   { label: '放逐者', url: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSPgmF_9uiGkG5t_1GxEnEBD3GSVFvj1MYTaXtKjLjIEa_XqIQcwrWpY9DHELim8zOhVkKcKCxIpSh8/pub?gid=333010439&single=true&output=csv' },
 ];
 
