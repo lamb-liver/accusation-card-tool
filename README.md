@@ -169,7 +169,7 @@ accusation-card-tool/
 
 首次部署或 schema 更新後執行 `npm run d1:migrations:apply:remote`。Cloudflare Pages 的 Git integration 是唯一部署路徑；不要另建只含靜態輸出的 artifact 或第二個部署 repo。
 
-對 `main` 的 pull request 由 [Validate pull request](.github/workflows/validate-pr.yml) 以 read-only repository 權限執行 `npm ci`、`npm run validate:repo` 與 `npm run build:ci`。每週 [Sync QA Weekly](.github/workflows/sync-qa-weekly.yml) 只負責同步 generated QA，兩者不共用 merge gate 或部署職責。
+對 `main` 的 pull request 由 [Validate pull request](.github/workflows/validate-pr.yml) 以 read-only repository 權限執行 `npm ci`、`npm run validate:repo` 與 `npm run build:ci`。每週 [Sync QA Weekly](.github/workflows/sync-qa-weekly.yml) 只負責同步 generated QA：有變化時推到固定分支 `qa-sync` 並開 PR，不直接推 `main`，合併前仍需人工確認。
 
 `dist/` 已在 `.gitignore`，不應 commit。
 

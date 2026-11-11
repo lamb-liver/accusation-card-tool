@@ -6,8 +6,11 @@ on:
     - cron: '0 1 * * 1'
   workflow_dispatch:
 
+# contents: write 只用來推 qa-sync 分支（不推 main）；pull-requests: write 用來開／關 PR。
+# 另需 repo 設定 Settings → Actions → General →「Allow GitHub Actions to create and approve pull requests」。
 permissions:
   contents: write
+  pull-requests: write
 
 concurrency:
   group: sync-qa-weekly
@@ -30,7 +33,7 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      # 內容無變化時 sync-qa 不會動檔案，因此 git diff 即可判斷是否需要推送
+      # 內容無變化時 sync-qa 不會動檔案，因此 git diff 即可判斷和 main 是否不同
       - name: Sync QA from Google Sheets
         run: npm run sync:qa
 
@@ -39,15 +42,16 @@ jobs:
         run: |
           if git diff --quiet -- src/data/qaData.js; then
             echo 'changed=false' >> "$GITHUB_OUTPUT"
-            echo 'QA 內容無變化，本次不推送。'
+            echo 'QA 內容和 main 相同，本次不開 PR。'
           else
             echo 'changed=true' >> "$GITHUB_OUTPUT"
             git --no-pager diff --stat -- src/data/qaData.js
           fi
 
-      # 免人工推送沒有合併前的人工把關，改由這兩道自動閘門負責：
+      # 合併前仍由人看過 PR；這兩道自動閘門先擋掉明顯出錯的同步結果：
       # 1) 內容流失防護：分頁被清空／取消發布時擋下，避免真 QA 被佔位符覆蓋
       # 2) 專案完整驗證：資產、生成檔、lint、全部測試套件
+      # 注意：GITHUB_TOKEN 開的 PR 不會觸發 validate-pr，所以驗證在這裡先跑。
       - name: Guard against QA content loss
         if: steps.changes.outputs.changed == 'true'
         run: node scripts/check-qa-sync-safety.mjs
@@ -56,13 +60,64 @@ jobs:
         if: steps.changes.outputs.changed == 'true'
         run: npm run validate:repo
 
-      # 推送後由 Cloudflare Pages 的 git 整合自動建置部署（非 Actions 工作流，
-      # 不受 GITHUB_TOKEN 的遞迴觸發限制）
-      - name: Commit and push to main
-        if: steps.changes.outputs.changed == 'true'
+      # 不直接推 main：同步結果放在固定分支 qa-sync，開（或更新）一個 PR 等人合併。
+      # - 和 main 相同：關掉還開著的舊 PR、刪掉 qa-sync 分支，不開新 PR
+      # - 和現有 qa-sync 內容相同（只差時間戳）：什麼都不做
+      # - 內容不同：從最新 main 重建 qa-sync（先刪舊分支，不用 force push），再開 PR
+      - name: Open or update QA sync pull request
+        env:
+          GH_TOKEN: ${{ github.token }}
+          CHANGED: ${{ steps.changes.outputs.changed }}
+          BRANCH: qa-sync
         run: |
+          set -euo pipefail
+          QA=src/data/qaData.js
+          open_pr="$(gh pr list --head "$BRANCH" --base main --state open --json number --jq '.[0].number // empty')"
+          remote_exists=false
+          if git ls-remote --exit-code --heads origin "$BRANCH" >/dev/null; then
+            remote_exists=true
+          fi
+
+          if [ "$CHANGED" != 'true' ]; then
+            if [ -n "$open_pr" ]; then
+              gh pr close "$open_pr" --comment '試算表內容已和 main 相同，關閉這個同步 PR。'
+            fi
+            if [ "$remote_exists" = true ]; then
+              git push origin --delete "$BRANCH"
+            fi
+            exit 0
+          fi
+
+          # 第 2 行是同步時間戳，比對內容時略過
+          strip_ts() { sed '2d'; }
+          if [ "$remote_exists" = true ] && [ -n "$open_pr" ]; then
+            git fetch --no-tags --depth=1 origin "$BRANCH"
+            if diff -q <(git show "FETCH_HEAD:$QA" | strip_ts) <(strip_ts < "$QA") >/dev/null; then
+              echo "qa-sync 已是最新內容（PR #$open_pr），不需更新。"
+              exit 0
+            fi
+          fi
+          if [ "$remote_exists" = true ]; then
+            # 刪掉舊分支會一併關閉舊 PR；之後從最新 main 重建，不需要 force push
+            git push origin --delete "$BRANCH"
+          fi
+
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add src/data/qaData.js
+          git switch -c "$BRANCH"
+          git add "$QA"
           git commit -m 'chore: sync QA from Google Sheets'
-          git push
+          git push origin "$BRANCH"
+
+          {
+            echo '每週 QA 同步的結果，合併後才會上線。'
+            echo
+            echo '```'
+            git --no-pager diff --stat HEAD~1 -- "$QA"
+            echo '```'
+            echo
+            echo '已通過 check-qa-sync-safety 與 validate:repo。這個 PR 由 GITHUB_TOKEN 開啟，不會再跑 Validate pull request。'
+          } > /tmp/qa-sync-pr.md
+          gh pr create --base main --head "$BRANCH" \
+            --title 'QA 同步：Google 試算表更新' \
+            --body-file /tmp/qa-sync-pr.md
