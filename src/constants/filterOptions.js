@@ -46,5 +46,7 @@ export const FILTER_OPTIONS = {
     { value: '獻祭', label: '獻祭' },
     { value: '聖戰', label: '聖戰' },
     { value: '供品', label: '供品' },
+    { value: '附著', label: '附著' },
+    { value: '飛升', label: '飛升' },
   ],
 };

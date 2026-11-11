@@ -35,15 +35,20 @@ export function getCardSearchRank(card, searchTerm) {
   const cardId = normalizeSearchText(card.id);
   if (query.length >= 2 && cardId.includes(query)) return 4;
 
+  // 直接打教團名（「鴉教團」「疫病中心」「疫病」）時列出該教團；排在卡名之後，
+  // 讓卡名本身含有該字的卡仍優先。單字查詢不比對教團，避免「門」「鴉」整團灌入。
+  const faction = normalizeSearchText(card.faction);
+  if (query.length >= 2 && faction.includes(query)) return 5;
+
   const effect = normalizeSearchText(card.effect);
   if (
     MECHANIC_TERMS.some(
       (term) => normalizeSearchText(term).includes(query) && effect.includes(normalizeSearchText(term)),
     )
   ) {
-    return 5;
+    return 6;
   }
-  if (effect.includes(query)) return 6;
+  if (effect.includes(query)) return 7;
   return null;
 }
 
