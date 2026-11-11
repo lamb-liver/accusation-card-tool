@@ -1,6 +1,6 @@
 import { FILTER_OPTIONS } from '../constants/filterOptions.js';
 
-/** @typedef {{ faction?: string, type?: string, symbol?: string, mechanic?: string }} CardFilters */
+/** @typedef {{ faction?: string, type?: string, symbol?: string, mechanic?: string, source?: string }} CardFilters */
 
 const MECHANIC_TERMS = FILTER_OPTIONS.mechanic
   .map((option) => option.value)
@@ -40,6 +40,12 @@ export function getCardSearchRank(card, searchTerm) {
   const faction = normalizeSearchText(card.faction);
   if (query.length >= 2 && faction.includes(query)) return 5;
 
+  // 系列、種類、符號也比對（「疫與飛升」「魔法」「夜幕」），同樣排在卡名之後、只限兩字以上
+  if (query.length >= 2) {
+    const facets = [card.source, card.type, ...(card.symbols ?? [])].map(normalizeSearchText);
+    if (facets.some((facet) => facet && facet.includes(query))) return 5;
+  }
+
   const effect = normalizeSearchText(card.effect);
   if (
     MECHANIC_TERMS.some(
@@ -52,6 +58,38 @@ export function getCardSearchRank(card, searchTerm) {
   return null;
 }
 
+/**
+ * 依空白拆成多個關鍵字（各自正規化，空的丟掉）。
+ * @param {unknown} searchTerm
+ */
+export function splitSearchTokens(searchTerm) {
+  return String(searchTerm ?? '')
+    .split(/\s+/u)
+    .map(normalizeSearchText)
+    .filter(Boolean);
+}
+
+/**
+ * 整串先照原本方式比對（「第 十 三 夜」這類仍當成一個詞）；整串找不到時，
+ * 再把空白分開的每個關鍵字都要命中（取交集），排在整串命中的卡之後。
+ * @param {object} card
+ * @param {string} searchTerm
+ * @returns {number | null}
+ */
+export function getCardMultiSearchRank(card, searchTerm) {
+  const whole = getCardSearchRank(card, searchTerm);
+  if (whole !== null) return whole;
+  const tokens = splitSearchTokens(searchTerm);
+  if (tokens.length < 2) return null;
+  let worst = 0;
+  for (const token of tokens) {
+    const rank = getCardSearchRank(card, token);
+    if (rank === null) return null;
+    worst = Math.max(worst, rank);
+  }
+  return 10 + worst;
+}
+
 function cardMatchesFacets(card, filters) {
   const matchesFaction = !filters.faction || card.faction === filters.faction;
   const matchesType = !filters.type || card.type === filters.type;
@@ -59,8 +97,9 @@ function cardMatchesFacets(card, filters) {
     !filters.symbol || (card.symbols && card.symbols.includes(filters.symbol));
   const matchesMechanic =
     !filters.mechanic || (card.effect && card.effect.includes(filters.mechanic));
+  const matchesSource = !filters.source || card.source === filters.source;
 
-  return matchesFaction && matchesType && matchesSymbol && matchesMechanic;
+  return matchesFaction && matchesType && matchesSymbol && matchesMechanic && matchesSource;
 }
 
 /**
@@ -69,7 +108,7 @@ function cardMatchesFacets(card, filters) {
  * @param {CardFilters} filters
  */
 export function cardMatchesFilters(card, searchTerm, filters) {
-  return getCardSearchRank(card, searchTerm) !== null && cardMatchesFacets(card, filters);
+  return getCardMultiSearchRank(card, searchTerm) !== null && cardMatchesFacets(card, filters);
 }
 
 /**
@@ -83,7 +122,7 @@ export function filterAndRankCards(cards, searchTerm, filters) {
   if (!query) return cards.filter((card) => cardMatchesFacets(card, filters));
 
   return cards
-    .map((card, index) => ({ card, index, rank: getCardSearchRank(card, query) }))
+    .map((card, index) => ({ card, index, rank: getCardMultiSearchRank(card, searchTerm) }))
     .filter(({ card, rank }) => rank !== null && cardMatchesFacets(card, filters))
     .sort((a, b) => a.rank - b.rank || a.index - b.index)
     .map(({ card }) => card);

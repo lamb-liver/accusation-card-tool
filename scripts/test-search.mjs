@@ -7,7 +7,9 @@ import {
 } from '../src/utils/cardFilterLogic.js';
 
 const cards = JSON.parse(readFileSync(new URL('../public/cards.json', import.meta.url), 'utf8'));
-const noFilters = { faction: '', type: '', symbol: '', mechanic: '' };
+import { FILTER_OPTIONS } from '../src/constants/filterOptions.js';
+
+const noFilters = { faction: '', type: '', symbol: '', mechanic: '', source: '' };
 
 const firstCases = [
   ['第十三夜', 'cro01'],
@@ -92,6 +94,36 @@ for (const mechanic of ['附著', '飛升']) {
   assert(result.every((card) => card.effect?.includes(mechanic)), `${mechanic} filter matches effect`);
 }
 
+// 多個關鍵字：空白分開時每個詞都要命中
+{
+  const result = filterAndRankCards(cards, '詠頌 夜幕', noFilters);
+  assert(result.length > 0, '詠頌 夜幕 has results');
+  assert(
+    result.every((card) => card.effect?.includes('詠頌') && (card.effect?.includes('夜幕') || card.symbols?.includes('夜幕'))),
+    '詠頌 夜幕 results contain both terms',
+  );
+  const ritual = filterAndRankCards(cards, '鴉教團 儀式', noFilters);
+  assert(ritual.length > 0 && ritual.every((card) => card.faction === '鴉教團'), '鴉教團 儀式 stays inside faction');
+  assert(ritual.some((card) => card.type === '儀式'), '鴉教團 儀式 includes ritual cards');
+}
+// 系列、種類、符號可直接搜
+assert.equal(
+  filterAndRankCards(cards, '疫與飛升', noFilters).filter((card) => card.source === '疫與飛升').length,
+  cards.filter((card) => card.source === '疫與飛升').length,
+  '疫與飛升 lists the whole series',
+);
+assert(
+  filterAndRankCards(cards, '夜幕', noFilters).some((card) => card.symbols?.includes('夜幕') && !card.effect?.includes('夜幕')),
+  'symbol search finds cards by symbol',
+);
+// 系列篩選：所有卡的 source 都要在選單內
+{
+  const sourceValues = new Set(FILTER_OPTIONS.source.map((option) => option.value));
+  for (const card of cards) assert(sourceValues.has(card.source), `${card.id} source ${card.source} is in series filter`);
+  const result = filterAndRankCards(cards, '', { ...noFilters, source: '疫與飛升' });
+  assert(result.length === 48 && result.every((card) => card.source === '疫與飛升'), 'series filter');
+}
+
 const originalOrder = cards.slice(0, 5).map((card) => card.id);
 assert.deepEqual(
   filterAndRankCards(cards, '', noFilters).slice(0, 5).map((card) => card.id),
@@ -99,4 +131,4 @@ assert.deepEqual(
   'blank query preserves catalog order',
 );
 
-console.log(`OK: ${firstCases.length + 14} golden search cases passed`);
+console.log(`OK: ${firstCases.length + 21} golden search cases passed`);

@@ -13,7 +13,7 @@ const drawerSelectClass =
 
 export default function MobileFilterDrawer({
   searchTerm = '',
-  filters = { faction: '', type: '', symbol: '', mechanic: '' },
+  filters = { faction: '', type: '', symbol: '', mechanic: '', source: '' },
   onApply = () => {},
   fabVisible = true,
   fabZIndex = 900,
@@ -25,6 +25,7 @@ export default function MobileFilterDrawer({
   const [draftType, setDraftType] = useState('all');
   const [draftSymbol, setDraftSymbol] = useState('all');
   const [draftMechanic, setDraftMechanic] = useState('all');
+  const [draftSource, setDraftSource] = useState('all');
 
   const syncDrawerFilters = useCallback(() => {
     setDraftSearch(searchTerm);
@@ -32,7 +33,8 @@ export default function MobileFilterDrawer({
     setDraftType(toDraftValue(filters.type));
     setDraftSymbol(toDraftValue(filters.symbol));
     setDraftMechanic(toDraftValue(filters.mechanic));
-  }, [searchTerm, filters.faction, filters.type, filters.symbol, filters.mechanic]);
+    setDraftSource(toDraftValue(filters.source));
+  }, [searchTerm, filters.faction, filters.type, filters.symbol, filters.mechanic, filters.source]);
 
   useEffect(() => {
     const onKey = (event) => {
@@ -56,6 +58,7 @@ export default function MobileFilterDrawer({
         type: draftType === 'all' ? '' : draftType,
         symbol: draftSymbol === 'all' ? '' : draftSymbol,
         mechanic: draftMechanic === 'all' ? '' : draftMechanic,
+        source: draftSource === 'all' ? '' : draftSource,
       },
     });
     closeDrawer();
@@ -68,9 +71,10 @@ export default function MobileFilterDrawer({
     setDraftType('all');
     setDraftSymbol('all');
     setDraftMechanic('all');
+    setDraftSource('all');
     onApply({
       searchTerm: '',
-      filters: { faction: '', type: '', symbol: '', mechanic: '' },
+      filters: { faction: '', type: '', symbol: '', mechanic: '', source: '' },
     });
     closeDrawer();
   };
@@ -196,7 +200,7 @@ export default function MobileFilterDrawer({
           </select>
         </div>
 
-        <div id="drawerMechanic" className="mb-4">
+        <div id="drawerMechanic" className="mb-3">
           <p className="mb-1 block text-xs text-gray-400">效果關鍵字</p>
           <select
             id="drawer-mechanic"
@@ -206,6 +210,23 @@ export default function MobileFilterDrawer({
             className={drawerSelectClass}
           >
             {FILTER_OPTIONS.mechanic.map((option) => (
+              <option key={option.value} value={option.value}>
+                {option.label}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        <div id="drawerSource" className="mb-4">
+          <p className="mb-1 block text-xs text-gray-400">系列</p>
+          <select
+            id="drawer-source"
+            value={draftSource}
+            onChange={(event) => setDraftSource(event.target.value)}
+            aria-label="系列篩選"
+            className={drawerSelectClass}
+          >
+            {FILTER_OPTIONS.source.map((option) => (
               <option key={option.value} value={option.value}>
                 {option.label}
               </option>

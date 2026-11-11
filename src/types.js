@@ -56,6 +56,7 @@
  * @property {string} type      - 篩選種類（'' = 全部）
  * @property {string} symbol    - 篩選符號（'' = 全部）
  * @property {string} mechanic  - 篩選效果關鍵字（'' = 全部）
+ * @property {string} source    - 篩選系列（'' = 全部）
  */
 
 // ── Toast ────────────────────────────────────────────────────────────────────
