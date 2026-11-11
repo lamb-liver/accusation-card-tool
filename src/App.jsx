@@ -547,7 +547,7 @@ function App() {
         </Suspense>
       )}
 
-      <AppFooter />
+      <AppFooter reserveDeckBar={currentMode === 'deck'} reserveFab={currentMode === 'gallery'} />
       <ToastList toasts={toasts} />
       <DialogContainer dialogState={dialogState} resolve={resolve} />
       <DeckSubmitModal

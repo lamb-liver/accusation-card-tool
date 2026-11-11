@@ -21,7 +21,7 @@ export default function PaginationControls({
           <button
             type="button"
             aria-label="上一頁"
-            className="inline-flex items-center justify-center px-3 py-1.5 bg-neutral-800 border border-neutral-600 text-white rounded text-sm disabled:opacity-50 disabled:cursor-not-allowed hover:bg-neutral-700"
+            className="inline-flex min-h-10 min-w-10 items-center justify-center px-3 py-1.5 bg-neutral-800 border border-neutral-600 text-white rounded text-sm disabled:opacity-50 disabled:cursor-not-allowed hover:bg-neutral-700"
             disabled={currentPage <= 1}
             onClick={() => onPageChange(currentPage - 1)}
           >
@@ -32,7 +32,7 @@ export default function PaginationControls({
             <button
               key={pageNum}
               type="button"
-              className={`px-3 py-1.5 border rounded text-sm min-w-[2.25rem] ${
+              className={`min-h-10 min-w-10 px-3 py-1.5 border rounded text-sm ${
                 pageNum === currentPage
                   ? 'bg-brand-gold text-neutral-900 border-brand-gold font-semibold'
                   : 'bg-neutral-800 border-neutral-600 text-white hover:bg-neutral-700'
@@ -46,7 +46,7 @@ export default function PaginationControls({
           <button
             type="button"
             aria-label="下一頁"
-            className="inline-flex items-center justify-center px-3 py-1.5 bg-neutral-800 border border-neutral-600 text-white rounded text-sm disabled:opacity-50 disabled:cursor-not-allowed hover:bg-neutral-700"
+            className="inline-flex min-h-10 min-w-10 items-center justify-center px-3 py-1.5 bg-neutral-800 border border-neutral-600 text-white rounded text-sm disabled:opacity-50 disabled:cursor-not-allowed hover:bg-neutral-700"
             disabled={currentPage >= totalPages}
             onClick={() => onPageChange(currentPage + 1)}
           >
@@ -57,7 +57,7 @@ export default function PaginationControls({
 
       <select
         aria-label="每頁顯示數量"
-        className="px-3 py-1.5 bg-neutral-800 border border-neutral-600 text-white rounded text-sm ml-1"
+        className="min-h-10 px-3 py-1.5 bg-neutral-800 border border-neutral-600 text-white rounded text-sm ml-1"
         value={perPage}
         onChange={(e) => onPerPageChange(Number(e.target.value))}
       >
