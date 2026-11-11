@@ -18,6 +18,9 @@
 /og-share.jpg
   Cache-Control: public, max-age=604800
 
+/og/*
+  Cache-Control: public, max-age=604800
+
 /cards.json
   Cache-Control: public, max-age=300, must-revalidate
 
