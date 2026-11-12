@@ -304,7 +304,7 @@ export default function CardModal({
                 <h2 id={titleId} className="font-display text-2xl font-bold text-brand-gold sm:text-3xl">
                   {card.name}
                 </h2>
-                <span className="font-mono text-xs text-stone-500" aria-label={`卡牌編號 ${formatCardNumber(card.id)}`}>
+                <span className="font-mono text-xs text-stone-400" aria-label={`卡牌編號 ${formatCardNumber(card.id)}`}>
                   {formatCardNumber(card.id)}
                 </span>
                 <button
@@ -319,7 +319,7 @@ export default function CardModal({
               <div className="mt-3 flex flex-wrap gap-x-4 gap-y-2 text-xs tracking-[0.08em]">
                 {metadata.map(([label, value]) => (
                   <span key={label} className="inline-flex items-baseline gap-1.5">
-                    <span className="text-[10px] text-stone-500">{label}</span>
+                    <span className="text-[10px] text-stone-400">{label}</span>
                     <strong className="font-semibold text-stone-200">{value}</strong>
                   </span>
                 ))}
@@ -328,7 +328,7 @@ export default function CardModal({
 
             {card.effect && (
               <section className="mb-5" aria-labelledby="card-effect-title">
-                <h3 id="card-effect-title" className="mb-2 text-[11px] font-semibold tracking-[0.18em] text-stone-500">
+                <h3 id="card-effect-title" className="mb-2 text-[11px] font-semibold tracking-[0.18em] text-stone-400">
                   卡牌效果
                 </h3>
                 <div className="border-y border-white/10 py-4">
@@ -348,7 +348,7 @@ export default function CardModal({
 
             {card.symbols && card.symbols.length > 0 && (
               <div className="mb-4 flex flex-wrap items-center gap-x-4 gap-y-2">
-                <span className="text-[11px] font-semibold tracking-[0.18em] text-stone-500">符號</span>
+                <span className="text-[11px] font-semibold tracking-[0.18em] text-stone-400">符號</span>
                 {card.symbols.map((symbol, idx) => (
                   <span
                     key={`${card.id}-symbol-${idx}`}
@@ -364,7 +364,7 @@ export default function CardModal({
             )}
 
             {displaySource && (
-              <div className="mb-5 flex items-center gap-1.5 text-xs text-stone-500">
+              <div className="mb-5 flex items-center gap-1.5 text-xs text-stone-400">
                 <List className="h-3.5 w-3.5 shrink-0" aria-hidden strokeWidth={2.25} />
                 <span>取得方式：{displaySource}</span>
               </div>
