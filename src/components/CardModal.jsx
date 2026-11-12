@@ -176,7 +176,10 @@ export default function CardModal({
     if (e.key === 'Escape') { onClose(); return; } 
     if (e.key !== 'Tab') return;
     
-    const focusable = Array.from(dialogRef.current?.querySelectorAll(FOCUSABLE_SELECTORS) ?? []);
+    // 手機／桌機各自隱藏一組動作列，只算看得到的元素
+    const focusable = Array.from(dialogRef.current?.querySelectorAll(FOCUSABLE_SELECTORS) ?? []).filter(
+      (el) => el.getClientRects().length > 0,
+    );
     if (focusable.length === 0) return;
     const first = focusable[0];
     const last = focusable[focusable.length - 1];
@@ -205,6 +208,57 @@ export default function CardModal({
   const handleBackdropClick = (e) => {
     if (e.target === e.currentTarget) onClose();
   };
+
+  const actionButtons = (
+    <>
+      {cardList.length > 1 ? (
+        <button
+          type="button"
+          onClick={onPrev}
+          disabled={!hasPrev}
+          className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-white/20 bg-black/40 text-stone-300 transition hover:border-brand-gold hover:text-brand-gold disabled:cursor-not-allowed disabled:opacity-30"
+          aria-label="上一張"
+        >
+          <ChevronLeft className="h-6 w-6" aria-hidden strokeWidth={2.25} />
+        </button>
+      ) : null}
+
+      <button
+        type="button"
+        onClick={() => onAdd(card)}
+        disabled={isInDeck}
+        className={`inline-flex items-center justify-center gap-2 rounded-full px-8 py-3 text-base font-bold transition ${
+          isInDeck
+            ? 'cursor-not-allowed border border-green-500/40 bg-green-950/30 text-green-300'
+            : 'bg-brand-gold-bright text-neutral-900 hover:bg-amber-300'
+        }`}
+      >
+        {isInDeck ? (
+          <>
+            <Check className="h-5 w-5 shrink-0" aria-hidden strokeWidth={2.25} />
+            已在牌組
+          </>
+        ) : (
+          <>
+            <Plus className="h-5 w-5 shrink-0" aria-hidden strokeWidth={2.25} />
+            加入牌組
+          </>
+        )}
+      </button>
+
+      {cardList.length > 1 ? (
+        <button
+          type="button"
+          onClick={onNext}
+          disabled={!hasNext}
+          className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-white/20 bg-black/40 text-stone-300 transition hover:border-brand-gold hover:text-brand-gold disabled:cursor-not-allowed disabled:opacity-30"
+          aria-label="下一張"
+        >
+          <ChevronRight className="h-6 w-6" aria-hidden strokeWidth={2.25} />
+        </button>
+      ) : null}
+    </>
+  );
 
   return (
     // eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions -- 全螢幕 modal 遮罩點擊關閉
@@ -381,55 +435,17 @@ export default function CardModal({
               </button>
             )}
 
-            <div className="mt-auto flex items-center justify-center gap-3 pt-1">
-              {cardList.length > 1 ? (
-                <button
-                  type="button"
-                  onClick={onPrev}
-                  disabled={!hasPrev}
-                  className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-white/20 bg-black/40 text-stone-300 transition hover:border-brand-gold hover:text-brand-gold disabled:cursor-not-allowed disabled:opacity-30"
-                  aria-label="上一張"
-                >
-                  <ChevronLeft className="h-6 w-6" aria-hidden strokeWidth={2.25} />
-                </button>
-              ) : null}
-
-              <button
-                type="button"
-                onClick={() => onAdd(card)}
-                disabled={isInDeck}
-                className={`inline-flex items-center justify-center gap-2 rounded-full px-8 py-3 text-base font-bold transition ${
-                  isInDeck
-                    ? 'cursor-not-allowed border border-green-500/40 bg-green-950/30 text-green-300'
-                    : 'bg-brand-gold-bright text-neutral-900 hover:bg-amber-300'
-                }`}
-              >
-                {isInDeck ? (
-                  <>
-                    <Check className="h-5 w-5 shrink-0" aria-hidden strokeWidth={2.25} />
-                    已在牌組
-                  </>
-                ) : (
-                  <>
-                    <Plus className="h-5 w-5 shrink-0" aria-hidden strokeWidth={2.25} />
-                    加入牌組
-                  </>
-                )}
-              </button>
-
-              {cardList.length > 1 ? (
-                <button
-                  type="button"
-                  onClick={onNext}
-                  disabled={!hasNext}
-                  className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-white/20 bg-black/40 text-stone-300 transition hover:border-brand-gold hover:text-brand-gold disabled:cursor-not-allowed disabled:opacity-30"
-                  aria-label="下一張"
-                >
-                  <ChevronRight className="h-6 w-6" aria-hidden strokeWidth={2.25} />
-                </button>
-              ) : null}
-            </div>
+            {/* 桌機：動作列維持在右欄底部；手機改用下方固定的動作列 */}
+            <div className="mt-auto hidden items-center justify-center gap-3 pt-1 lg:flex">{actionButtons}</div>
           </div>
+        </div>
+
+        {/* 手機：加入牌組與上一張／下一張固定在彈窗底部，不必捲到最下面才按得到 */}
+        <div
+          data-card-modal-actionbar
+          className="sticky bottom-0 z-20 flex items-center justify-center gap-3 border-t border-white/10 bg-[#171614]/95 px-4 pt-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] backdrop-blur lg:hidden"
+        >
+          {actionButtons}
         </div>
       </div>
     </div>
