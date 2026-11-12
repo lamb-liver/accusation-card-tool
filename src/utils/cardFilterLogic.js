@@ -40,10 +40,11 @@ export function getCardSearchRank(card, searchTerm) {
   const faction = normalizeSearchText(card.faction);
   if (query.length >= 2 && faction.includes(query)) return 5;
 
-  // 系列、種類、符號也比對（「疫與飛升」「魔法」「夜幕」），同樣排在卡名之後、只限兩字以上
+  // 系列、種類、符號也比對（「疫與飛升」「魔法」「夜幕」），同樣排在卡名之後、只限兩字以上。
+  // 只比對開頭：「飛升」是紫靈山的機制，不能因為系列名「疫與飛升」含這兩個字就把整個系列 48 張灌進來
   if (query.length >= 2) {
     const facets = [card.source, card.type, ...(card.symbols ?? [])].map(normalizeSearchText);
-    if (facets.some((facet) => facet && facet.includes(query))) return 5;
+    if (facets.some((facet) => facet && facet.startsWith(query))) return 5;
   }
 
   const effect = normalizeSearchText(card.effect);

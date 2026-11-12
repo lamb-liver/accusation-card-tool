@@ -112,6 +112,12 @@ assert.equal(
   cards.filter((card) => card.source === '疫與飛升').length,
   '疫與飛升 lists the whole series',
 );
+
+// 機制名剛好是系列名的一部分（飛升 ⊂ 疫與飛升）時，只列出效果有該機制的卡，不灌入整個系列
+{
+  const result = filterAndRankCards(cards, '飛升', noFilters);
+  assert(result.length > 0 && result.every((card) => card.effect?.includes('飛升')), '飛升 only lists cards with the mechanic');
+}
 assert(
   filterAndRankCards(cards, '夜幕', noFilters).some((card) => card.symbols?.includes('夜幕') && !card.effect?.includes('夜幕')),
   'symbol search finds cards by symbol',
