@@ -106,10 +106,10 @@ function Card({
 
   const showActionButton = onAdd !== undefined || isInDeck;
 
-  const cardImageAlt =
-    artVariant !== 'main' && hasAlt
-      ? `卡牌「${card.name}」異畫，${card.faction}${card.type}`
-      : `卡牌「${card.name}」，${card.faction}${card.type}`;
+  // 按鈕名稱由可見文字組成並以卡名開頭（WCAG 2.5.3）；查卡格只顯示卡名，補上教團與種類給讀屏
+  const srNameSuffix = `${minimalMeta ? `，${card.faction}${card.type}` : ''}${
+    artVariant !== 'main' && hasAlt ? '（異畫）' : ''
+  }`;
 
   const handleArtPrev = useCallback(
     (e) => {
@@ -140,7 +140,7 @@ function Card({
       <button
         type="button"
         onClick={handleClick}
-        aria-label={`查看卡牌：${card.name}（${card.faction}）`}
+        data-card-open={card.id}
         className={`block w-full cursor-pointer bg-transparent p-0 text-left focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-gold ${
           alignActionBar ? 'min-h-0 flex-1' : compact ? 'shrink-0' : 'min-h-0 flex-1'
         } ${showActionButton ? 'rounded-t-lg' : 'rounded-lg'}`}
@@ -159,7 +159,7 @@ function Card({
                 webpSrcSet={picture.webpSrcSet}
                 avifSrcSet={picture.avifSrcSet}
                 sizes={CARD_GALLERY_SIZES}
-                alt={cardImageAlt}
+                alt=""
                 imgKey={`${card.id}-${artVariant}-${artRev}`}
                 priority={imagePriority}
                 className="card-image-media touch-manipulation select-none"
@@ -205,6 +205,7 @@ function Card({
                 }`}
               >
                 {card.name}
+                <span className="sr-only">{srNameSuffix}</span>
               </p>
             </div>
 
@@ -246,7 +247,8 @@ function Card({
                       {SYMBOL_ICONS[symbol] && (
                         <img
                           src={SYMBOL_ICONS[symbol]}
-                          alt={`符號「${symbol}」圖示`}
+                          alt=""
+                          aria-hidden
                           loading="lazy"
                           decoding="async"
                           className="w-3 h-3 object-contain shrink-0"
