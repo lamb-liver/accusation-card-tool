@@ -1,7 +1,7 @@
 import { mapPublicDeckListRow } from '../_shared/db.js';
 import { PUBLIC_LIST_DEFAULT, PUBLIC_LIST_HARD_CAP } from '../_shared/constants.js';
 import { checkMutatingOrigin } from '../_shared/origin.js';
-import { publicListJsonResponse } from '../_shared/publicListCache.js';
+import { publicListJsonResponse, servePublicGet } from '../_shared/publicListCache.js';
 import { checkRateLimit } from '../_shared/rateLimit.js';
 import { parseLimitParam, readJsonBody, resolvePageQuery } from '../_shared/request.js';
 import { nextCursorFrom } from '../_shared/cursor.js';
@@ -58,7 +58,7 @@ export async function onRequestPost(context) {
   }
 }
 
-export async function onRequestGet(context) {
+async function loadPublicDecks(context) {
   const { request, env } = context;
   const url = new URL(request.url);
   const { requestId, respond } = createResponder(request);
@@ -100,4 +100,8 @@ export async function onRequestGet(context) {
     request,
     requestId,
   );
+}
+
+export function onRequestGet(context) {
+  return servePublicGet(context, () => loadPublicDecks(context));
 }

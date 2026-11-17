@@ -2,11 +2,11 @@ import { mapPublicDeckRow } from '../../_shared/db.js';
 import {
   createResponder,
   errorResponse,
-  jsonResponse,
   runDbQuery,
 } from '../../_shared/response.js';
+import { publicListJsonResponse, servePublicGet } from '../../_shared/publicListCache.js';
 
-export async function onRequestGet(context) {
+async function loadApprovedDeck(context) {
   const { request, env, params } = context;
   const { requestId, respond } = createResponder(request);
   const shareId = params.shareId;
@@ -27,5 +27,9 @@ export async function onRequestGet(context) {
 
   const mapped = mapPublicDeckRow(row);
   if (!mapped) return respond(errorResponse('Internal server error', 500));
-  return respond(jsonResponse(mapped));
+  return publicListJsonResponse(mapped, request, requestId);
+}
+
+export function onRequestGet(context) {
+  return servePublicGet(context, () => loadApprovedDeck(context));
 }
