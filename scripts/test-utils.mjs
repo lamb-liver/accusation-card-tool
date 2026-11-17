@@ -473,4 +473,77 @@ assert(findLookalikeIssues('限ㄧ次').includes('注音符號'), 'zhuyin flagge
 assert(findLookalikeIssues('\u2F00').length > 0, 'kangxi radical flagged');
 assert(findLookalikeIssues('ＣＲＯ').length > 0, 'fullwidth latin flagged');
 
+const { publicListJsonResponse, servePublicGet } = await import('../functions/_shared/publicListCache.js');
+
+{
+  const payload = { decks: [{ share_id: 'abc' }] };
+  const first = await publicListJsonResponse(payload, new Request('https://cards.test/api/decks'), 'req-1');
+  assert.equal(first.status, 200);
+  assert.equal(first.headers.get('Cache-Control'), 'public, max-age=60');
+  const etag = first.headers.get('ETag');
+  assert.equal(typeof etag, 'string');
+  const again = await publicListJsonResponse(
+    payload,
+    new Request('https://cards.test/api/decks', { headers: { 'If-None-Match': etag } }),
+    'req-2',
+  );
+  assert.equal(again.status, 304);
+  assert.equal(again.headers.get('ETag'), etag);
+}
+
+{
+  const stored = new Map();
+  globalThis.caches = {
+    default: {
+      async match(request) {
+        const hit = stored.get(request.url);
+        return hit ? hit.clone() : undefined;
+      },
+      async put(request, response) {
+        stored.set(request.url, response);
+      },
+    },
+  };
+  let loads = 0;
+  const context = {
+    request: new Request('https://cards.test/api/decks/one'),
+    waitUntil(task) { return task; },
+  };
+  const first = await servePublicGet(context, async () => {
+    loads += 1;
+    return publicListJsonResponse({ share_id: 'one' }, context.request, 'req-3');
+  });
+  assert.equal(first.status, 200);
+  assert.equal(first.headers.get('Cache-Control'), 'public, max-age=60');
+  const second = await servePublicGet(context, async () => {
+    loads += 1;
+    throw new Error('cached public get should skip the loader');
+  });
+  assert.equal(second.status, 200);
+  assert.equal(loads, 1);
+  const etag = first.headers.get('ETag');
+  const notModified = await servePublicGet({
+    request: new Request('https://cards.test/api/decks/one', { headers: { 'If-None-Match': etag } }),
+  }, async () => {
+    loads += 1;
+    throw new Error('conditional public get should skip the loader');
+  });
+  assert.equal(notModified.status, 304);
+  assert.equal(loads, 1);
+
+  let misses = 0;
+  const missing = {
+    request: new Request('https://cards.test/api/decks/missing'),
+    waitUntil(task) { return task; },
+  };
+  const loadMiss = async () => {
+    misses += 1;
+    return new Response(JSON.stringify({ error: 'Not found' }), { status: 404 });
+  };
+  assert.equal((await servePublicGet(missing, loadMiss)).status, 404);
+  assert.equal((await servePublicGet(missing, loadMiss)).status, 404);
+  assert.equal(misses, 2, 'errors stay uncached');
+  delete globalThis.caches;
+}
+
 console.log('OK: utility tests passed');
