@@ -156,7 +156,7 @@ Run `npm run d1:migrations:apply:remote` after the first deployment or a schema 
    Edit `src/rules/` → `npm run test:rule-engine`
 
 4. **FAQ copy**  
-   Run `npm run sync:qa` to update from Google Sheets. `src/data/qaData.js` is generated output and should not be edited directly; fix `scripts/sync-qa.mjs` or `scripts/lib/qa-module.mjs` when output formatting is wrong.
+   Run `npm run sync:qa` to update from Google Sheets. The sheet list lives in `scripts/lib/qa-sheets.mjs` and must be updated when a faction is added; `validate:repo` checks this in PR CI. `src/data/qaData.js` is generated output and should not be edited directly; fix `scripts/sync-qa.mjs` or `scripts/lib/qa-module.mjs` when output formatting is wrong.
 
 ## License & disclaimer
 

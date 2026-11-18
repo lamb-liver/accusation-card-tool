@@ -169,7 +169,7 @@ accusation-card-tool/
 
 首次部署或 schema 更新後執行 `npm run d1:migrations:apply:remote`。Cloudflare Pages 的 Git integration 是唯一部署路徑；不要另建只含靜態輸出的 artifact 或第二個部署 repo。
 
-對 `main` 的 pull request 由 [Validate pull request](.github/workflows/validate-pr.yml) 以 read-only repository 權限執行 `npm ci`、`npm run validate:repo` 與 `npm run build:ci`。每週 [Sync QA Weekly](.github/workflows/sync-qa-weekly.yml) 只負責同步 generated QA，兩者不共用 merge gate 或部署職責。
+對 `main` 的 pull request 由 [Validate pull request](.github/workflows/validate-pr.yml) 以 read-only repository 權限執行 `npm ci`、`npm run validate:repo` 與 `npm run build:ci`。`validate:repo` 會檢查 QA 分頁清單是否涵蓋全部教團，避免只改 `FACTION_ORDER`、漏加分頁。每週 [Sync QA Weekly](.github/workflows/sync-qa-weekly.yml) 只負責同步 generated QA 並直接推 `main`；失敗時會開 GitHub issue（或在既有 issue 下留言），兩者不共用 merge gate 或部署職責。
 
 `dist/` 已在 `.gitignore`，不應 commit。
 
@@ -191,7 +191,7 @@ accusation-card-tool/
    > `validate:repo` 的 `check:display-glyphs` 會擋下缺字。
 
 4. **常見問題**  
-   執行 `npm run sync:qa` 從 Google Sheets 更新；`src/data/qaData.js` 是 generated output，不應手動編輯。若輸出格式有問題，修正 `scripts/sync-qa.mjs`／`scripts/lib/qa-module.mjs`，並以 `npm run check:content` 確認 production 資料沒有洩漏 template 或 parser 訊息
+   執行 `npm run sync:qa` 從 Google Sheets 更新；分頁清單在 `scripts/lib/qa-sheets.mjs`，新增教團時需一併加入。`src/data/qaData.js` 是 generated output，不應手動編輯。若輸出格式有問題，修正 `scripts/sync-qa.mjs`／`scripts/lib/qa-module.mjs`，並以 `npm run check:content` 確認 production 資料沒有洩漏 template 或 parser 訊息
 
 ## 授權與免責
 

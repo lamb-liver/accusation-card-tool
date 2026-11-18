@@ -8,7 +8,7 @@ const FACTION_FILTER_LABELS = {
 /**
  * 篩選選項的統一資料源。
  * Native select intentionally uses text labels only; card/symbol art lives in the card views.
- * 教團順序見 factionOrder.js；新增教團時更新 FACTION_ORDER、試算表 QA 分頁，再 npm run sync:qa。
+ * 教團順序見 factionOrder.js；新增教團時更新 FACTION_ORDER、試算表 QA 分頁與 scripts/lib/qa-sheets.mjs 的 SHEETS，再 npm run sync:qa。
  */
 export const FILTER_OPTIONS = {
   faction: [

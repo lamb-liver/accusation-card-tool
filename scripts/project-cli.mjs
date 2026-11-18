@@ -140,6 +140,7 @@ async function runValidateRepo() {
     ['check:generated', () => runNodeScript('check-generated.mjs')],
     ['check:lockfile', () => runNodeScript('check-lockfile.mjs')],
     ['check:deploy-flow', () => runNodeScript('check-deploy-flow.mjs')],
+    ['check:qa-sheets', () => runNodeScript('check-qa-sheets.mjs')],
     ['lint', () => runPackageBin('eslint', 'bin/eslint.js', ['.'])],
     ['test:rule-engine', () => runNodeScript('test-rule-engine.mjs')],
     ['test:card-catalog', () => runNodeScript('test-card-catalog.mjs')],
@@ -147,6 +148,7 @@ async function runValidateRepo() {
     ['test:deck', () => runNodeScript('test-deck.mjs')],
     ['test:clock', () => runNodeScript('test-clock.mjs')],
     ['test:utils', () => runNodeScript('test-utils.mjs')],
+    ['test:qa-sheets', () => runNodeScript('test-qa-sheets.mjs')],
     ['test:share-wall', () => runShareWallTests()],
   ];
   for (const [name, check] of checks) {
