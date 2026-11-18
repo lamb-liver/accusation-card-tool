@@ -8,6 +8,7 @@ on:
 
 permissions:
   contents: write
+  issues: write
 
 concurrency:
   group: sync-qa-weekly
@@ -66,3 +67,55 @@ jobs:
           git add src/data/qaData.js
           git commit -m 'chore: sync QA from Google Sheets'
           git push
+
+  # 同步仍直接推 main；失敗時開 issue（或在既有 issue 留言），避免排程紅燈沒人注意到
+  report-failure:
+    name: Report workflow failure
+    if: failure()
+    needs: sync-qa
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+    steps:
+      - name: Open or comment on QA sync failure issue
+        uses: actions/github-script@v8
+        with:
+          script: |
+            const title = '週排程：QA 同步失敗';
+            const marker = '<!-- qa-sync-weekly-failure -->';
+            const runUrl = `${process.env.GITHUB_SERVER_URL}/${process.env.GITHUB_REPOSITORY}/actions/runs/${process.env.GITHUB_RUN_ID}`;
+            const body = [
+              marker,
+              '每週 QA 同步（Sync QA Weekly）失敗，尚未寫入 `main`。',
+              '',
+              `執行紀錄：${runUrl}`,
+              '',
+              '修復後關閉此 issue 即可。若尚未修復，下次失敗會在此留言，不會另開新 issue。',
+            ].join('\n');
+
+            const { data: issues } = await github.rest.issues.listForRepo({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              state: 'open',
+              per_page: 100,
+            });
+            const existing = issues.find((issue) => !issue.pull_request && (
+              issue.title === title || (issue.body && issue.body.includes(marker))
+            ));
+            if (existing) {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: existing.number,
+                body,
+              });
+              core.info(`已在既有 issue #${existing.number} 留言`);
+            } else {
+              const created = await github.rest.issues.create({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                title,
+                body,
+              });
+              core.info(`已開 issue #${created.data.number}`);
+            }
