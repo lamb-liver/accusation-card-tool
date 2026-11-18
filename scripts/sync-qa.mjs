@@ -5,45 +5,12 @@ import { fileURLToPath } from 'url';
 import { formatQaModule, parseQaModule } from './lib/qa-module.mjs';
 import { fixLookalikeText } from './lib/text-lint.mjs';
 import { QA_PLACEHOLDER, isPlaceholderOnlyCategory } from '../src/constants/qaPlaceholder.js';
-import { FACTION_ORDER } from '../src/constants/factionOrder.js';
+import { SHEETS, assertFactionCoverage } from './lib/qa-sheets.mjs';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
-const SHEETS = [
-  { label: '通用規則', url: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSPgmF_9uiGkG5t_1GxEnEBD3GSVFvj1MYTaXtKjLjIEa_XqIQcwrWpY9DHELim8zOhVkKcKCxIpSh8/pub?gid=1169306065&single=true&output=csv' },
-  { label: '白狐神社', url: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSPgmF_9uiGkG5t_1GxEnEBD3GSVFvj1MYTaXtKjLjIEa_XqIQcwrWpY9DHELim8zOhVkKcKCxIpSh8/pub?gid=1973167497&single=true&output=csv' },
-  { label: '鴉教團', url: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSPgmF_9uiGkG5t_1GxEnEBD3GSVFvj1MYTaXtKjLjIEa_XqIQcwrWpY9DHELim8zOhVkKcKCxIpSh8/pub?gid=1253175233&single=true&output=csv' },
-  { label: '瘋人院', url: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSPgmF_9uiGkG5t_1GxEnEBD3GSVFvj1MYTaXtKjLjIEa_XqIQcwrWpY9DHELim8zOhVkKcKCxIpSh8/pub?gid=332236121&single=true&output=csv' },
-  { label: '門教團', url: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSPgmF_9uiGkG5t_1GxEnEBD3GSVFvj1MYTaXtKjLjIEa_XqIQcwrWpY9DHELim8zOhVkKcKCxIpSh8/pub?gid=2076037145&single=true&output=csv' },
-  { label: '逐光者', url: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSPgmF_9uiGkG5t_1GxEnEBD3GSVFvj1MYTaXtKjLjIEa_XqIQcwrWpY9DHELim8zOhVkKcKCxIpSh8/pub?gid=719906907&single=true&output=csv' },
-  { label: '禁忌廚房', url: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSPgmF_9uiGkG5t_1GxEnEBD3GSVFvj1MYTaXtKjLjIEa_XqIQcwrWpY9DHELim8zOhVkKcKCxIpSh8/pub?gid=1316542157&single=true&output=csv' },
-  // VIR／CEN 分頁：卡號前綴 vir = 疫病中心、cen = 紫靈山（對照 public/cards.json）
-  { label: '疫病中心', url: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSPgmF_9uiGkG5t_1GxEnEBD3GSVFvj1MYTaXtKjLjIEa_XqIQcwrWpY9DHELim8zOhVkKcKCxIpSh8/pub?gid=444439601&single=true&output=csv' },
-  { label: '紫靈山', url: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSPgmF_9uiGkG5t_1GxEnEBD3GSVFvj1MYTaXtKjLjIEa_XqIQcwrWpY9DHELim8zOhVkKcKCxIpSh8/pub?gid=703670617&single=true&output=csv' },
-  { label: '放逐者', url: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSPgmF_9uiGkG5t_1GxEnEBD3GSVFvj1MYTaXtKjLjIEa_XqIQcwrWpY9DHELim8zOhVkKcKCxIpSh8/pub?gid=333010439&single=true&output=csv' },
-];
-
 const OUTPUT_PATH = resolve(__dirname, '../src/data/qaData.js');
 const PLACEHOLDER = QA_PLACEHOLDER;
-/** 非教團的 QA 專屬分類，不需對應 FACTION_ORDER */
-const NON_FACTION_CATEGORIES = new Set(['通用規則']);
-
-/** 新增教團時若忘了建 QA 分頁，卡片彈窗的「查看此教團常見問題」會靜默消失 */
-function assertFactionCoverage() {
-  const labels = new Set(SHEETS.map((sheet) => sheet.label));
-  const missing = FACTION_ORDER.filter((faction) => !labels.has(faction));
-  if (missing.length > 0) {
-    throw new Error(
-      `SHEETS 缺少教團分頁：${missing.join('、')}。新增教團時需一併加入 QA 分頁設定`,
-    );
-  }
-  const unknown = SHEETS.map((s) => s.label).filter(
-    (label) => !FACTION_ORDER.includes(label) && !NON_FACTION_CATEGORIES.has(label),
-  );
-  if (unknown.length > 0) {
-    throw new Error(`SHEETS 含未知分類：${unknown.join('、')}`);
-  }
-}
 
 async function fetchCSV(url) {
   const res = await fetch(url);
